@@ -23,7 +23,7 @@ Implemented in this change. Everlook modules and other addons use `Everlook.isla
 
 Messages have a source, optional source-scoped key, category, text, and banner duration. The island owns copied records, caps its history, ignores notices while disabled, and invalidates superseded timeouts. Notification data remains in memory. Producer errors go to WoW's error handler with event context.
 
-See [the notification API](smart-island-notifications.md) for the complete current contract. This interface supports in-client addon callers. Desktop or web feeds would require a separate transport design.
+See [the notification API](smart-island-notifications.md) for the complete current contract. This interface is for addons in the client.
 
 ## 2. Make the surface readable
 

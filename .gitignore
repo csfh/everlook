@@ -3,17 +3,11 @@
 .vscode
 .zed
 .env
-.env.backup
-.env.production
 .env.local
 node_modules
 .playwright-mcp
 /.worktrees/
-vendor
 dist
-/auth.json
 .claude/
 __pycache__/
 luac.out
-
-/output/

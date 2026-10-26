@@ -5,7 +5,7 @@ description: >-
   guessing UI geometry or Settings-panel behavior. Use when building or
   fixing addon patterns such as minimap buttons, MinimapCluster parenting,
   frame strata, Settings.RegisterVerticalLayoutCategory, Settings.OpenToCategory,
-  HideUIPanel, or when the user mentions Wowhead, Questie, Leatrix, TomTom,
+  HideUIPanel, or when the user mentions Questie, Leatrix, TomTom,
   LibDBIcon, or wow-ui-source.
 ---
 
@@ -19,7 +19,7 @@ Read a current retail implementation first, then reimplement in this repo's styl
 1. **Blizzard FrameXML** — [Gethe/wow-ui-source](https://github.com/Gethe/wow-ui-source). This is how the client parents `Minimap`, `MinimapCluster`, `SettingsPanel`, and `HideUIPanel`.
 2. **API page** — [warcraft.wiki.gg](https://warcraft.wiki.gg) for the exact function (`Settings.OpenToCategory`, `RegisterAddOnSetting`, `CreateFrame`).
 3. **Two current retail addons** that already ship the pattern. Prefer first-party Lua over Ace wrappers when this repo forbids embeds.
-4. **Local install** — `Interface/AddOns/<Name>` on this machine (Wowhead Looter is often only here).
+4. **Local install** — `Interface/AddOns/<Name>` on this machine.
 5. Invent only after those are missing or contradict each other. State the conflict.
 
 Classic backports (3.3.5, WotLK forks, "PA-" ports) are not retail. Reject a hit whose `.toc` `## Interface:` is below `100000` unless the task is Classic.
@@ -47,7 +47,7 @@ rg -n "OpenToCategory|MinimapCluster|LibDBIcon|RegisterVerticalLayoutCategory" \
   "$WOW/Interface/AddOns" -g '*.lua'
 ```
 
-Wowhead Looter is maintained by the Wowhead Client and is often **not** on GitHub. Read the copy under `Interface/AddOns` if present. Do not treat CurseForge zip comments as source.
+Do not treat CurseForge zip comments as source.
 
 ## Canonical homes
 
@@ -58,7 +58,6 @@ Read [sources.md](sources.md) for org/repo URLs. Default set:
 | Blizzard `wow-ui-source` | Minimap cluster, Settings panel, `HideUIPanel` | Branch must match the API generation |
 | **Leatrix Plus / Leatrix Maps** | Vanilla Lua, minimap button, QoL toggles | Official org is `leatrix`, not Classic forks |
 | **Questie** | Minimap button show/hide, options entry points | AceConfig / LibDBIcon — extract behavior, do not import Ace |
-| **Wowhead Looter** | Companion/collector Settings category | Local install; closed distribution |
 | TomTom | Arrow + minimap button placement | Mixed Classic/retail branches |
 | LibDBIcon-1.0 | De-facto rim angle/radius for round minimaps | LibStub library — copy the **formula**, not the embed |
 

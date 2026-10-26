@@ -1,25 +1,24 @@
 # Everlook
 
-A World of Warcraft quality-of-life addon, the harness that runs it outside the game, and its site.
+Quality-of-life addons for World of Warcraft, and the small site that lists them.
 
 ```
-addon/    WoW addon and its module addons (Interface/AddOns/Everlook*)
-harness/  Lua 5.1 host (Rust) that runs the addon files
+addon/    The addons: the Everlook core and its Everlook_<Name> modules, with their tests, release scripts and harness
 www/      Static site (Vite) for Cloudflare Pages. Output is www/dist
 ```
 
-The addon does not collect world data, sign uploads, or keep a journey. An older saved file loses those keys on load.
+Everlook tweaks the default interface. Each module starts off, and you turn on the ones you want from the Everlook settings page. It does not collect or upload data. An older saved file loses the keys the old data collection wrote on load.
 
 ## Addon
 
 ```sh
-lua5.1 addon/tests/run.lua
-just test harness
+just test addon     # Lua suite, script and luac checks
+just test harness   # the addon files on the harness (addon/harness, Rust)
 ```
 
 `just addon sync` links the addon folders into the game; it reads `EVERLOOK_ADDONS_DIR` from the environment or `.env.local`. See `addon/README.md` and `addon/RELEASING.md`.
 
-Releases are GitHub Releases tagged `addon-v<version>`. A push to `main` that changes `addon/**` runs the addon tests and, when the commits ask for one, publishes that release.
+Releases are GitHub Releases tagged `addon-v<version>`. A push to `main` that changes `addon/**` runs the addon tests and, when the commits ask for one, publishes that release. A commit that touches only `addon/harness` never releases.
 
 ## Site
 
@@ -32,4 +31,4 @@ Cloudflare Pages:
 | Output directory | `dist` |
 | Node.js | 22 |
 
-`www/wrangler.toml` sets `pages_build_output_dir` only. Nothing here creates a Cloudflare project or a custom domain.
+The page lists the modules from their TOC files at build time, so a new module shows up on the next build. `www/wrangler.toml` sets `pages_build_output_dir` only. Nothing here creates a Cloudflare project or a custom domain.

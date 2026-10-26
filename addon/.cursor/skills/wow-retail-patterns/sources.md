@@ -18,7 +18,6 @@ Prefer the official org. Classic forks and 3.3.5 ports are listed only so they c
 | Leatrix Plus | https://github.com/leatrix (also CurseForge “Leatrix Plus”) | `Sattva-108/Leatrix_Plus`, `Xurkon/PA-Leatrix_Plus` |
 | Leatrix Maps | same `leatrix` org / CurseForge “Leatrix Maps” | Classic-only maps ports |
 | Questie | https://github.com/Questie/Questie | old Classic-only tags when you need Mainline Settings |
-| Wowhead Looter | local `Interface/AddOns` after Wowhead Client install; https://www.wowhead.com/client | random “wowhead quick link” addons unless that *is* the pattern |
 | TomTom | https://github.com/jlamkins/TomTom | stale forks |
 | LibDBIcon-1.0 | WowAce / the LibDBIcon repo shipped inside current retail addons (`Libs/LibDBIcon-1.0`) | copy-paste of the whole library into Everlook |
 
@@ -33,4 +32,4 @@ Prefer the official org. Classic forks and 3.3.5 ports are listed only so they c
 
 ## Local Wow install (this machine)
 
-Steam prefix and Battle.net Wine prefixes often contain a live `Interface/AddOns` tree. Use those when GitHub is behind or Wowhead Looter has no repo.
+Steam prefix and Battle.net Wine prefixes often contain a live `Interface/AddOns` tree. Use those when GitHub is behind.

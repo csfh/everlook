@@ -60,7 +60,7 @@ The boss emote frame is the exception. In 12.0 it receives its messages through 
 
 ## Tooltips
 
-`TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, callback)` calls `callback(tooltip, data)`. The types used are `Item` (0), `Spell` (1) and `Unit` (2). The site's pages take the game id: `/database/items/{id}`, `/database/spells/{id}`, `/database/npcs/{id}`, `/database/objects/{id}` and `/quests/{id}`.
+`TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, callback)` calls `callback(tooltip, data)`. The types used are `Item` (0), `Spell` (1) and `Unit` (2).
 
 ## From the removed replacement UI
 
