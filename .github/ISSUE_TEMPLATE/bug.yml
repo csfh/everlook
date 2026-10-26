@@ -1,0 +1,36 @@
+name: Something is broken
+description: A Lua error, a window that is wrong, or a module that does not do what it says.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened
+      description: What you saw, in your own words. Which module is it, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to make it happen again
+      description: The steps, starting from a fresh login if that matters.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Everlook version
+      description: The version on the Everlook row in the addons list, and the client build if you know it.
+    validations:
+      required: true
+  - type: textarea
+    id: errors
+    attributes:
+      label: Lua errors, if there are any
+      description: Turn them on with `/console scriptErrors 1`, and paste the whole message.
+      render: text
+  - type: input
+    id: credit
+    attributes:
+      label: Name to credit in the release notes
+      description: Optional. If this is fixed, the release notes thank the name you give here.

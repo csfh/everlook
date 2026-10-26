@@ -1,0 +1,22 @@
+## Interface: 16001
+## Title: |cffffd100Everlook|r
+## Notes: Quality-of-life tweaks for World of Warcraft, and the settings page for its module addons.
+## Author: Christoffer Hallas
+## Version: 1.0.0
+## SavedVariables: EverlookDB
+## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
+
+world.lua
+errors.lua
+trace.lua
+sched.lua
+combat.lua
+migrations.lua
+module.lua
+overlaps.lua
+install.lua
+tooltips.lua
+blizzard_settings.lua
+sched_page.lua
+settings.lua
+minimap.lua

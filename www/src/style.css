@@ -1,0 +1,132 @@
+:root {
+  color-scheme: dark;
+  --bg: #16130f;
+  --bg-raised: #221c16;
+  --ink: #f4efe6;
+  --muted: #c4b6a2;
+  --line: #3a3126;
+  --gold: #ffd100;
+  --island: #ad76ef;
+  --focus: #fff4c2;
+  font-family: "Iowan Old Style", Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: 0.5rem;
+  transform: translateY(-150%);
+  background: var(--gold);
+  color: #1a1408;
+  padding: 0.4rem 0.7rem;
+}
+
+.skip:focus { transform: none; }
+
+.wrap {
+  width: min(42rem, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 3.5rem 0 4rem;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2.4rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.version {
+  margin: 0.35rem 0 0;
+  color: var(--gold);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lede {
+  margin: 1.25rem 0 0;
+  font-size: 1.15rem;
+  max-width: 38rem;
+}
+
+.downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin-top: 1.5rem;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.downloads a {
+  color: #1a1408;
+  background: var(--gold);
+  text-decoration: none;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  font-weight: 650;
+}
+
+.downloads a.quiet {
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line);
+  font-weight: 550;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+section { margin-top: 2.75rem; }
+
+h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.section-note {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.92rem;
+}
+
+ul.modules {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+ul.modules li {
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+ul.modules h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-weight: 650;
+}
+
+ul.modules p {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.98rem;
+}
+
+.island h3 { color: var(--island); }

@@ -1,0 +1,42 @@
+name: release-tooling
+
+on:
+  pull_request:
+    paths:
+      - 'addon/scripts/auto_release.py'
+      - 'addon/scripts/auto_release_test.py'
+      - 'addon/scripts/push_release_commit.sh'
+      - 'addon/scripts/push_release_commit_test.sh'
+      - '.github/workflows/release-tooling.yml'
+      - '.github/workflows/addon-release.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'addon/scripts/auto_release.py'
+      - 'addon/scripts/auto_release_test.py'
+      - 'addon/scripts/push_release_commit.sh'
+      - 'addon/scripts/push_release_commit_test.sh'
+      - '.github/workflows/release-tooling.yml'
+      - '.github/workflows/addon-release.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: release-tooling-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  release-tooling:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: addon
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: python3 scripts/auto_release_test.py
+      - run: bash scripts/push_release_commit_test.sh

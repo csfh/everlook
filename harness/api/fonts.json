@@ -1,0 +1,4179 @@
+{
+  "AchievementCriteriaFont": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "AchievementDateFont": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": "RIGHT",
+    "outline": null
+  },
+  "AchievementDescriptionFont": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": "CENTER",
+    "outline": null
+  },
+  "AchievementFont_Small": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "AchievementPointsFont": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": "CENTER",
+    "outline": null
+  },
+  "AchievementPointsFontSmall": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "CENTER",
+    "outline": null
+  },
+  "ArtifactAppearanceSetHighlightFont": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.TTF",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "ArtifactAppearanceSetNormalFont": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.TTF",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "BossEmoteNormalHuge": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 25.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "CharacterCreateTooltipFont": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "ChatBubbleFont": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 13.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "ChatFontNormal": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "ChatFontSmall": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "CombatLogFont": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "CombatTextFont": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 64.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "CombatTextFontOutline": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 64.0,
+    "justify_h": null,
+    "outline": "THICK"
+  },
+  "CommentatorCCFont": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 32.0,
+    "justify_h": null,
+    "outline": "THICK"
+  },
+  "CommentatorDampeningFont": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "CommentatorFontMedium": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "CommentatorFontSmall": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "CommentatorTeamNameFont": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "CommentatorTeamScoreFont": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "CommentatorVictoryFanfare": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 120.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "CommentatorVictoryFanfareTeam": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 72.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "ConsoleFontNormal": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "ConsoleFontSmall": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "CoreAbilityFont": {
+    "color": [
+      0.1,
+      0.1,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 32.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "DestinyFontHuge": {
+    "color": [
+      0.1,
+      0.1,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 32.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "DestinyFontLarge": {
+    "color": [
+      0.1,
+      0.1,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "DestinyFontMed": {
+    "color": [
+      0.1,
+      0.1,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "DialogButtonHighlightText": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "DialogButtonNormalText": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "ErrorFont": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Fancy12Font": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Fancy14Font": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Fancy16Font": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Fancy18Font": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Fancy20Font": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.TTF",
+    "height": 20.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Fancy22Font": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 22.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Fancy24Font": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.TTF",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Fancy27Font": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.TTF",
+    "height": 27.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Fancy30Font": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.TTF",
+    "height": 30.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Fancy32Font": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.TTF",
+    "height": 32.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Fancy36Font": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.TTF",
+    "height": 36.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Fancy40Font": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.TTF",
+    "height": 40.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Fancy48Font": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.TTF",
+    "height": 48.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "FocusFontSmall": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "FriendsFont_11": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 11.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "FriendsFont_Large": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "FriendsFont_Normal": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "FriendsFont_Small": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "FriendsFont_UserText": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 11.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game10Font_o1": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "Game11Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 11.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game11Font_Shadow": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 11.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game11Font_o1": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 11.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "Game120Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 120.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game12Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game12Font_o1": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "Game13Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 13.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game13FontShadow": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 13.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game13Font_o1": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 13.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "Game15Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game15Font_Shadow": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game15Font_o1": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "Game16Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game17Font_Shadow": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 17.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game18Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game19Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 19.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game20Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 20.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game21Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 21.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game22Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 22.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game24Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game27Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 27.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game30Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 30.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game32Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 32.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game32Font_Shadow2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 32.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game36Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 36.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game36Font_Shadow2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 36.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game40Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 40.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game40Font_Shadow2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 40.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game42Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 42.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game46Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 46.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game46Font_Shadow2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 46.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game48Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 48.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game48FontShadow": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 48.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game52Font_Shadow2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 52.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game58Font_Shadow2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 58.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game60Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 60.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game69Font_Shadow2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 69.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game72Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 72.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Game72Font_Shadow": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 72.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFont72Highlight": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 72.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFont72HighlightShadow": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 72.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFont72Normal": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 72.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFont72NormalShadow": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.ttf",
+    "height": 72.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontBlack": {
+    "color": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontBlackMedium": {
+    "color": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontBlackSmall": {
+    "color": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontBlackSmall2": {
+    "color": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 11.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontBlackTiny": {
+    "color": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 9.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontBlackTiny2": {
+    "color": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 8.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontDarkGraySmall": {
+    "color": [
+      0.35,
+      0.35,
+      0.35,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontDisable": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontDisableHuge": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 20.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontDisableLarge": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontDisableLeft": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontDisableMed2": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontDisableMed3": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontDisableOutline22": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 22.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontDisableSmall": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontDisableSmall2": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 11.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontDisableSmallLeft": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontDisableTiny": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 9.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontDisableTiny2": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 8.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontGreen": {
+    "color": [
+      0.1,
+      1.0,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontGreenLarge": {
+    "color": [
+      0.1,
+      1.0,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontGreenSmall": {
+    "color": [
+      0.1,
+      1.0,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontHighlight": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontHighlightCenter": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "CENTER",
+    "outline": null
+  },
+  "GameFontHighlightExtraSmall": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontHighlightExtraSmallLeft": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontHighlightExtraSmallLeftTop": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontHighlightHuge": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 20.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontHighlightHuge2": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontHighlightHugeOutline": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 20.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontHighlightLarge": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontHighlightLarge2": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontHighlightLeft": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontHighlightMed2": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontHighlightMed2Outline": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontHighlightMedium": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontHighlightOutline": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontHighlightOutline22": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 22.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontHighlightRight": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "RIGHT",
+    "outline": null
+  },
+  "GameFontHighlightShadowHuge2": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontHighlightShadowOutline22": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 22.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontHighlightSmall": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontHighlightSmall2": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 11.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontHighlightSmallLeft": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontHighlightSmallLeftTop": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontHighlightSmallOutline": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontHighlightSmallRight": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": "RIGHT",
+    "outline": null
+  },
+  "GameFontHighlight_NoShadow": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormal": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalHuge": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 20.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalHuge2": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalHuge2Outline": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontNormalHuge3": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 25.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalHuge3Outline": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 25.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontNormalHuge4": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 27.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalHuge4Outline": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 27.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontNormalHugeBlack": {
+    "color": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 20.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalHugeOutline": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 20.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontNormalLarge": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalLarge2": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalLargeLeft": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontNormalLargeLeftTop": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontNormalLargeOutline": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontNormalLeft": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontNormalLeftBottom": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontNormalLeftGreen": {
+    "color": [
+      0.0,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontNormalLeftGrey": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontNormalLeftLightBlue": {
+    "color": [
+      0.53,
+      0.67,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontNormalLeftLightGreen": {
+    "color": [
+      0.25,
+      0.75,
+      0.25,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontNormalLeftLightGrey": {
+    "color": [
+      0.6,
+      0.6,
+      0.6,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontNormalLeftOrange": {
+    "color": [
+      1.0,
+      0.5,
+      0.25,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontNormalLeftRed": {
+    "color": [
+      0.9,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontNormalLeftYellow": {
+    "color": [
+      1.0,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontNormalMed1": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 13.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalMed2": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalMed2Outline": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontNormalMed3": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalMed3Outline": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontNormalOutline": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontNormalOutline22": {
+    "color": [
+      1.0,
+      0.78,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 22.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontNormalShadowHuge2": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalShadowOutline22": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 22.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontNormalSmall": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalSmall2": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 11.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalSmallBattleNetBlueLeft": {
+    "color": [
+      0.51,
+      0.773,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontNormalSmallLeft": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameFontNormalSmallOutline": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontNormalTiny": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 9.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalTiny2": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 8.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalWTF2": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 36.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontNormalWTF2Outline": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 36.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GameFontNormal_NoShadow": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontRed": {
+    "color": [
+      1.0,
+      0.1,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontRedLarge": {
+    "color": [
+      1.0,
+      0.1,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontRedSmall": {
+    "color": [
+      1.0,
+      0.1,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontWhite": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontWhiteLarge": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontWhiteSmall": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontWhiteTiny": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 9.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFontWhiteTiny2": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 8.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameFont_Gigantic": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 32.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameNormalNumberFont": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameTooltipHeader": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "GameTooltipHeaderText": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameTooltipText": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GameTooltipTextSmall": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "GlueFontDisable": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GlueFontDisableExtraSmall": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GlueFontDisableLarge": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GlueFontHighlight": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GlueFontHighlightExtraSmall": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GlueFontHighlightLarge": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GlueFontNormal": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GlueFontNormalExtraSmall": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "GlueFontNormalLarge": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "IMEHighlight": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "IMENormal": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "InvoiceFont_Med": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "InvoiceFont_Small": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "InvoiceTextFontNormal": {
+    "color": [
+      0.18,
+      0.12,
+      0.06,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "InvoiceTextFontSmall": {
+    "color": [
+      0.18,
+      0.12,
+      0.06,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "ItemTextFontNormal": {
+    "color": [
+      0.18,
+      0.12,
+      0.06,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 15.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "LFGActivityEntry": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "LFGActivityEntryDifficult": {
+    "color": [
+      1.0,
+      0.5,
+      0.25,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "LFGActivityEntryTrivial": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "LFGActivityHeader": {
+    "color": [
+      0.7,
+      0.7,
+      0.7,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "MailFont_Large": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "MailTextFontNormal": {
+    "color": [
+      0.18,
+      0.12,
+      0.06,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 15.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "MissionCombatTextFontOutline": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 36.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "MovieSubtitleFont": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 22.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "NewSubSpellFont": {
+    "color": [
+      0.82,
+      0.7,
+      0.54,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number11Font": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 11.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number11FontWhite": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 11.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number12Font": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number12FontOutline": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "Number12Font_o1": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "Number13Font": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 13.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number13FontGray": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 13.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number13FontRed": {
+    "color": [
+      1.0,
+      0.1,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 13.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number13FontWhite": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 13.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number13FontYellow": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 13.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number14FontGray": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number14FontGreen": {
+    "color": [
+      0.1,
+      1.0,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number14FontRed": {
+    "color": [
+      1.0,
+      0.1,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number14FontWhite": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number15Font": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number15FontWhite": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number16Font": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number18Font": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Number18FontWhite": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "NumberFontNormal": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalGray": {
+    "color": [
+      0.6,
+      0.6,
+      0.6,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalHuge": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\skurri.ttf",
+    "height": 30.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalLarge": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalLargeRight": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 16.0,
+    "justify_h": "RIGHT",
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalLargeRightGray": {
+    "color": [
+      0.6,
+      0.6,
+      0.6,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 16.0,
+    "justify_h": "RIGHT",
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalLargeRightRed": {
+    "color": [
+      1.0,
+      0.1,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 16.0,
+    "justify_h": "RIGHT",
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalLargeRightYellow": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 16.0,
+    "justify_h": "RIGHT",
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalLargeYellow": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalRight": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": "RIGHT",
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalRightGray": {
+    "color": [
+      0.6,
+      0.6,
+      0.6,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": "RIGHT",
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalRightGreen": {
+    "color": [
+      0.1,
+      1.0,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": "RIGHT",
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalRightRed": {
+    "color": [
+      1.0,
+      0.1,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": "RIGHT",
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalRightYellow": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": "RIGHT",
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalSmall": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalSmallGray": {
+    "color": [
+      0.6,
+      0.6,
+      0.6,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "NumberFontNormalYellow": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "NumberFontSmallBattleNetBlueLeft": {
+    "color": [
+      0.51,
+      0.773,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "NumberFontSmallWhiteLeft": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "NumberFontSmallYellowLeft": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "NumberFont_GameNormal": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "NumberFont_Normal_Med": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "NumberFont_OutlineThick_Mono_Small": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "NumberFont_Outline_Huge": {
+    "color": null,
+    "font": "Fonts\\skurri.ttf",
+    "height": 30.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "NumberFont_Outline_Large": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "NumberFont_Outline_Med": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "NumberFont_Shadow_Large": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 20.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "NumberFont_Shadow_Med": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "NumberFont_Shadow_Small": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "NumberFont_Shadow_Tiny": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "NumberFont_Small": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "ObjectiveFont": {
+    "color": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "OptionsFontHighlight": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "OptionsFontHighlightSmall": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "OptionsFontLarge": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "OptionsFontLeft": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "OptionsFontSmall": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "OrderHallTalentRowFont": {
+    "color": [
+      0.9,
+      0.8,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "PVPInfoTextFont": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 22.0,
+    "justify_h": null,
+    "outline": "THICK"
+  },
+  "PriceFont": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "PriceFontGray": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "PriceFontGreen": {
+    "color": [
+      0.1,
+      1.0,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "PriceFontRed": {
+    "color": [
+      1.0,
+      0.1,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "PriceFontWhite": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "PriceFontYellow": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestDifficulty_Difficult": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "QuestDifficulty_Header": {
+    "color": [
+      0.7,
+      0.7,
+      0.7,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "QuestDifficulty_Impossible": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "QuestDifficulty_Standard": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "QuestDifficulty_Trivial": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "QuestDifficulty_VeryDifficult": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "QuestFont": {
+    "color": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 13.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestFontHighlightHuge": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestFontLeft": {
+    "color": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 13.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "QuestFontNormalHuge": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestFontNormalLarge": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestFontNormalSmall": {
+    "color": [
+      0.3,
+      0.18,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestFont_30": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 30.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestFont_39": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 39.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestFont_Enormous": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 30.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestFont_Huge": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestFont_Large": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestFont_Outline_Huge": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "QuestFont_Shadow_Enormous": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 30.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestFont_Shadow_Huge": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestFont_Shadow_Small": {
+    "color": null,
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestFont_Shadow_Super_Huge": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestFont_Super_Huge": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestFont_Super_Huge_Outline": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "QuestTitleFont": {
+    "color": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "QuestTitleFontBlackShadow": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "ReputationDetailFont": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SpellFont_Small": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SplashHeaderFont": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\MORPHEUS.ttf",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SubSpellFont": {
+    "color": [
+      0.35,
+      0.2,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SubZoneTextFont": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 26.0,
+    "justify_h": null,
+    "outline": "THICK"
+  },
+  "System15Font": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont16_Shadow_ThickOutline": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": "THICK"
+  },
+  "SystemFont18_Shadow_ThickOutline": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": "THICK"
+  },
+  "SystemFont22_Outline": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 22.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont22_Shadow_Outline": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 22.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont22_Shadow_ThickOutline": {
+    "color": null,
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": "THICK"
+  },
+  "SystemFont_Huge1": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 20.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Huge1_Outline": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 20.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Huge1_Outline_Slug": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 20.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Huge2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Huge4": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 27.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_InverseShadow_Small": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Large": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Large2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_LargeNamePlate": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_LargeNamePlateFixed": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 20.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Med1": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Med2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 13.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Med3": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_NamePlate": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 9.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_NamePlateCastBar": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_NamePlateFixed": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_NamePlate_Outlined": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 9.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Outline": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 13.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_OutlineThick_Huge2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 22.0,
+    "justify_h": null,
+    "outline": "THICK"
+  },
+  "SystemFont_OutlineThick_Huge4": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 26.0,
+    "justify_h": null,
+    "outline": "THICK"
+  },
+  "SystemFont_OutlineThick_WTF": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 32.0,
+    "justify_h": null,
+    "outline": "THICK"
+  },
+  "SystemFont_Outline_Med2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Outline_Slug_Huge2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Outline_Slug_Large2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Outline_Small": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Outline_WTF2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 36.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Shadow_Huge1": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 20.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Shadow_Huge1_Outline": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 20.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Shadow_Huge2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Shadow_Huge2_Outline": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 24.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Shadow_Huge3": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 25.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Shadow_Huge4": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 27.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Shadow_Huge4_Outline": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 27.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Shadow_Large": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Shadow_Large2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Shadow_Large2_Outline": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Shadow_Large_Outline": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Shadow_Med1": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Shadow_Med1_Outline": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Shadow_Med2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Shadow_Med2_Outline": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Shadow_Med3": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Shadow_Med3_Outline": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Shadow_Outline_Huge3": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 25.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Shadow_Outline_Large": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Shadow_Outline_Small": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Shadow_Small": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Shadow_Small2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 11.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Shadow_Small2_Outline": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 11.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Shadow_Small_Outline": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "SystemFont_Small": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Small2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 11.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Tiny": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 9.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_Tiny2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 8.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_WTF2": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 36.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_World": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 64.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "SystemFont_World_ThickOutline": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 64.0,
+    "justify_h": null,
+    "outline": "THICK"
+  },
+  "System_IME": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "TextStatusBarText": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "TextStatusBarTextLarge": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 13.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "Tooltip_Med": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "Tooltip_Small": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "UserScaledChatFontNormal": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "UserScaledFontBody": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "UserScaledFontGameDisable": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "UserScaledFontGameDisableSmall": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "UserScaledFontGameHighlight": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "UserScaledFontGameHighlightRight": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": "RIGHT",
+    "outline": null
+  },
+  "UserScaledFontGameHighlightSmall": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "UserScaledFontGameNormal": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "UserScaledFontGameNormalLarge": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "UserScaledFontGameNormalSmall": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "UserScaledFontGlueDisable": {
+    "color": [
+      0.5,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "UserScaledFontGlueHighlight": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "UserScaledFontGlueNormal": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 15.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "UserScaledFontGlueNormalExtraSmall": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "UserScaledFontGlueNormalLarge": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 18.0,
+    "justify_h": null,
+    "outline": "NORMAL"
+  },
+  "UserScaledFontHeader": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": "LEFT",
+    "outline": null
+  },
+  "UserScaledFontNumberNormalRight": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": "RIGHT",
+    "outline": "NORMAL"
+  },
+  "UserScaledFontNumberNormalRightGray": {
+    "color": [
+      0.6,
+      0.6,
+      0.6,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": "RIGHT",
+    "outline": "NORMAL"
+  },
+  "UserScaledFontNumberNormalRightRed": {
+    "color": [
+      1.0,
+      0.1,
+      0.1,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": "RIGHT",
+    "outline": "NORMAL"
+  },
+  "UserScaledFontNumberNormalRightYellow": {
+    "color": [
+      1.0,
+      0.82,
+      0.0,
+      1.0
+    ],
+    "font": "Fonts\\ARIALN.TTF",
+    "height": 14.0,
+    "justify_h": "RIGHT",
+    "outline": "NORMAL"
+  },
+  "UserScaledFontSystem_Body": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 14.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "UserScaledFontSystem_Header": {
+    "color": null,
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 16.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "VehicleMenuBarStatusBarText": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 12.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "WhiteNormalNumberFont": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 10.0,
+    "justify_h": null,
+    "outline": null
+  },
+  "WorldMapTextFont": {
+    "color": [
+      1.0,
+      0.9294,
+      0.7607,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 32.0,
+    "justify_h": null,
+    "outline": "THICK"
+  },
+  "ZoneTextFont": {
+    "color": [
+      1.0,
+      0.9294,
+      0.7607,
+      1.0
+    ],
+    "font": "Fonts\\FRIZQT__.TTF",
+    "height": 32.0,
+    "justify_h": null,
+    "outline": "THICK"
+  }
+}

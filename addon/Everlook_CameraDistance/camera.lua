@@ -1,0 +1,37 @@
+local addon_name = ...
+local Everlook = Everlook
+local module = Everlook.module
+local id = "camera"
+local cvar = "cameraDistanceMaxZoomFactor"
+
+-- The factor from before this was turned on is kept in the saved variables, not in this session: after a
+-- reload the game already holds the number this set, and putting that back would never undo it.
+local function apply(enabled)
+	if type(GetCVar) ~= "function" or type(SetCVar) ~= "function" then
+		return
+	end
+	EverlookDB = EverlookDB or {}
+	if not enabled then
+		if EverlookDB.cameraBefore ~= nil then
+			SetCVar(cvar, EverlookDB.cameraBefore)
+			EverlookDB.cameraBefore = nil
+		end
+		return
+	end
+	if EverlookDB.cameraBefore == nil then
+		local current = GetCVar(cvar)
+		if type(current) == "string" and not (issecretvalue and issecretvalue(current)) then EverlookDB.cameraBefore = current end
+	end
+	SetCVar(cvar, tostring(module.get(id, "distance")))
+end
+
+module.register({
+	addon = addon_name, page = "screen", order = 70,
+	id = id,
+	name = "Camera distance",
+	description = "Sets the farthest the camera can zoom out, using the factor on Maximum camera distance, from 100% to 400%. A higher percentage lets the camera sit farther out, other camera settings stay as they are, the number does nothing until this is on, nothing changes when the client has no way to set it, and turning this off puts back the factor from before this was turned on.",
+	options = {
+		distance = { name = "Maximum camera distance", default = 2.6, min = 1, max = 4, step = 0.1, percent = true, description = "Sets the game's maximum zoom factor, from 100% to 400%, in steps of 10%. A higher percentage lets the camera sit farther out, other camera settings stay as they are, this number does nothing until Camera distance is on, nothing changes when the client has no way to set it, and turning Camera distance off puts the previous factor back." },
+	},
+	apply = apply,
+})

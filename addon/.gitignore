@@ -1,0 +1,16 @@
+dist/
+.DS_Store
+*.swp
+*.swo
+*~
+WTF/
+Interface/
+SavedVariables/
+.luac
+*.luac
+*.lua.bak
+.env
+.env.*
+*.pem
+*.key
+__pycache__/

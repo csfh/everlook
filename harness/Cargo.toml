@@ -1,0 +1,19 @@
+[package]
+name = "everlook-harness"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+base64 = "0.23.1"
+flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
+image = { version = "0.25.10", default-features = false, features = ["tga", "png"] }
+mlua = { version = "0.12.2", features = ["lua51", "serialize", "vendored"] }
+roxmltree = "0.21.1"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+ttf-parser = "0.25.1"
+
+# Lua's API checks, when on, abort on a pcall that returns more than twenty values, which stock Lua allows and
+# the game relies on (a frame's GetChildren). The vendored Lua is built without them.
+[profile.dev.build-override]
+debug-assertions = false

@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<style>
+:root { --bg: #14161a; --panel: #1d2026; --text: #e8e6e1; --muted: #9aa0a8; --line: #343944; --accent: #4aa3ff; }
+:root[data-theme="light"] { --bg: #eceae4; --panel: #fbfaf7; --text: #1d1f23; --muted: #5c626b; --line: #c9c5bb; --accent: #1565c0; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --bg: #eceae4; --panel: #fbfaf7; --text: #1d1f23; --muted: #5c626b; --line: #c9c5bb; --accent: #1565c0; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, sans-serif; }
+header { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
+header h1 { font-size: 15px; margin: 0 16px 0 0; }
+label { display: inline-flex; gap: 6px; align-items: center; color: var(--muted); }
+button { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+button:hover { border-color: var(--accent); }
+select { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+main { padding: 16px; }
+#frame { position: relative; width: 100%; max-width: 1920px; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: linear-gradient(135deg, #2b3a2f, #1c2a3a); }
+#stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+.item { position: absolute; }
+.text { display: flex; align-items: center; white-space: pre-wrap; overflow: visible; }
+.missing { outline: 1px dashed rgba(255,255,255,.5); background: repeating-linear-gradient(45deg, rgba(255,255,255,.12) 0 4px, transparent 4px 8px); color: #fff; font: 9px/1 monospace; overflow: hidden; }
+.box { position: absolute; border: 1px dashed rgba(150,150,150,.6); pointer-events: none; }
+.box.mouse { border-color: rgba(60,220,120,.9); }
+.box.focus { border: 2px solid #ffd02a; background: rgba(255,208,42,.12); }
+.box span { position: absolute; left: 0; top: -13px; font: 10px/12px monospace; white-space: nowrap; background: rgba(0,0,0,.7); color: #fff; padding: 0 3px; }
+#info { margin-top: 12px; padding: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; font: 12px/1.5 ui-monospace, monospace; white-space: pre-wrap; min-height: 4.5em; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Everlook harness</h1>
+  <label><input type="checkbox" id="crop" checked> zoom to content</label>
+  <label><input type="checkbox" id="show-frames"> frames</label>
+  <label><input type="checkbox" id="show-names"> names</label>
+  <label id="pick-label" hidden>state <select id="pick"></select></label>
+  <span id="controls"></span>
+</header>
+<main>
+  <div id="frame"><div id="stage"></div></div>
+  <div id="info" aria-live="polite">Move over the picture.</div>
+</main>
+<script>
+const INTERACTIVE = __INTERACTIVE__;
+const ASSETS = __ASSETS__;
+const SCENES = __SCENES__;
+let scene = SCENES[0].scene;
+const stage = document.getElementById("stage");
+const frameBox = document.getElementById("frame");
+const info = document.getElementById("info");
+let focusId = null;
+let hits = [];
+
+const style = document.createElement("style");
+for (const font of Object.values(ASSETS.fonts)) if (font.uri) style.textContent += `@font-face{font-family:${font.family};src:url(${font.uri})}`;
+document.head.appendChild(style);
+
+const rgba = (c, a = 1) => c ? `rgba(${Math.round(c[0]*255)},${Math.round(c[1]*255)},${Math.round(c[2]*255)},${(c[3] ?? 1) * a})` : "transparent";
+
+function place(node, item) {
+  const r = item.rect;
+  node.style.left = r.x + "px"; node.style.top = r.y + "px"; node.style.width = r.w + "px"; node.style.height = r.h + "px";
+  if (item.alpha < 1) node.style.opacity = item.alpha;
+  if (item.clip) {
+    const c = item.clip;
+    node.style.clipPath = `inset(${Math.max(0, c.y - r.y)}px ${Math.max(0, r.x + r.w - (c.x + c.w))}px ${Math.max(0, r.y + r.h - (c.y + c.h))}px ${Math.max(0, c.x - r.x)}px)`;
+  }
+}
+
+// The part of the picture a texture shows: left, right, top, bottom as fractions, or the eight numbers of a corner list.
+function cut(node, item, masked) {
+  const c = item.texcoord;
+  let left = 0, right = 1, top = 0, bottom = 1;
+  if (c && c.length === 4) [left, right, top, bottom] = c;
+  else if (c && c.length === 8) { left = Math.min(c[0], c[2], c[4], c[6]); right = Math.max(c[0], c[2], c[4], c[6]); top = Math.min(c[1], c[3], c[5], c[7]); bottom = Math.max(c[1], c[3], c[5], c[7]); }
+  const flipX = left > right, flipY = top > bottom;
+  const l = Math.min(left, right), r = Math.max(left, right), t = Math.min(top, bottom), b = Math.max(top, bottom);
+  const w = item.rect.w / Math.max(r - l, 1e-6), h = item.rect.h / Math.max(b - t, 1e-6);
+  const size = `${w}px ${h}px`, position = `${-l * w}px ${-t * h}px`;
+  if (masked) { node.style.webkitMaskSize = node.style.maskSize = size; node.style.webkitMaskPosition = node.style.maskPosition = position; }
+  else { node.style.backgroundSize = size; node.style.backgroundPosition = position; }
+  if (flipX || flipY) node.style.transform = `scale(${flipX ? -1 : 1}, ${flipY ? -1 : 1})`;
+}
+
+function drawTexture(item) {
+  const node = document.createElement("div");
+  node.className = "item";
+  place(node, item);
+  const uri = item.path ? ASSETS.textures[item.path] : null;
+  if (item.gradient) {
+    const g = item.gradient;
+    const dir = g.orientation === "VERTICAL" ? "to top" : "to right";
+    node.style.background = `linear-gradient(${dir}, ${rgba(g.from)}, ${rgba(g.to)})`;
+  } else if (item.color) {
+    node.style.background = rgba(item.color);
+  } else if (uri) {
+    const tint = item.tint && !(item.tint[0] === 1 && item.tint[1] === 1 && item.tint[2] === 1);
+    if (tint) {
+      node.style.background = rgba(item.tint);
+      node.style.webkitMaskImage = node.style.maskImage = `url(${uri})`;
+      node.style.webkitMaskSize = node.style.maskSize = "100% 100%";
+      cut(node, item, true);
+    } else {
+      node.style.backgroundImage = `url(${uri})`;
+      cut(node, item);
+    }
+  } else {
+    node.classList.add("missing");
+    node.textContent = item.atlas || (item.path ? item.path.split("\\").pop() : "");
+  }
+  // Mask textures cut a texture to their shape: the mask's picture, put where the mask sits.
+  if (item.masks && item.masks.length) {
+    const images = [], sizes = [], positions = [];
+    for (const m of item.masks) {
+      const maskUri = m.path ? ASSETS.textures[m.path] : null;
+      if (!maskUri) continue;
+      images.push(`url(${maskUri})`); sizes.push(`${m.rect.w}px ${m.rect.h}px`); positions.push(`${m.rect.x - item.rect.x}px ${m.rect.y - item.rect.y}px`);
+    }
+    if (images.length) {
+      node.style.webkitMaskImage = node.style.maskImage = images.join(",");
+      node.style.webkitMaskSize = node.style.maskSize = sizes.join(",");
+      node.style.webkitMaskPosition = node.style.maskPosition = positions.join(",");
+      node.style.webkitMaskRepeat = node.style.maskRepeat = "no-repeat";
+      node.style.maskComposite = "intersect"; node.style.webkitMaskComposite = "source-in";
+    }
+  }
+  if (item.rotation) node.style.transform = (node.style.transform || "") + ` rotate(${-item.rotation}rad)`;
+  return node;
+}
+
+function drawText(item) {
+  const node = document.createElement("div");
+  node.className = "item text";
+  place(node, item);
+  const font = ASSETS.fonts[item.font];
+  node.style.fontFamily = font ? font.family + ", sans-serif" : "sans-serif";
+  node.style.fontSize = item.height + "px";
+  node.style.lineHeight = item.height + "px";
+  node.style.color = rgba(item.color);
+  node.style.justifyContent = item.justify === "LEFT" ? "flex-start" : item.justify === "RIGHT" ? "flex-end" : "center";
+  node.style.textAlign = (item.justify || "CENTER").toLowerCase();
+  // A line break in the text always breaks; a string that may not wrap keeps its lines as they are.
+  node.style.whiteSpace = item.wrap ? "pre-wrap" : "pre";
+  // A string held to some lines is cut with an ellipsis where it runs out, as the game does.
+  const span = document.createElement("span");
+  span.textContent = item.text;
+  span.style.maxWidth = "100%";
+  if (item.max_lines === 1) { span.style.overflow = "hidden"; span.style.textOverflow = "ellipsis"; span.style.whiteSpace = "nowrap"; }
+  else if (item.max_lines > 1) { span.style.display = "-webkit-box"; span.style.webkitLineClamp = item.max_lines; span.style.webkitBoxOrient = "vertical"; span.style.overflow = "hidden"; }
+  node.appendChild(span);
+  return node;
+}
+
+function drawBar(item) {
+  const node = document.createElement("div");
+  node.className = "item";
+  place(node, item);
+  node.style.background = rgba(item.color || [0, 1, 0, 1]);
+  node.style.width = item.rect.w * item.fraction + "px";
+  return node;
+}
+
+function draw() {
+  stage.replaceChildren();
+  for (const item of scene.items) {
+    stage.appendChild(item.kind === "texture" ? drawTexture(item) : item.kind === "text" ? drawText(item) : drawBar(item));
+  }
+  const frames = document.getElementById("show-frames").checked;
+  const names = document.getElementById("show-names").checked;
+  if (frames || INTERACTIVE) {
+    for (const f of scene.frames) {
+      const showAll = frames;
+      if (!showAll && f.id !== focusId) continue;
+      const node = document.createElement("div");
+      node.className = "box" + (f.mouse ? " mouse" : "") + (f.id === focusId ? " focus" : "");
+      node.style.left = f.rect.x + "px"; node.style.top = f.rect.y + "px"; node.style.width = f.rect.w + "px"; node.style.height = f.rect.h + "px";
+      if (names || f.id === focusId) { const label = document.createElement("span"); label.textContent = `${f.name || f.type} L${f.level} ${f.strata}`; node.appendChild(label); }
+      stage.appendChild(node);
+    }
+  }
+}
+
+// Zoom to what is drawn, so a pill 76 wide is not lost on a 1920 wide screen.
+function bounds() {
+  if (INTERACTIVE || !document.getElementById("crop").checked || !scene.items.length) return { x: 0, y: 0, w: scene.screen.w, h: scene.screen.h };
+  let left = 1e9, top = 1e9, right = -1e9, bottom = -1e9;
+  for (const item of scene.items) {
+    const r = item.rect;
+    if (r.w <= 0 || r.h <= 0) continue;
+    left = Math.min(left, r.x); top = Math.min(top, r.y); right = Math.max(right, r.x + r.w); bottom = Math.max(bottom, r.y + r.h);
+  }
+  const pad = 24;
+  return { x: left - pad, y: top - pad, w: right - left + pad * 2, h: bottom - top + pad * 2 };
+}
+function fit() {
+  const b = bounds();
+  frameBox.style.aspectRatio = `${b.w} / ${b.h}`;
+  frameBox.style.maxWidth = Math.min(b.w * 6, 1920) + "px";
+  stage.style.transform = `scale(${frameBox.clientWidth / b.w}) translate(${-b.x}px, ${-b.y}px)`;
+}
+addEventListener("resize", fit);
+document.getElementById("crop").addEventListener("change", fit);
+document.getElementById("show-frames").addEventListener("change", draw);
+document.getElementById("show-names").addEventListener("change", draw);
+
+function describe() {
+  if (!INTERACTIVE) { info.textContent = `${scene.items.length} drawn items, ${scene.frames.length} frames, game time ${scene.now.toFixed(2)}s`; return; }
+  const lines = hits.length ? hits.map((h, i) => `${i === 0 ? "gets the mouse" : "under it     "}  ${h}`) : ["nothing takes the mouse here"];
+  info.textContent = lines.join("\n");
+}
+
+async function send(message) {
+  const response = await fetch("/input", { method: "POST", body: JSON.stringify(message) });
+  const data = await response.json();
+  scene = data.scene; hits = data.hits; focusId = data.focus;
+  if (data.errors && data.errors.length) info.textContent = data.errors.join("\n");
+  draw(); if (!(data.errors && data.errors.length)) describe();
+}
+
+function point(event) {
+  const box = frameBox.getBoundingClientRect();
+  return { x: (event.clientX - box.left) * scene.screen.w / box.width, y: (event.clientY - box.top) * scene.screen.h / box.height };
+}
+
+if (INTERACTIVE) {
+  let pending = false;
+  frameBox.addEventListener("mousemove", (event) => { if (pending) return; pending = true; send({ type: "move", ...point(event) }).finally(() => { pending = false; }); });
+  frameBox.addEventListener("click", (event) => send({ type: "click", button: "LeftButton", ...point(event) }));
+  frameBox.addEventListener("contextmenu", (event) => { event.preventDefault(); send({ type: "click", button: "RightButton", ...point(event) }); });
+  frameBox.addEventListener("wheel", (event) => { event.preventDefault(); send({ type: "wheel", delta: event.deltaY < 0 ? 1 : -1, ...point(event) }); }, { passive: false });
+  const controls = document.getElementById("controls");
+  for (const seconds of [0.1, 0.5, 2]) {
+    const button = document.createElement("button");
+    button.textContent = `advance ${seconds}s`;
+    button.addEventListener("click", () => send({ type: "advance", seconds }));
+    controls.appendChild(button);
+  }
+}
+const pick = document.getElementById("pick");
+if (!INTERACTIVE && SCENES.length > 1) {
+  document.getElementById("pick-label").hidden = false;
+  SCENES.forEach((entry, index) => pick.add(new Option(entry.name, index)));
+  pick.addEventListener("change", () => { scene = SCENES[pick.value].scene; fit(); draw(); describe(); history.replaceState(null, "", "#" + pick.value); });
+  const start = parseInt(location.hash.slice(1), 10);
+  if (start >= 0 && start < SCENES.length) { pick.value = start; scene = SCENES[start].scene; }
+}
+fit(); draw(); describe();
+</script>
+</body>
+</html>

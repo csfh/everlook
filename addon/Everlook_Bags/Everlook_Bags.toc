@@ -1,0 +1,22 @@
+## Interface: 16001
+## Title: |cffffd100Everlook|r |cff66bbffBags|r
+## Notes: Lays the combined bag out in a different number of columns or in sections by item type with pinned and recent items on top, shows an item level on gear, and lets you mark items as junk, with the stock look.
+## Author: Christoffer Hallas
+## Dependencies: Everlook
+## Group: Everlook
+## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
+
+bags_layout.lua
+bags_item_level.lua
+bags_junk.lua
+bags_categories.lua
+bags_pins.lua
+bags_assign.lua
+bags_alts.lua
+bags_recent.lua
+bags_folds.lua
+bags_headers.lua
+bags_chips.lua
+bags_search.lua
+bags_marker.lua
+bags.lua

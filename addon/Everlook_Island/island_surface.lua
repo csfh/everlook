@@ -1,0 +1,284 @@
+local Everlook = Everlook
+
+-- The Island's rounded surface: a tintable quarter circle supplies the corners
+-- and straight sections stretch without stretching the radius. Layers stay
+-- allocated across repaints. smart_island.lua owns when and how big.
+local surface = {}
+Everlook.island_surface = surface
+
+local ART = "Interface\\AddOns\\Everlook_Island\\assets\\"
+local EDGE = { 1, 1, 1, 0.12 }
+local FILL = { 13 / 255, 15 / 255, 20 / 255, 0.96 }
+
+local function call(object, method, ...)
+	local fn = object and object[method]
+	if type(fn) == "function" then return fn(object, ...) end
+end
+
+local surface_layers = {}
+
+local function tint_piece(texture, corner, color)
+	if corner then
+		call(texture, "SetVertexColor", unpack(color))
+	else
+		call(texture, "SetColorTexture", unpack(color))
+	end
+end
+
+local function rounded_layer(parent, color, inset, sublevel, draw_layer)
+	local layer = { parent = parent, pieces = {}, corners = {}, inset = inset, color = color }
+	if color == FILL then surface_layers[#surface_layers + 1] = layer end
+	for row = 1, 3 do
+		for column = 1, 3 do
+			local texture = call(parent, "CreateTexture", nil, draw_layer or "BACKGROUND", nil, sublevel)
+			if row ~= 2 and column ~= 2 then
+				call(texture, "SetTexture", ART .. "island_corner.tga")
+				call(texture, "SetTexCoord", column == 1 and 0 or 1, column == 1 and 1 or 0,
+					row == 1 and 0 or 1, row == 1 and 1 or 0)
+				call(texture, "SetVertexColor", unpack(color))
+				layer.corners[#layer.pieces + 1] = true
+			else
+				call(texture, "SetColorTexture", unpack(color))
+			end
+			layer.pieces[#layer.pieces + 1] = texture
+		end
+	end
+	return layer
+end
+
+-- The game's own tooltip border and fill, laid on the parent frame. The pieces
+-- anchor to the parent's edges, so sizing the parent sizes the surface. Without
+-- NineSliceUtil the hand-drawn layers below stand in.
+local NATIVE_LAYOUT = "TooltipDefaultLayout"
+local natives = {}
+local native_alpha = FILL[4]
+-- Half the opacity again keeps nameplates out of the text without turning the panel black.
+local BACKING_SHARE = 0.5
+
+local function native_available()
+	return NineSliceUtil and NineSliceUtil.GetLayout and NineSliceUtil.ApplyLayoutByName
+		and NineSliceUtil.GetLayout(NATIVE_LAYOUT) ~= nil
+end
+
+local function tint_native(handle)
+	local color = TOOLTIP_DEFAULT_BACKGROUND_COLOR
+	local red, green, blue = FILL[1], FILL[2], FILL[3]
+	if color and color.GetRGB then red, green, blue = color:GetRGB() end
+	call(handle.parent.Center, "SetVertexColor", red, green, blue, native_alpha)
+	-- The game's fill lets a lot of the world through. A dark backing under it
+	-- follows the same opacity, so names and bars behind the Island stay out of the text.
+	call(handle.backing, "SetColorTexture", FILL[1], FILL[2], FILL[3], native_alpha * BACKING_SHARE)
+end
+
+-- Every card, the pill and the open island share the one surface color, so
+-- the opacity option changes that color and retints the layers already built.
+function surface.set_opacity(alpha)
+	if FILL[4] == alpha then return end
+	FILL[4] = alpha
+	native_alpha = alpha
+	for _, handle in ipairs(natives) do tint_native(handle) end
+	for _, layer in ipairs(surface_layers) do
+		for index, texture in ipairs(layer.pieces) do tint_piece(texture, layer.corners[index], layer.color) end
+	end
+end
+
+-- The colour the open island's body shows, as one opaque-ish colour, so a fade
+-- laid over its content ends in the same dark as the surface around it.
+function surface.body_color()
+	if native_available() then
+		local red, green, blue = FILL[1], FILL[2], FILL[3]
+		local color = TOOLTIP_DEFAULT_BACKGROUND_COLOR
+		if color and color.GetRGB then red, green, blue = color:GetRGB() end
+		return red, green, blue, 1 - (1 - native_alpha) * (1 - native_alpha * BACKING_SHARE)
+	end
+	return FILL[1], FILL[2], FILL[3], FILL[4]
+end
+
+function surface.make(parent)
+	if native_available() then
+		NineSliceUtil.ApplyLayoutByName(parent, NATIVE_LAYOUT)
+		local handle = { native = true, parent = parent }
+		handle.backing = call(parent, "CreateTexture", nil, "BACKGROUND", nil, -8)
+		call(handle.backing, "SetPoint", "TOPLEFT", parent, "TOPLEFT", 4, -4)
+		call(handle.backing, "SetPoint", "BOTTOMRIGHT", parent, "BOTTOMRIGHT", -4, 4)
+		natives[#natives + 1] = handle
+		tint_native(handle)
+		return handle
+	end
+	return {
+		rounded_layer(parent, { 0, 0, 0, 0.18 }, -2, -8),
+		rounded_layer(parent, EDGE, 0, -7),
+		rounded_layer(parent, FILL, 1, -6),
+	}
+end
+
+-- Sizes one rounded layer to `width` by `height`, `drop` lower than the frame's top.
+-- A layer that something else shows and hides (the glow) is sized and left as it is.
+local function size_layer(layer, width, height, radius, drop, leave_visibility)
+	local inset = layer.inset
+	local w, h = width - inset * 2, height - inset * 2
+	local r = math.min(radius - inset, w / 2, h / 2)
+	local widths, heights = { r, math.max(0, w - r * 2), r }, { r, math.max(0, h - r * 2), r }
+	local y = 0
+	for row = 1, 3 do
+		local x = 0
+		for column = 1, 3 do
+			local texture = layer.pieces[(row - 1) * 3 + column]
+			call(texture, "ClearAllPoints")
+			call(texture, "SetPoint", "TOPLEFT", layer.parent, "TOPLEFT", inset + x, -inset - y - drop)
+			call(texture, "SetSize", widths[column], heights[row])
+			if not leave_visibility then call(texture, widths[column] > 0 and heights[row] > 0 and "Show" or "Hide") end
+			x = x + widths[column]
+		end
+		y = y + heights[row]
+	end
+end
+
+function surface.size(layers, width, height, radius)
+	if layers.native then return end
+	for index, layer in ipairs(layers) do size_layer(layer, width, height, radius, index == 1 and 3 or 0) end
+end
+
+-- A button's surface: a thin outline round a fill, in one of three styles. "quiet" is a shade off the
+-- panel's, for the island's own controls. "accent" is Stormwind blue, the action a notice wants pressed,
+-- and "silver" is bright silver, for the others beside it. Each rests, lights under the pointer and
+-- darkens when pressed.
+local BUTTON_RADIUS = 6
+local BUTTON_STATES = {
+	quiet = {
+		rest = { edge = { 1, 1, 1, 0.2 }, fill = { 22 / 255, 25 / 255, 32 / 255, 1 } },
+		hover = { edge = { 1, 1, 1, 0.45 }, fill = { 38 / 255, 43 / 255, 55 / 255, 1 } },
+		press = { edge = { 1, 1, 1, 0.45 }, fill = { 14 / 255, 16 / 255, 21 / 255, 1 } },
+	},
+	-- The accent button has a gold border, the game's own where it can be drawn and a thin gold line where
+	-- not, so the outline here is that line.
+	accent = {
+		rest = { edge = { 0.78, 0.64, 0.33, 0.9 }, fill = { 44 / 255, 108 / 255, 214 / 255, 1 } },
+		hover = { edge = { 0.95, 0.8, 0.45, 1 }, fill = { 52 / 255, 118 / 255, 224 / 255, 1 } },
+		press = { edge = { 0.95, 0.8, 0.45, 1 }, fill = { 32 / 255, 84 / 255, 172 / 255, 1 } },
+	},
+	silver = {
+		rest = { edge = { 0.94, 0.95, 0.97, 0.9 }, fill = { 196 / 255, 202 / 255, 212 / 255, 1 } },
+		hover = { edge = { 1, 1, 1, 1 }, fill = { 218 / 255, 223 / 255, 231 / 255, 1 } },
+		press = { edge = { 1, 1, 1, 1 }, fill = { 164 / 255, 170 / 255, 181 / 255, 1 } },
+	},
+}
+-- The words on a button, at rest and when lit. Silver has dark words, blue and the quiet button light ones.
+surface.button_words = {
+	quiet = { rest = { 174 / 255, 182 / 255, 195 / 255, 1 }, lit = { 245 / 255, 247 / 255, 250 / 255, 1 } },
+	accent = { rest = { 235 / 255, 243 / 255, 1, 1 }, lit = { 1, 1, 1, 1 } },
+	silver = { rest = { 22 / 255, 27 / 255, 36 / 255, 1 }, lit = { 8 / 255, 11 / 255, 16 / 255, 1 } },
+}
+
+-- The game's gold tooltip border round a button, drawn on a frame of its own over the button's
+-- fill. The border art has a size of its own, so the frame is scaled down until a corner and its
+-- opposite fit in the button with room to spare. Returns nil where the game cannot draw it.
+local function native_border(parent, height)
+	if not native_available() or not CreateFrame then return nil end
+	local frame = CreateFrame("Frame", nil, parent)
+	call(frame, "SetAllPoints", parent)
+	call(frame, "SetFrameLevel", (call(parent, "GetFrameLevel") or 1) + 1)
+	call(frame, "EnableMouse", false)
+	NineSliceUtil.ApplyLayoutByName(frame, NATIVE_LAYOUT)
+	-- The border's own fill is not wanted: the button has its blue.
+	call(frame.Center, "Hide")
+	local corner = call(frame.TopLeftCorner, "GetHeight")
+	if type(corner) == "number" and corner > 0 then call(frame, "SetScale", math.min(1, height / (corner * 2 + 2))) end
+	return frame
+end
+
+-- style is "quiet", "accent" or "silver". An accent button gets the game's gold border where it can; the
+-- layers a button always has are an outline, thin and gold for an accent button when the game's
+-- border draws, and the fill under it.
+function surface.make_button(parent, style, height)
+	style = BUTTON_STATES[style] and style or "quiet"
+	local rest = BUTTON_STATES[style].rest
+	local button = {
+		style = style,
+		edge = rounded_layer(parent, { unpack(rest.edge) }, 0, -3),
+		fill = rounded_layer(parent, { unpack(rest.fill) }, 1, -2),
+	}
+	button.border = native_border(parent, height or 22)
+	call(button.border, style == "accent" and "Show" or "Hide")
+	return button
+end
+
+-- Changes a button between its styles: its colors, and whether it has the gold border.
+function surface.set_button_style(button, style)
+	button.style = BUTTON_STATES[style] and style or "quiet"
+	call(button.border, button.style == "accent" and "Show" or "Hide")
+	surface.tint_button(button, "rest")
+end
+
+function surface.size_button(button, width, height)
+	size_layer(button.edge, width, height, BUTTON_RADIUS, 0)
+	size_layer(button.fill, width, height, BUTTON_RADIUS, 0)
+end
+
+-- state is "rest", "hover" or "press".
+function surface.tint_button(button, state)
+	local colors = BUTTON_STATES[button.style][state] or BUTTON_STATES[button.style].rest
+	for _, name in ipairs({ "edge", "fill" }) do
+		local layer = button[name]
+		local color = colors[name]
+		-- Under the game's gold border the thin line is not wanted.
+		if name == "edge" and button.border and button.style == "accent" then color = { color[1], color[2], color[3], 0 } end
+		for index, texture in ipairs(layer.pieces) do
+			tint_piece(texture, layer.corners[index], color)
+		end
+	end
+end
+
+-- A reaction's colour on a surface: a tint over the body that follows its rounded shape, and
+-- a line along each straight edge. Both sit above the fill and below the text, start
+-- invisible, and take no art but the corner piece the surface already uses.
+local EDGE_THICKNESS = 2
+
+function surface.make_glow(parent)
+	local glow = { parent = parent, tint = rounded_layer(parent, { 1, 1, 1, 0 }, 1, 2, "ARTWORK"), edges = {} }
+	for index = 1, 4 do
+		glow.edges[index] = call(parent, "CreateTexture", nil, "ARTWORK", nil, 3)
+		call(glow.edges[index], "SetColorTexture", 1, 1, 1, 0)
+		call(glow.edges[index], "Hide")
+	end
+	surface.set_glow(glow, nil, 0, 0)
+	return glow
+end
+
+function surface.size_glow(glow, width, height, radius)
+	if not glow then return end
+	size_layer(glow.tint, width, height, radius, 0, true)
+	local top, bottom, left, right = unpack(glow.edges)
+	local run_x, run_y = math.max(0, width - radius * 2), math.max(0, height - radius * 2)
+	local parent = glow.parent
+	for _, edge in ipairs(glow.edges) do call(edge, "ClearAllPoints") end
+	call(top, "SetPoint", "TOPLEFT", parent, "TOPLEFT", radius, 0)
+	call(top, "SetSize", run_x, EDGE_THICKNESS)
+	call(bottom, "SetPoint", "BOTTOMLEFT", parent, "BOTTOMLEFT", radius, 0)
+	call(bottom, "SetSize", run_x, EDGE_THICKNESS)
+	call(left, "SetPoint", "TOPLEFT", parent, "TOPLEFT", 0, -radius)
+	call(left, "SetSize", EDGE_THICKNESS, run_y)
+	call(right, "SetPoint", "TOPRIGHT", parent, "TOPRIGHT", 0, -radius)
+	call(right, "SetSize", EDGE_THICKNESS, run_y)
+end
+
+-- Shows the glow in `color` ({ r, g, b }) at the given opacities, or hides it when both are zero.
+function surface.set_glow(glow, color, tint, edge)
+	if not glow then return end
+	local red, green, blue = 1, 1, 1
+	if color then red, green, blue = color[1], color[2], color[3] end
+	for index, texture in ipairs(glow.tint.pieces) do
+		if tint > 0 then
+			if glow.tint.corners[index] then
+				call(texture, "SetVertexColor", red, green, blue, tint)
+			else
+				call(texture, "SetColorTexture", red, green, blue, tint)
+			end
+		end
+		call(texture, tint > 0 and "Show" or "Hide")
+	end
+	for _, texture in ipairs(glow.edges) do
+		if edge > 0 then call(texture, "SetColorTexture", red, green, blue, edge) end
+		call(texture, edge > 0 and "Show" or "Hide")
+	end
+end
