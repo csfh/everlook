@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'addon/**'
+      - '!addon/harness/**'
       - '.github/workflows/addon-release.yml'
       - '.github/workflows/addon-tests.yml'
   workflow_dispatch:

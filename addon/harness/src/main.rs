@@ -28,7 +28,7 @@ fn main() {
         }
         Some("run") => {
             let scenario = PathBuf::from(arguments.get(2).unwrap_or_else(|| usage()));
-            let addons = arguments.iter().position(|argument| argument == "--addons").and_then(|index| arguments.get(index + 1)).map(PathBuf::from).unwrap_or_else(|| PathBuf::from("../addon"));
+            let addons = arguments.iter().position(|argument| argument == "--addons").and_then(|index| arguments.get(index + 1)).map(PathBuf::from).unwrap_or_else(|| PathBuf::from(".."));
             std::process::exit(run(&scenario, &addons));
         }
         Some("render") => {
@@ -57,7 +57,7 @@ fn main() {
 }
 
 fn addons_from(arguments: &[String]) -> PathBuf {
-    arguments.iter().position(|argument| argument == "--addons").and_then(|index| arguments.get(index + 1)).map(PathBuf::from).unwrap_or_else(|| PathBuf::from("../addon"))
+    arguments.iter().position(|argument| argument == "--addons").and_then(|index| arguments.get(index + 1)).map(PathBuf::from).unwrap_or_else(|| PathBuf::from(".."))
 }
 
 /// Starts the game and runs a scenario into it, then hands the game back, whatever the scenario's checks said.

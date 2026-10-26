@@ -1,4 +1,4 @@
-//! Runs every scenario in scenarios/ against the addons next to this repository, and fails on any
+//! Runs every scenario in scenarios/ against the addon folders around this crate, and fails on any
 //! failed check, any error a script raised, or a call to a part of the game the harness has not built.
 
 use everlook_harness::runtime::Harness;
@@ -7,7 +7,7 @@ use std::path::PathBuf;
 #[test]
 fn scenarios_pass() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    let addons = std::env::var("EVERLOOK_ADDONS_DIR").map(PathBuf::from).unwrap_or_else(|_| root.join("../addon"));
+    let addons = root.join("..");
     let mut files: Vec<PathBuf> = std::fs::read_dir(root.join("scenarios"))
         .unwrap()
         .filter_map(|entry| entry.ok().map(|entry| entry.path()))

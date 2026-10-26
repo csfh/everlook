@@ -3,13 +3,11 @@ name: harness-tests
 on:
   pull_request:
     paths:
-      - 'harness/**'
       - 'addon/**'
       - '.github/workflows/harness-tests.yml'
   push:
     branches: [main]
     paths:
-      - 'harness/**'
       - 'addon/**'
       - '.github/workflows/harness-tests.yml'
   workflow_dispatch:
@@ -31,7 +29,5 @@ jobs:
           persist-credentials: false
       - uses: dtolnay/rust-toolchain@stable
       - name: Test
-        working-directory: harness
-        env:
-          EVERLOOK_ADDONS_DIR: ${{ github.workspace }}/addon
+        working-directory: addon/harness
         run: cargo test --locked

@@ -14,5 +14,5 @@ Rules for writing a test (they come from mistakes already made):
 - Mock only names that appear in Blizzard's own code (wow-ui-source 12.0.0, `Mainline` and `Shared`).
 - Write the failing test first, and check that it fails for the reason you think by running it against the old code.
 - `run.lua` and `qol.lua` are near Lua's limit of 200 locals in one function: new checks go in a `do ... end` block, or in a file of their own that `run.lua` loads.
-- A new module folder is added to `scripts/folders.txt` and to the list in `qol.lua`; `scripts_test.py` unpacks a real release and runs the suite against it.
+- A new module folder is added to `scripts/folders.txt`, to the list in `qol.lua` and to the list in `harness/scenarios/all_addons.lua`; `scripts_test.py` unpacks a real release and runs the suite against it.
 

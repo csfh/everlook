@@ -11,7 +11,6 @@ Before 1.0.0 a breaking change bumps minor, so it never jumps to 1.0.0 by accide
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import re
 import subprocess
@@ -20,10 +19,6 @@ from pathlib import Path
 
 SEMVER = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 TOC_VERSION = re.compile(r"^(## Version: )(\S+)", re.MULTILINE)
-LOCK_VERSION = re.compile(
-    r'("name": "everlook",\n\s*"version": ")([^"]+)(")',
-)
-JSON_VERSION_LINE = re.compile(r'^"version"\s*:\s*"([^"]+)"')
 TOC_VERSION_LINE = re.compile(r"^## Version:\s*(\S+)", re.IGNORECASE)
 ZERO_SHA = "0" * 40
 
@@ -113,7 +108,8 @@ def commits_touching(
 PRODUCTS = {
     "addon": {
         "file": "Everlook/Everlook.toc",
-        "paths": ["."],
+        # The harness is a test tool that lives here; its commits never release the addon.
+        "paths": [".", ":(exclude)harness"],
         "tag": "addon-v",
     },
 }
@@ -202,7 +198,6 @@ def plan_release(
     version_file: str,
     product_paths: list[str],
     tag_prefix: str | None = None,
-    former_files: tuple[str, ...] = (),
 ) -> tuple[str | None, bool]:
     """Return (bump level, whether to release).
 
@@ -210,9 +205,7 @@ def plan_release(
     a push whose tests failed or whose run was cancelled still counts in the
     next one. With no release at all, only this push counts. A level of None
     with release True means the push already set the version by hand, so the
-    release ships it as it is. The diff also covers the version file's former
-    paths, so moving the file reads as the old version leaving and the same
-    version arriving, not as a hand-set one.
+    release ships it as it is.
     """
     if before not in ("", ZERO_SHA) and not commit_known(root, before):
         # A force push replaced the history, so the runner never fetched the old tip.
@@ -224,7 +217,7 @@ def plan_release(
     ours = [(s, b) for s, b in commits if not RELEASE_SUBJECT.match(s)]
     if not ours:
         return None, False
-    diff = "" if before in ("", ZERO_SHA) else git(root, "diff", before, after, "--", version_file, *former_files)
+    diff = "" if before in ("", ZERO_SHA) else git(root, "diff", before, after, "--", version_file)
     if version_field_changed(diff):
         return None, True
     level = highest([commit_level(s, b) for s, b in ours])
@@ -232,7 +225,7 @@ def plan_release(
 
 
 def version_value(line_body: str) -> str | None:
-    match = JSON_VERSION_LINE.match(line_body) or TOC_VERSION_LINE.match(line_body)
+    match = TOC_VERSION_LINE.match(line_body)
     if match:
         return match.group(1)
     return line_body if SEMVER.fullmatch(line_body) else None
@@ -286,7 +279,7 @@ def maybe_bump(
     current, bump = VERSIONS[product]
     info = PRODUCTS[product]
     level, release = plan_release(
-        root, before, after, info["file"], info["paths"], info["tag"], info.get("former_files", ())
+        root, before, after, info["file"], info["paths"], info["tag"]
     )
     if level is not None:
         return bump(root, level), True, True, level

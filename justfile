@@ -39,9 +39,9 @@ addonsubjects:
     @long="$(git log --format='%h %s' origin/main..HEAD | awk '{ if (length($0) - 8 > 100) print }')"; if [ -n "$long" ]; then echo "These commit subjects are over 100 characters; put the detail in the body:" >&2; echo "$long" >&2; exit 1; fi
 
 [private]
-[working-directory('harness')]
+[working-directory('addon/harness')]
 harnesstest:
-    EVERLOOK_ADDONS_DIR="{{ justfile_directory() }}/addon" cargo test -q
+    cargo test -q
 
 [private]
 [working-directory('www')]

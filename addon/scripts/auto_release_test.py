@@ -59,12 +59,7 @@ class Planning(unittest.TestCase):
     def write_version(self, version: str) -> None:
         path = self.repo / VERSION_FILE
         path.parent.mkdir(parents=True, exist_ok=True)
-        if PRODUCT == "addon":
-            path.write_text(f"## Version: {version}\n")
-        else:
-            path.write_text('{\n  "name": "everlook",\n  "version": "%s"\n}\n' % version)
-            lock = '{\n  "name": "everlook",\n  "version": "%s",\n  "packages": {\n    "": {\n      "name": "everlook",\n      "version": "%s"\n    }\n  }\n}\n' % (version, version)
-            (self.repo / "package-lock.json").write_text(lock)
+        path.write_text(f"## Version: {version}\n")
 
     def commit(self, relative: str, text: str, message: str) -> str:
         (self.repo / relative).write_text(text)
@@ -131,6 +126,12 @@ class Planning(unittest.TestCase):
         self.commit("src.txt", "two\n", "docs: comment")
         after = self.commit("src.txt", "three\n", "fix: real")
         self.assertEqual(auto_release.plan_release(self.repo, "0" * 40, after, VERSION_FILE, ["."], TAG), ("patch", True))
+
+    def test_a_harness_commit_does_not_release_the_addon(self) -> None:
+        (self.repo / "harness").mkdir()
+        after = self.commit("harness/runtime.rs", "two\n", "fix: model a frame rule")
+        paths = auto_release.PRODUCTS[PRODUCT]["paths"]
+        self.assertEqual(auto_release.plan_release(self.repo, self.before, after, VERSION_FILE, paths), (None, False))
 
     def test_bumps_the_version_file(self) -> None:
         after = self.commit("src.txt", "two\n", "feat: change")

@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'addon/**'
+      - '!addon/harness/**'
       - '.github/workflows/addon-tests.yml'
       - '.github/workflows/addon-release.yml'
   workflow_dispatch:
