@@ -95,7 +95,6 @@ name = "everlook-harness"
 version = "0.1.0"
 dependencies = [
  "base64",
- "flate2",
  "image",
  "mlua",
  "roxmltree",
