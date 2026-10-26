@@ -18,8 +18,7 @@ LUAC = "luac5.1"
 MAIN_LOCALS_MAX = 180
 UPVALUES_MAX = 55
 ALLOWED_PREFIXES = ("SLASH_EVERLOOK", "BINDING_HEADER_EVERLOOK", "BINDING_NAME_EVERLOOK")
-# Everlook_Data is the data addon's one table, which its generated chunk files call into.
-ALLOWED_NAMES = {"SlashCmdList", "Everlook_Data"}
+ALLOWED_NAMES = {"SlashCmdList"}
 
 
 def lua_files():
