@@ -36,10 +36,9 @@ class RiskyUsesTest(unittest.TestCase):
     def test_removed_lines_and_deleted_files_are_not_listed(self):
         self.assertNotIn("gone.lua", risky.scan(DIFF, "addon"))
 
-    def test_the_app_profile_looks_for_what_matters_there(self):
-        diff = "+++ b/src/main/x.ts\n+const child = spawn('x')\n+window = { webPreferences: { nodeIntegration: true } }\n"
-        found = risky.scan(diff, "app")["src/main/x.ts"]
-        self.assertEqual([reason for reason, _ in found], ["runs programs", "window security settings"])
+    def test_a_changed_release_script_is_listed_by_its_path_from_the_repository_root(self):
+        found = risky.scan("+++ b/addon/scripts/pack.sh\n+echo packed\n", "addon")
+        self.assertEqual(found["addon/scripts/pack.sh"][0][0], "a workflow or release script changed")
 
     def test_a_clean_diff_says_so(self):
         self.assertIn("No added line", risky.render(risky.scan("+++ b/a.lua\n+local x = 1\n", "addon")))

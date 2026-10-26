@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 # Pushes the release commit at HEAD to the release branch, usually main.
 #
-# One push can change several products, and then a release workflow starts for
-# each of them at the same time. Each makes its own version commit, so
-# whichever pushes second finds main has moved and is rejected. A release
-# commit only touches its own product's version files, which means it can be
-# rebased onto the new main without a conflict. This pushes, and on a
-# rejection rebases onto the current main and pushes again.
+# Someone can push to main while the release job runs, and then the release
+# commit is rejected because main has moved. A release commit only touches the
+# version file, so it can be rebased onto the new main without a conflict. This
+# pushes, and on a rejection rebases onto the current main and pushes again.
 #
 # The job has usually built things by now, and a build can rewrite a tracked
 # file, so the rebase sets such changes aside and puts them back.

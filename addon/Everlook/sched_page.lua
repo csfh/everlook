@@ -9,8 +9,6 @@ local BAR_GAP = 1
 local ROW_HEIGHT = 20
 
 local NAMES = {
-	items = "Item reads",
-	segments = "World data",
 	defer = "Event scans",
 }
 

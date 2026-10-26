@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Races release commits against a throwaway remote, the way three release
-# workflows do when one push touches several products.
+# Races a release commit against other pushes to a throwaway remote.
 set -euo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -37,33 +36,32 @@ git -C "${work}/seed" add base.txt
 git -C "${work}/seed" commit -q -m base
 git -C "${work}/seed" push -q origin HEAD:main
 
-# Both clones start from the same commit, as two workflows on one push do.
-new_clone web
-new_clone app
-release_commit web web.txt 0.15.0
-release_commit app app.txt 0.5.0
+# Both clones start from the same commit: a push lands while the release job runs.
+new_clone other
+new_clone release
+release_commit other other.txt change
+release_commit release version.txt 1.0.1
 
-CHECK_NAME="the first release pushes"
-check bash -c "cd '${work}/web' && bash '${script}'"
+CHECK_NAME="the other push lands first"
+check bash -c "cd '${work}/other' && bash '${script}'"
 
-CHECK_NAME="the second release is rebased and pushed, not rejected"
-check bash -c "cd '${work}/app' && bash '${script}'"
+CHECK_NAME="the release is rebased and pushed, not rejected"
+check bash -c "cd '${work}/release' && bash '${script}'"
 
 remote_files="$(git -C "${work}/remote.git" ls-tree -r --name-only main | sort | tr '\n' ' ')"
-CHECK_NAME="main holds both releases"
-check test "${remote_files}" = "app.txt base.txt web.txt "
+CHECK_NAME="main holds both commits"
+check test "${remote_files}" = "base.txt other.txt version.txt "
 CHECK_NAME="the rebased commit is what HEAD points at, so a tag lands on the pushed commit"
-check test "$(git -C "${work}/app" rev-parse HEAD)" = "$(git -C "${work}/remote.git" rev-parse main)"
+check test "$(git -C "${work}/release" rev-parse HEAD)" = "$(git -C "${work}/remote.git" rev-parse main)"
 CHECK_NAME="history stays linear"
 check test "$(git -C "${work}/remote.git" rev-list --merges main | wc -l)" = "0"
 
 # A release job builds things before it commits, and a build can rewrite a
-# tracked file (the app regenerates build/icon-512.png). That unstaged change
-# must not stop the rebase.
+# tracked file. That unstaged change must not stop the rebase.
 new_clone dirty
 release_commit dirty dirty.txt 1.0.0
 new_clone mover
-release_commit mover other.txt other
+release_commit mover moved.txt moved
 git -C "${work}/mover" push -q origin HEAD:main
 echo "rebuilt" > "${work}/dirty/base.txt"
 CHECK_NAME="a dirty working tree does not stop the rebase and push"

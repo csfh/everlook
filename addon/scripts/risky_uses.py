@@ -25,18 +25,8 @@ PROFILES = {
             (r"\b(hooksecurefunc|securecall\w*|SecureActionButton\w*|SecureHandler\w*|RegisterStateDriver|SetAttribute)\b", "secure code and hooks"),
             (r"\b(SendChatMessage|SendAddonMessage|JoinChannelByName|InviteUnit)\b", "sends messages or invites"),
         ],
-        "files": [r"^\.github/", r"^scripts/.*\.(sh|py)$"],
-    },
-    "app": {
-        "patterns": [
-            (r"\bchild_process\b|\b(exec|execFile|spawn)(Sync)?\s*\(", "runs programs"),
-            (r"\b(eval|new Function)\s*\(|dangerouslySetInnerHTML", "runs text as code"),
-            (r"\b(nodeIntegration|contextIsolation|webSecurity|sandbox|allowRunningInsecureContent)\b", "window security settings"),
-            (r"\bshell\.openExternal\b|\bsetPermissionRequestHandler\b|\bprotocol\.(handle|register\w*)\b", "opens links, permissions, protocols"),
-            (r"\b(safeStorage|keytar|autoUpdater|electron-updater)\b", "tokens and updates"),
-            (r"\bfetch\s*\(|\bnet\.request\b|\bhttps?\.request\b", "network requests"),
-        ],
-        "files": [r"^\.github/", r"^scripts/.*\.(sh|py|mjs|js)$", r"^package\.json$"],
+        # git diff names files from the repository root, so the scripts are under addon/.
+        "files": [r"^\.github/", r"^addon/scripts/.*\.(sh|py)$"],
     },
 }
 

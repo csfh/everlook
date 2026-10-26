@@ -470,7 +470,7 @@ return function(root, check)
 			counts = { fonts_passes = 3, fonts_frames = 4100, settings_kb = 310 },
 		} }
 		env.EverlookDB = { loadTraceHistory = { { done = 1300, reload = false }, { done = 980, reload = true } } }
-		local worker_state = worker(sched, game, "segments", 100000, 0.25)
+		local worker_state = worker(sched, game, "defer", 100000, 0.25)
 		sched.tick()
 		page.scripts.OnShow(page)
 		local lines = {}
@@ -480,7 +480,7 @@ return function(root, check)
 			end
 		end
 		local joined = table.concat(lines, "\n")
-		check("it names the budget and each task in words", joined:find("1.5 ms", 1, true) and joined:find("World data", 1, true) and joined:find("Working", 1, true))
+		check("it names the budget and each task in words", joined:find("1.5 ms", 1, true) and joined:find("Event scans", 1, true) and joined:find("Working", 1, true))
 		check("it reports the last load from the trace",
 			joined:find("12.3 ms", 1, true) and joined:find("Fonts 6.1, Smart island 4", 1, true) and joined:find("5.2 ms, 310 KB", 1, true)
 			and joined:find("3 passes", 1, true) and joined:find("4,100 frames walked", 1, true) and joined:find("1,234 ms after Everlook began", 1, true)

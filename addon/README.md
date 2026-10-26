@@ -33,7 +33,7 @@ python3 tests/luac_test.py
 bash scripts/pack.sh <version> <output dir>
 ```
 
-This writes `Everlook-<version>.tar.gz`, a zip of the same folders, and `Everlook.json`. It stamps the core's version into each module's TOC. Module TOCs in the repository have no `## Version`.
+This writes `Everlook-<version>.tar.gz`, a zip of the same folders, and `SHA256SUMS` for both. It stamps the core's version into each module's TOC. Module TOCs in the repository have no `## Version`.
 
 ## Third-party assets
 

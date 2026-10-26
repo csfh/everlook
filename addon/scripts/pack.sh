@@ -73,7 +73,6 @@ find "${stage}" -type f -exec chmod 644 {} +
 
 archive="${outdir}/Everlook-${version}.tar.gz"
 tar -C "${stage}" --sort=name --mtime="@${epoch}" --owner=0 --group=0 --numeric-owner -cf - "${folders[@]}" | gzip -n -9 > "${archive}"
-cp "${archive}" "${outdir}/Everlook-latest.tar.gz"
 
 # Windows opens a .zip without extra tools, so every release carries the same folders as one.
 zip_archive="${outdir}/Everlook-${version}.zip"
@@ -93,19 +92,6 @@ with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as archive:
                 info.compress_type = zipfile.ZIP_DEFLATED
                 info.external_attr = 0o644 << 16
                 archive.writestr(info, path.read_bytes())
-PY
-cp "${zip_archive}" "${outdir}/Everlook-latest.zip"
-
-interface="$(awk -F': ' '/^## Interface:/{gsub("\r","",$2); print $2; exit}' "${core}/Everlook.toc")"
-title="$(awk -F': ' '/^## Title:/{gsub("\r","",$2); print $2; exit}' "${core}/Everlook.toc")"
-uv run --no-project python - "${outdir}/Everlook.json" "${title:-Everlook}" "${version}" "${interface}" <<'PY'
-import json
-import sys
-
-path, title, version, interface = sys.argv[1:5]
-with open(path, "w", encoding="utf-8") as handle:
-    json.dump({"title": title, "version": version, "interface": interface or None}, handle)
-    handle.write("\n")
 PY
 
 members="$(tar -tzf "${archive}")"

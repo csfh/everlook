@@ -59,7 +59,6 @@ class AddonScriptsTest(unittest.TestCase):
         self.sync()
         self.assertTrue(self.destination.is_symlink())
         self.assertEqual(self.destination.resolve(), self.core)
-        self.assertFalse((self.core / "sign.lua").exists())
 
     def test_links_every_module_folder(self):
         self.sync()
@@ -156,18 +155,16 @@ class AddonScriptsTest(unittest.TestCase):
     def test_release_also_ships_a_zip_with_the_same_folders(self):
         output = self.base / "release-zip"
         self.pack(output, version="2.3.4").close()
-        for name in ("Everlook-2.3.4.zip", "Everlook-latest.zip"):
-            with zipfile.ZipFile(output / name) as archive:
-                names = archive.namelist()
-                self.assertIn("Everlook/Everlook.toc", names)
-                self.assertIn("Everlook/world.lua", names)
-                self.assertIn("Everlook/LICENSE", names)
-                self.assertIn("Everlook_SellJunk/sell_junk.lua", names)
-                # Windows Explorer needs forward slashes and no leading folder above the addons.
-                self.assertTrue(all("\\" not in entry and not entry.startswith("/") for entry in names))
-                toc = archive.read("Everlook_SellJunk/Everlook_SellJunk.toc").decode()
-            self.assertIn("## Version: 2.3.4", toc)
-        self.assertEqual((output / "Everlook-2.3.4.zip").read_bytes(), (output / "Everlook-latest.zip").read_bytes())
+        with zipfile.ZipFile(output / "Everlook-2.3.4.zip") as archive:
+            names = archive.namelist()
+            self.assertIn("Everlook/Everlook.toc", names)
+            self.assertIn("Everlook/world.lua", names)
+            self.assertIn("Everlook/LICENSE", names)
+            self.assertIn("Everlook_SellJunk/sell_junk.lua", names)
+            # Windows Explorer needs forward slashes and no leading folder above the addons.
+            self.assertTrue(all("\\" not in entry and not entry.startswith("/") for entry in names))
+            toc = archive.read("Everlook_SellJunk/Everlook_SellJunk.toc").decode()
+        self.assertIn("## Version: 2.3.4", toc)
 
 
 class ReleaseArchiveTest(unittest.TestCase):
@@ -245,7 +242,7 @@ class LayoutTest(unittest.TestCase):
                 listed = {name.replace("\\", "/") for name in files}
                 for path in folder.rglob("*"):
                     relative = path.relative_to(folder).as_posix()
-                    if path.suffix in (".lua", ".xml") and path.name != "Bindings.xml" and not relative.startswith("sign"):
+                    if path.suffix in (".lua", ".xml") and path.name != "Bindings.xml":
                         self.assertIn(relative, listed, f"{folder.name}.toc does not load {relative}")
 
     # The addon list shows these titles. "Everlook" is in the gold of the game's
