@@ -1789,9 +1789,7 @@ return function(root, check)
 			self.parent, self.predicate = parent, predicate; children[#children + 1] = self
 		end, AddSearchTags = function(self, ...) self.tags = { ... } end }
 	end
-	local canvas = {}
-	local canvas_requests, opened = 0, nil
-	addon2.collected = { page = function() canvas_requests = canvas_requests + 1; return canvas end }
+	local opened = nil
 	addon2.sched = { frame = {}, page = function() return addon2.sched.frame end }
 	local scanned = 0
 	addon2.scan = { now = function() scanned = scanned + 1 end }

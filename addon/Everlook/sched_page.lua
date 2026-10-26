@@ -10,7 +10,6 @@ local ROW_HEIGHT = 20
 
 local NAMES = {
 	items = "Item reads",
-	collected_scan = "Collected search",
 	segments = "World data",
 	defer = "Event scans",
 }
