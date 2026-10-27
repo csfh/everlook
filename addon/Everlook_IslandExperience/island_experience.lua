@@ -38,12 +38,7 @@ end
 local secret = Everlook.secret
 
 local plain_number = Everlook.island_feed_kit.plain_number
-
-local function whole(value)
-	value = plain_number(value)
-	if value == nil or value < 0 or value % 1 ~= 0 then return nil end
-	return value
-end
+local whole = Everlook.island_vitals.whole
 
 local function server_now()
 	if type(GetServerTime) == "function" then

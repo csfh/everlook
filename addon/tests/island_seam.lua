@@ -73,6 +73,12 @@ return function(root, check, island_world, quest_world, secret_stat)
 			and advance({ level = 10, xp = 400, xp_max = 1000 }, { level = 11, xp = 50, xp_max = 2000 }) == 650
 			and advance({ level = 10, xp = 100, xp_max = 1000 }, { level = 10, xp = 50, xp_max = 1000 }) == nil
 			and advance({ level = 10, xp = 100, xp_max = 1000 }, { level = 12, xp = 0, xp_max = 1000 }) == nil)
+		local whole = addon.island_vitals.whole
+		check("a bar reading is whole by the one shared rule", type(whole) == "function"
+			and whole(12) == 12 and whole(0) == 0 and whole(-1) == nil and whole(1.5) == nil
+			and whole(0 / 0) == nil and whole(math.huge) == nil and whole("12") == nil)
+		check("experience detail keeps no rule of its own for a whole reading",
+			not read_source("island_experience.lua"):find("local function whole", 1, true))
 	end
 
 	do

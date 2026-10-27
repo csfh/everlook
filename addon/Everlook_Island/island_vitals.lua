@@ -104,6 +104,7 @@ local function whole(value)
 	if value == nil or value < 0 or value % 1 ~= 0 then return nil end
 	return value
 end
+vitals.whole = whole
 
 function vitals.at_cap(level)
 	if type(GetMaxPlayerLevel) ~= "function" then return false end
