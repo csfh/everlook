@@ -271,8 +271,7 @@ local function note(current_session, kind, amount)
 	end
 end
 
-local function pattern_from(fmt)
-	if type(fmt) ~= "string" or secret(fmt) or fmt == "" then return nil end
+local function compile(fmt)
 	local kinds, parts = {}, {}
 	local i, size = 1, #fmt
 	while i <= size do
@@ -306,6 +305,20 @@ local function pattern_from(fmt)
 		end
 	end
 	return "^" .. table.concat(parts) .. "$", kinds
+end
+
+-- The KILL_TEXT globals are still read on every kill line, but each format string is turned
+-- into a pattern only once, since that walk is most of the cost of a line.
+local compiled = {}
+
+local function pattern_from(fmt)
+	if type(fmt) ~= "string" or secret(fmt) or fmt == "" then return nil end
+	local known = compiled[fmt]
+	if not known then
+		known = { compile(fmt) }
+		compiled[fmt] = known
+	end
+	return known[1], known[2]
 end
 
 local function kill_amount(text)
