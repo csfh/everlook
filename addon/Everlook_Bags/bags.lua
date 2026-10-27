@@ -86,8 +86,6 @@ local function slots_of(frame)
 	return slots
 end
 
--- Lays the grid out in the given number of columns, anchored where stock
--- anchors it. At the stock column count this is the layout stock draws.
 local function unpark_all()
 	for button, was in pairs(parked) do
 		button:SetAlpha(was.alpha)
@@ -104,6 +102,8 @@ local function park(button, frame)
 	button:SetPoint("BOTTOMRIGHT", frame.MoneyFrame, "TOPRIGHT", 0, GRID_OFFSET_Y)
 end
 
+-- Lays the grid out in the given number of columns, anchored where stock
+-- anchors it. At the stock column count this is the layout stock draws.
 local function place_flat(frame, columns)
 	headers.hide_all()
 	chips.hide()
@@ -118,9 +118,6 @@ local function place_flat(frame, columns)
 	frame:SetSize(layout.resized(stock_width, stock_height, #slots, columns))
 end
 
--- The section a slot belongs to: its item's type, junk ahead of it, or free
--- space when it holds nothing. A grey item is junk, and so is a marked one
--- while the marker is on.
 -- The custom sections the player has named, by number, and the numbers in order.
 local function custom_in_use()
 	local labels, numbers = {}, {}
@@ -136,6 +133,10 @@ local function custom_in_use()
 	return labels, numbers
 end
 
+-- The section a slot belongs to, and its item: free space when it holds nothing,
+-- otherwise pinned, then a custom section, then junk, then recent, then its
+-- item's type, as categories.of ranks them. A grey item is junk, and so is a
+-- marked one while the marker is on.
 local function section_of(slot, pinned_data, assigned_data, labels)
 	local info = C_Container.GetContainerItemInfo(slot.bag, slot.slot)
 	if type(info) ~= "table" then return categories.FREE end
