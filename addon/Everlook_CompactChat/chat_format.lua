@@ -106,9 +106,12 @@ local function set_timestamps(hidden)
 	end
 	EverlookDB = EverlookDB or {}
 	if hidden then
-		if EverlookDB.timestampsBefore == nil then
-			local current = GetCVar(cvar)
-			if type(current) ~= "string" or (issecretvalue and issecretvalue(current)) then
+		-- Hidden again while a choice is saved: anything but the "none" this set was picked by the
+		-- player since, and becomes the choice to put back.
+		local current = GetCVar(cvar)
+		local readable = type(current) == "string" and not (issecretvalue and issecretvalue(current))
+		if EverlookDB.timestampsBefore == nil or (readable and current ~= "none") then
+			if not readable then
 				return
 			end
 			EverlookDB.timestampsBefore = current
@@ -137,9 +140,9 @@ module.register({
 	addon = addon_name, page = "chat", order = 20,
 	id = id,
 	name = "Compact chat lines",
-	description = "Shows say, yell, party, raid, guild, officer, instance, and whisper lines as a short label (S, Y, P, PL, R, RL, RW, G, O, I, IL, W, or To), the name, then the message, with no brackets, and a numbered channel as its number. The label takes that chat's color, or white when that chat has none, the name keeps its class color and the message keeps the color the game gives it, a system line, an emote, text the client hides, and a line already showing stay as they are, the option Hide the game's chat timestamps starts on and stays separate, turning this off puts the game's own format back for new lines and, while that option is still on, puts back the timestamp choice from before this was turned on, and a client with none of those chat formats or with no timestamp choice it can save is left alone.",
+	description = "Shows say, yell, party, raid, guild, officer, instance, and whisper lines as a short label (S, Y, P, PL, R, RL, RW, G, O, I, IL, W, or To), the name, then the message, with no brackets, and a numbered channel as its number. The label takes that chat's color, or white when that chat has none, the name keeps its class color and the message keeps the color the game gives it, a system line, an emote, text the client hides, and a line already showing stay as they are, the option Hide the game's chat timestamps starts on and stays separate, turning this off puts the game's own format back for new lines and, while that option is still on, puts back your timestamp choice, and a client with none of those chat formats or with no timestamp choice it can save is left alone.",
 	options = {
-		hide_timestamps = { name = "Hide the game's chat timestamps", default = true, description = "While Compact chat lines is on, this sets Timestamps in Options, Social to None and keeps the choice that was in place when that hide started. Turning this off, or turning Compact chat lines off while this stays on, puts that choice back when one was saved and Timestamps still says None, so a choice you made there since stays, the next hide keeps the choice in place then, and a client that cannot read or save the current choice is left alone." },
+		hide_timestamps = { name = "Hide the game's chat timestamps", default = true, description = "While Compact chat lines is on, this sets Timestamps in Options, Social to None and keeps your choice: the one in place when the hide started, or one you picked there since. Turning this off, or turning Compact chat lines off while this stays on, puts your choice back, and a client that cannot read or save the current choice is left alone." },
 	},
 	events = { "UPDATE_CHAT_COLOR", "UPDATE_CHAT_WINDOWS", "UPDATE_FLOATING_CHAT_WINDOWS" },
 	on_event = function() apply(true) end,

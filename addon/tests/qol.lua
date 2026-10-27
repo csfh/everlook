@@ -1053,6 +1053,13 @@ return function(root, check)
 	chat_env.timestamps = "%I:%M "
 	chat.module.set("chat_format", "enabled", false)
 	check("a format the player picked meanwhile is kept, not overwritten", chat_env.timestamps == "%I:%M " and chat_env.EverlookDB.timestampsBefore == nil)
+	chat.module.set("chat_format", "enabled", true)
+	-- Picked again, then the chat windows change and the module hides timestamps once more before it lets go.
+	chat_env.timestamps = "%H:%M:%S "
+	chat_event("UPDATE_CHAT_WINDOWS")
+	check("a chat window change hides the timestamps again", chat_env.timestamps == "none")
+	chat.module.set("chat_format", "enabled", false)
+	check("and the format picked before that change is the one that comes back", chat_env.timestamps == "%H:%M:%S ")
 	do
 		-- A reload in the middle: a new session with the same saved variables, and the game still holding "none".
 		chat_env.timestamps = "%H:%M "
