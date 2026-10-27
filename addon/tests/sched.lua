@@ -470,7 +470,7 @@ return function(root, check)
 			counts = { fonts_passes = 3, fonts_frames = 4100, settings_kb = 310 },
 		} }
 		env.EverlookDB = { loadTraceHistory = { { done = 1300, reload = false }, { done = 980, reload = true } } }
-		local worker_state = worker(sched, game, "defer", 100000, 0.25)
+		worker(sched, game, "defer", 100000, 0.25)
 		sched.tick()
 		page.scripts.OnShow(page)
 		local lines = {}

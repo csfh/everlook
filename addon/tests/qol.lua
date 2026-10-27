@@ -3044,11 +3044,6 @@ return function(root, check)
 		local function near(actual, expected)
 			return type(actual) == "number" and math.abs(actual - expected) < 1e-4
 		end
-		local function arrow_on(frame)
-			for _, region in ipairs(frame and frame.regions or {}) do
-				if region.path == "Interface\\AddOns\\Everlook_Island\\assets\\island_arrow.tga" then return region end
-			end
-		end
 		local addon, env, event, state, _, _, frames = quest_world()
 		local bearing = addon.island_quests.bearing
 		-- GetWorldPosFromMapPos on Elwynn 37: x grows north, y grows west.
