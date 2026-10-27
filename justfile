@@ -41,7 +41,7 @@ addonsubjects:
 [private]
 [working-directory('addon/harness')]
 harnesstest:
-    cargo test -q
+    cargo test -q --locked
 
 [private]
 [working-directory('www')]

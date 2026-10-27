@@ -15,7 +15,7 @@ bugs the stand-ins cannot show. The addon's own `lua5.1 tests/run.lua` stays the
 - `docs/engine-facts.md` lists every rule of the game the harness assumes. Correct it when the client disagrees.
 
 ```
-cargo test                                  # every scenario in scenarios/ against the addon folders in ..
+cargo test --locked                         # every scenario in scenarios/ against the addon folders in ..
 cargo run -- run scenarios/island_mouse.lua # one scenario, with its checks printed
 cargo run -- render scenarios/island_gallery.lua out.html # one HTML file; a scenario's harness.snapshot(name) calls become its states
 cargo run -- serve scenarios/island_mouse.lua             # the same, live: hover, click, wheel, step the clock
