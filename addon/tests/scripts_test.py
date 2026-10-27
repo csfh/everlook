@@ -12,6 +12,8 @@ import unittest
 
 
 ADDON = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ADDON / "scripts"))
+import auto_release  # noqa: E402
 
 
 class AddonScriptsTest(unittest.TestCase):
@@ -265,6 +267,10 @@ class LayoutTest(unittest.TestCase):
                 name = folder.name.removeprefix("Everlook_")
                 color = self.ISLAND if self.is_island(name) else self.MODULE
                 self.assertEqual(fields.get("Title"), f"{prefix} |cff{color}{name}|r")
+
+    def test_the_core_version_is_written_the_way_the_release_reads_and_bumps_it(self):
+        # auto_release knows one form, "## Version: x.y.z", so any other spelling fails here, before a push.
+        self.assertTrue(auto_release.SEMVER.fullmatch(auto_release.current_addon_version(ADDON)))
 
     NAMEPLATE_PROVIDERS = {"QuestNameplates", "NameplateTitles"}
 

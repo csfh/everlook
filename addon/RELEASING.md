@@ -2,7 +2,7 @@
 
 A push to `main` that changes `addon/**` runs the addon tests and, when the commits ask for one, publishes a GitHub Release tagged `addon-v<version>`. CI has never played the build, so the smoke list below still happens in the client before that push.
 
-The version in `addon/Everlook/Everlook.toc` is what ships when that line changes by hand. Do not tag a release yourself, and do not bump the version past what the release workflow should publish.
+The version in `addon/Everlook/Everlook.toc`, written `## Version: x.y.z`, is what ships when that line changes by hand. The release reads and bumps only that form, and `tests/scripts_test.py` fails on any other. Do not tag a release yourself, and do not bump the version past what the release workflow should publish.
 
 ## Before the push
 

@@ -18,8 +18,8 @@ import sys
 from pathlib import Path
 
 SEMVER = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
+# The one form of the version line: the bump writes it, and the hand-set check reads only it.
 TOC_VERSION = re.compile(r"^(## Version: )(\S+)", re.MULTILINE)
-TOC_VERSION_LINE = re.compile(r"^## Version:\s*(\S+)", re.IGNORECASE)
 ZERO_SHA = "0" * 40
 
 
@@ -225,10 +225,8 @@ def plan_release(
 
 
 def version_value(line_body: str) -> str | None:
-    match = TOC_VERSION_LINE.match(line_body)
-    if match:
-        return match.group(1)
-    return line_body if SEMVER.fullmatch(line_body) else None
+    match = TOC_VERSION.match(line_body)
+    return match.group(2) if match else None
 
 
 def version_field_changed(diff: str) -> bool:

@@ -133,6 +133,12 @@ class Planning(unittest.TestCase):
         paths = auto_release.PRODUCTS[PRODUCT]["paths"]
         self.assertEqual(auto_release.plan_release(self.repo, self.before, after, VERSION_FILE, paths), (None, False))
 
+    def test_only_the_version_line_the_bump_writes_counts_as_a_hand_set_version(self) -> None:
+        self.assertTrue(auto_release.version_field_changed("-## Version: 1.0.0\n+## Version: 1.1.0\n"))
+        self.assertFalse(auto_release.version_field_changed("-## version: 1.0.0\n+## version: 1.1.0\n"))
+        self.assertFalse(auto_release.version_field_changed("-## Version:1.0.0\n+## Version:1.1.0\n"))
+        self.assertFalse(auto_release.version_field_changed("-1.0.0\n+1.1.0\n"))
+
     def test_bumps_the_version_file(self) -> None:
         after = self.commit("src.txt", "two\n", "feat: change")
         version, bumped, release, level = auto_release.maybe_bump(PRODUCT, self.repo, self.before, after)
