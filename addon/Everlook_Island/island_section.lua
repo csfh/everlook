@@ -36,9 +36,7 @@ local function plain_table(value)
 	return usable(value) and type(value) == "table" and getmetatable(value) == nil
 end
 
-local function plain_string(value, maximum)
-	return usable(value) and type(value) == "string" and #value >= 1 and #value <= maximum and value:find("%S") ~= nil
-end
+local plain_string = Everlook.text
 
 -- A text a producer writes is plain: no colour codes, links or textures, which all start with a pipe.
 local function plain_text(value, maximum)

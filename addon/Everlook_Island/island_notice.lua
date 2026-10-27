@@ -17,9 +17,7 @@ local usable = Everlook.readable
 
 local finite = Everlook.finite
 
-local function plain_string(value, maximum)
-	return usable(value) and type(value) == "string" and #value <= maximum and value:find("%S") ~= nil
-end
+local plain_string = Everlook.text
 
 notice.plain_string = plain_string
 

@@ -1657,9 +1657,7 @@ function island.undo_clear()
 	return true
 end
 
-local function plain_string(value, maximum)
-	return usable(value) and type(value) == "string" and #value <= maximum and value:find("%S") ~= nil
-end
+local plain_string = Everlook.text
 
 local function refresh_status(entry)
 	local exists = false

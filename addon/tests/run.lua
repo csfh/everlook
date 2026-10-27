@@ -64,6 +64,11 @@ do
 	check("call runs a method the object has, with its arguments, and gives back what it returns", size == 9 and word == "grown")
 	check("call does nothing for a method the object lacks, a value that is not a method, or no object",
 		masked.call(widget, "Shrink") == nil and masked.call(widget, "size") == nil and masked.call(nil, "Grow", 1, 1) == nil and widget.size == 9)
+	check("text is a readable string with something in it, up to the length given",
+		masked.text("Inspect", 7) == true and masked.text(" a ", 3) == true)
+	check("a longer, blank, empty, missing or non-string value is not text",
+		masked.text("Inspect", 6) == false and masked.text("   ", 8) == false and masked.text("", 8) == false
+		and masked.text(nil, 8) == false and masked.text(42, 8) == false and masked.text(7, 8) == false)
 end
 
 do

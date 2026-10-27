@@ -40,6 +40,12 @@ function Everlook.readable(value)
 	return Everlook.world.usable(value) and value ~= nil
 end
 
+-- Whether a value is text that can be shown: a readable string with something
+-- other than spaces in it, no longer than maximum.
+function Everlook.text(value, maximum)
+	return Everlook.readable(value) and type(value) == "string" and #value <= maximum and value:find("%S") ~= nil
+end
+
 -- Whether a value is a number that can be compared and shown: public, and
 -- neither NaN nor infinite.
 function Everlook.finite(value)

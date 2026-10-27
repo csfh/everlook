@@ -12,9 +12,7 @@ local hooks = {}
 
 local usable = Everlook.readable
 
-local function plain(value, maximum)
-	return usable(value) and type(value) == "string" and #value <= maximum and value:find("%S") ~= nil
-end
+local plain = Everlook.text
 
 local function integer(value)
 	return usable(value) and type(value) == "number" and value == value and value >= 1
