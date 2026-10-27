@@ -1598,15 +1598,21 @@ inspect_rows = function()
 	end
 end
 
+-- A held scroll thumb asks for its offset on every frame, so an offset that does not move the
+-- list, held still or dragged past an end, paints nothing.
 function island.scroll_to(offset)
 	if not usable(offset) or type(offset) ~= "number" or not opened() then return end
-	scroll_offset = math.max(0, math.min(offset, content_height - scroll_height))
+	local clamped = math.max(0, math.min(offset, content_height - scroll_height))
+	if clamped == scroll_offset then return end
+	scroll_offset = clamped
 	paint()
 end
 
 function island.scroll_quests(offset)
 	if not usable(offset) or type(offset) ~= "number" or not opened() then return end
-	shell.quest_offset = math.max(0, math.min(offset, shell.quest_height - scroll_height))
+	local clamped = math.max(0, math.min(offset, shell.quest_height - scroll_height))
+	if clamped == shell.quest_offset then return end
+	shell.quest_offset = clamped
 	paint()
 end
 
