@@ -229,6 +229,23 @@ return function(root, check)
 	end
 
 	do
+		-- The host's addon finishes loading before an extension's addon calls extend, as the
+		-- island's does before its feeds, and the player had the host on last session.
+		local registry, env, finish, fire = load_registry()
+		env.EverlookDB.qol = { host = { enabled = true } }
+		local heard = {}
+		plain(registry, "host", "smart_island", 10)
+		finish("Everlook_host")
+		registry.extend("host", {
+			id = "loot", addon = "Everlook_loot", order = 10,
+			events = { "CHAT_MSG_LOOT" }, on_event = function(event) heard[#heard + 1] = event end,
+		})
+		finish("Everlook_loot")
+		fire("CHAT_MSG_LOOT")
+		check("an extension of a host that is already on hears its events once its addon has loaded", #heard == 1)
+	end
+
+	do
 		local registry, env, finish, fire = load_registry()
 		local after = 0
 		plain(registry, "waits", "map", 10, { events = { "PLAYER_REGEN_ENABLED" }, on_event = function() end, out_of_combat = true, apply = function() after = after + 1 end })

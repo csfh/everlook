@@ -290,6 +290,8 @@ function registry.extend(host_id, extension)
 		timed("module:" .. host_id .. "/" .. extension.id, function()
 			fill_defaults(host_id, extension.options)
 			if extension.apply then extension.apply(registry.enabled(host_id)) end
+			-- The host's own apply ran before this addon loaded, so it could not see these events.
+			sync_events()
 		end)
 	end)
 	return extension
