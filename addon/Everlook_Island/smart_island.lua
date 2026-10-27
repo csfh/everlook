@@ -437,7 +437,6 @@ local function content_size(node, entry, width, compact, activity)
 	else
 		call(node.accent, "Hide")
 	end
-	if action_row > 0 then actions.paint(node, entry, compact) end
 	if not activity and (not compact or call(node.frame, "IsMouseEnabled") == true) then
 		-- A card with buttons or a click target keeps its left clicks. Letting them pass through
 		-- the card can let them pass its buttons too, so only a plain notice is click-through.
