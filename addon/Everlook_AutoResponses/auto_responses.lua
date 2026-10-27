@@ -11,7 +11,8 @@ local resurrection_popups = { "RESURRECT", "RESURRECT_NO_SICKNESS", "RESURRECT_N
 -- answers it and closes it.
 local function accept_summon(summon_type, skip_starting_area)
 	if skip_starting_area or not (Enum and Enum.SummonReason) or summon_type == Enum.SummonReason.Scenario then return end
-	if (InCombatLockdown and InCombatLockdown()) or not (C_SummonInfo and C_SummonInfo.ConfirmSummon) then return end
+	-- A combat state the client does not report counts as combat.
+	if type(InCombatLockdown) ~= "function" or InCombatLockdown() or not (C_SummonInfo and C_SummonInfo.ConfirmSummon) then return end
 	C_SummonInfo.ConfirmSummon()
 	if StaticPopup_Hide then StaticPopup_Hide("CONFIRM_SUMMON") end
 end

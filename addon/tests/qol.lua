@@ -1667,6 +1667,9 @@ return function(root, check)
 	check("a combat resurrection is accepted and its popups close",
 		accepted_res == 1 and popups_hidden[#popups_hidden] == "RESURRECT_NO_TIMER"
 		and popups_hidden[#popups_hidden - 1] == "RESURRECT_NO_SICKNESS" and popups_hidden[#popups_hidden - 2] == "RESURRECT")
+	env6.InCombatLockdown = nil
+	event6("CONFIRM_SUMMON", 0, false)
+	check("a summon stays when the client cannot say whether you are in combat", confirmed == 1)
 	env6.InCombatLockdown = function() return false end
 	addon6.module.set("auto_responses", "accept_summons", false)
 	addon6.module.set("auto_responses", "accept_resurrections", false)
