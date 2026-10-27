@@ -4,9 +4,11 @@ return function(root, check)
 	local Everlook = {}
 	local env = setmetatable({ Everlook = Everlook }, { __index = _G })
 	env._G = env
-	local chunk = assert(loadfile(source("island_row")))
-	setfenv(chunk, env)
-	chunk("Everlook", Everlook)
+	for _, file in ipairs({ "world", "island_row" }) do
+		local chunk = assert(loadfile(source(file)))
+		setfenv(chunk, env)
+		chunk("Everlook", Everlook)
+	end
 	local fit = Everlook.island_row.fit
 	local function width(text) return #text * 6 end
 

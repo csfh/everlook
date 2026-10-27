@@ -108,10 +108,7 @@ local usable = Everlook.readable
 
 local finite = Everlook.finite
 
-local function call(object, method, ...)
-	local fn = object and object[method]
-	if type(fn) == "function" then return fn(object, ...) end
-end
+local call = Everlook.call
 
 -- Headings are set in capitals, which a font cannot do for us.
 -- Sets a label to a font role: its font and its tone.

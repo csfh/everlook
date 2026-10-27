@@ -27,6 +27,13 @@ function Everlook.public(value)
 	end
 end
 
+-- Calls a method when the object has one and gives back what it returns. A
+-- widget the client does not make, or one older than the method, is left alone.
+function Everlook.call(object, method, ...)
+	local fn = object and object[method]
+	if type(fn) == "function" then return fn(object, ...) end
+end
+
 -- Whether a value is there and can be read: not nil and not hidden. The hidden
 -- check comes first, so a hidden value is never compared.
 function Everlook.readable(value)

@@ -10,10 +10,7 @@ local ART = "Interface\\AddOns\\Everlook_Island\\assets\\"
 local EDGE = { 1, 1, 1, 0.12 }
 local FILL = { 13 / 255, 15 / 255, 20 / 255, 0.96 }
 
-local function call(object, method, ...)
-	local fn = object and object[method]
-	if type(fn) == "function" then return fn(object, ...) end
-end
+local call = Everlook.call
 
 local surface_layers = {}
 

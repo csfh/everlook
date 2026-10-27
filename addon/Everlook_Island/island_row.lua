@@ -25,10 +25,7 @@ local ARROW_TONE = { 1, 0.86, 0.35 }
 local BADGE_TONE = { 0.68, 0.46, 0.94, 1 }
 local LABEL_TONE = { 174 / 255, 182 / 255, 195 / 255, 1 }
 
-local function call(object, method, ...)
-	local fn = object and object[method]
-	if type(fn) == "function" then return fn(object, ...) end
-end
+local call = Everlook.call
 
 function row.make_arrow(parent)
 	local texture = call(parent, "CreateTexture", nil, "OVERLAY")

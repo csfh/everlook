@@ -58,6 +58,12 @@ do
 	check("a value that is there and public is readable, false included",
 		masked.readable(7) == true and masked.readable("text") == true and masked.readable(false) == true)
 	check("nil and a hidden value are not readable", masked.readable(nil) == false and masked.readable(42) == false)
+	local widget = { size = 3 }
+	function widget:Grow(by, times) self.size = self.size + by * times; return self.size, "grown" end
+	local size, word = masked.call(widget, "Grow", 2, 3)
+	check("call runs a method the object has, with its arguments, and gives back what it returns", size == 9 and word == "grown")
+	check("call does nothing for a method the object lacks, a value that is not a method, or no object",
+		masked.call(widget, "Shrink") == nil and masked.call(widget, "size") == nil and masked.call(nil, "Grow", 1, 1) == nil and widget.size == 9)
 end
 
 do

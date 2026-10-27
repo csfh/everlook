@@ -8,10 +8,7 @@ Everlook.island_blocks = blocks
 
 local island_row = Everlook.island_row
 
-local function call(object, method, ...)
-	local fn = object and object[method]
-	if type(fn) == "function" then return fn(object, ...) end
-end
+local call = Everlook.call
 
 -- A producer's callback runs with the handle and the action id, as a notice's does,
 -- and its failures go to the error handler instead of stopping the island.

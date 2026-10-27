@@ -12,10 +12,7 @@ local THUMB_MIN, WIDTH, OFFSET = 24, 4, 2
 -- rows and below the thumb.
 local FADE_HEIGHT, FADE_LEVEL = 20, 58
 
-local function call(object, method, ...)
-	local fn = object and object[method]
-	if type(fn) == "function" then return fn(object, ...) end
-end
+local call = Everlook.call
 
 -- options.scroll_to(offset) moves the list. options.ratio() is screen pixels
 -- per Island unit, so a drag follows the pointer at any scale. options.name

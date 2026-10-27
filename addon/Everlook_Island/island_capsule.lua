@@ -314,10 +314,7 @@ local function resolved_icon(name)
 	return MARKS[name] or MARKS.generic
 end
 
-local function call(object, method, ...)
-	local fn = object and object[method]
-	if type(fn) == "function" then return fn(object, ...) end
-end
+local call = Everlook.call
 
 function capsule.resolve(mark)
 	if type(mark) == "string" then return resolved_icon(mark) end

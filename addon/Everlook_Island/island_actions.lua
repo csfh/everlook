@@ -25,10 +25,7 @@ local function identifier(value)
 	return plain(value, 32) and value:find("^[%a_][%w_]*$") ~= nil
 end
 
-local function call(object, method, ...)
-	local fn = object and object[method]
-	if type(fn) == "function" then return fn(object, ...) end
-end
+local call = Everlook.call
 
 function actions.use(next_hooks)
 	hooks = next_hooks or {}
