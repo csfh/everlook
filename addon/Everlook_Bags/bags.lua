@@ -330,11 +330,12 @@ on_solo = function(key)
 	if type(frame.IsShown) == "function" and frame:IsShown() then regroup(frame) end
 end
 
+local function under_pointer(button)
+	return not parked[button] and type(button.IsMouseOver) == "function" and button:IsMouseOver()
+end
+
 local function pointer_on_slot(frame)
-	for _, button in ipairs(layout.buttons_of(frame)) do
-		if not parked[button] and type(button.IsMouseOver) == "function" and button:IsMouseOver() then return true end
-	end
-	return false
+	return layout.any_button(frame, under_pointer)
 end
 
 -- A slot under the pointer must stay put: selling or using an item empties its slot, and a

@@ -19,6 +19,15 @@ function layout.buttons_of(frame)
 	return found
 end
 
+-- Whether any of those buttons passes `test`, asked without building the list, for a
+-- question asked on every frame.
+function layout.any_button(frame, test)
+	for _, button in frame:EnumerateValidItems() do
+		if button ~= nil and test(button) then return true end
+	end
+	return false
+end
+
 local function span(count)
 	return count * ITEM_SIZE + (count - 1) * SPACING
 end
