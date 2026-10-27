@@ -91,8 +91,16 @@ end
 
 registry.snap = on_step
 
+-- The errors below name what they are about, as the registration errors do. They are raised
+-- with error() and not assert(), because assert would build the message on every call.
+local function known(id)
+	local module = by_id[id]
+	if not module then error("Unknown Everlook module " .. tostring(id), 2) end
+	return module
+end
+
 function registry.get(id, key)
-	local module = assert(by_id[id], "Unknown Everlook module")
+	local module = known(id)
 	local value = EverlookDB and EverlookDB.qol and EverlookDB.qol[id] and EverlookDB.qol[id][key]
 	local option = module.options[key]
 	if option and not (issecretvalue and issecretvalue(value)) and type(value) == type(option.default) and allowed(option, value) then
@@ -148,10 +156,15 @@ local function apply(module)
 end
 
 function registry.set(id, key, value)
-	local module = assert(by_id[id], "Unknown Everlook module")
-	local option = assert(module.options[key], "Unknown Everlook module option")
-	assert(not (issecretvalue and issecretvalue(value)) and type(value) == type(option.default) and allowed(option, value), "Invalid Everlook module option")
-	if type(value) == "number" then assert(value == value and value > -math.huge and value < math.huge, "Invalid Everlook module number") end
+	local module = known(id)
+	local option = module.options[key]
+	if not option then error("Unknown Everlook option " .. id .. "." .. tostring(key)) end
+	if (issecretvalue and issecretvalue(value)) or type(value) ~= type(option.default) or not allowed(option, value) then
+		error("Invalid value for Everlook option " .. id .. "." .. key)
+	end
+	if type(value) == "number" and not (value == value and value > -math.huge and value < math.huge) then
+		error("Invalid number for Everlook option " .. id .. "." .. key)
+	end
 	if option.min then value = on_step(option, value) end
 	if value == option.default then value = nil end
 	saved(id)[key] = value
