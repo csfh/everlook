@@ -12,7 +12,6 @@ Everlook_CompactChat
 Everlook_FlightTime
 Everlook_Fonts
 Everlook_FriendConveniences
-Everlook_GossipSkip
 Everlook_GroundEffects
 Everlook_HideClutter
 Everlook_Island

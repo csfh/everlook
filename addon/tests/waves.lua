@@ -89,7 +89,7 @@ return function(root, check)
 	end
 
 	local addon, play, fire = load({
-		"world", "module", "tooltips", "useful_tooltips", "chat_tweaks", "coordinates", "quest_levels", "cinematic_skip", "camera", "ground_effects", "mail", "gossip_continue",
+		"world", "module", "tooltips", "useful_tooltips", "chat_tweaks", "coordinates", "quest_levels", "cinematic_skip", "camera", "ground_effects", "mail",
 	})
 	play.TooltipDataProcessor = {
 		AddTooltipPostCall = function(kind, callback)
@@ -435,39 +435,6 @@ return function(root, check)
 	check("a secret mail command state waits", #taken == 0 and not play.tickers[#play.tickers].cancelled)
 	play.issecretvalue = nil
 	play.C_Mail = nil
-
-	local selected
-	play.C_GossipInfo = {
-		GetOptions = function()
-			return play.gossip_options
-		end,
-		GetActiveQuests = function()
-			return {}
-		end,
-		GetAvailableQuests = function()
-			return {}
-		end,
-		SelectOption = function(option_id)
-			selected = option_id
-		end,
-	}
-	play.gossip_options = { { gossipOptionID = 9, gossipOptionType = 2 } }
-	addon.module.set("gossip_continue", "enabled", true)
-	fire("GOSSIP_SHOW")
-	check("one ordinary gossip option is selected", selected == 9)
-	selected = nil
-	play.gossip_options = { { gossipOptionID = 3, gossipOptionType = 1 } }
-	fire("GOSSIP_SHOW")
-	check("a vendor option is not selected", selected == nil)
-	play.gossip_options = { { gossipOptionID = 1, gossipOptionType = 2 }, { gossipOptionID = 2, gossipOptionType = 2 } }
-	fire("GOSSIP_SHOW")
-	check("two gossip options select nothing", selected == nil)
-	play.IsShiftKeyDown = function()
-		return true
-	end
-	play.gossip_options = { { gossipOptionID = 9, gossipOptionType = 2 } }
-	fire("GOSSIP_SHOW")
-	check("Shift selects no gossip option", selected == nil)
 
 	play.GetGameTime = function()
 		return 9, 5

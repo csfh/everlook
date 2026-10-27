@@ -4,7 +4,7 @@ harness.include("lib/game.lua")
 game.quests()
 local names = { "Everlook", "Everlook_Fonts", "Everlook_Island" }
 for _, name in ipairs({ "ActionBarSlots", "ActionShortcuts", "AutoLoot", "AutoRepair", "AutoResponses", "Bags", "CameraDistance", "ChatLayout", "CinematicSkip", "CompactChat",
-	"FlightTime", "FriendConveniences", "GossipSkip", "GroundEffects", "HideClutter", "IslandBuffs", "IslandExperience", "IslandHearth", "IslandInvites", "IslandLoot",
+	"FlightTime", "FriendConveniences", "GroundEffects", "HideClutter", "IslandBuffs", "IslandExperience", "IslandHearth", "IslandInvites", "IslandLoot",
 	"IslandMail", "IslandProfessions", "IslandQuestNotices", "IslandReactions", "IslandRecap", "IslandReputation", "IslandShare", "IslandWarnings",
 	"MinimapCoordinates", "Nameplates", "NameplateTitles", "OpenContainers", "Optimize", "QuestAutomation", "QuestLevels", "QuestNameplates", "QuestTextSize", "RadialMenu", "RewardMarks", "SellJunk",
 	"SwingTimers", "TakeMail", "TooltipCursor", "TrackerTextSize", "UnitFrameNames", "UsefulTooltips" }) do
