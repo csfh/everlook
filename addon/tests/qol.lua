@@ -193,7 +193,7 @@ return function(root, check)
 			frames[#frames + 1] = frame
 			return frame
 		end
-		for _, file in ipairs({ "world", "module", "tooltips", "blizzard_settings", "quest_interface", "flight_time", "friend_conveniences", "useful_tooltips", "faster_loot", "quest_automation", "auto_repair", "sell_junk", "open_containers", "fonts", "hide_clutter", "auto_responses", "chat_tweaks", "coordinates", "quest_levels", "reward_marks", "cinematic_skip", "camera", "swing_timers", "unit_names", "nameplate_kinds", "nameplate_view", "npc_titles", "quest_nameplates", "quest_tracker", "mail", "tooltip_cursor", "chat_format", "radial_wheel", "radial_menu", "island_capsule", "island_row", "island_grid", "island_section", "island_blocks", "island_reaction", "island_summary", "island_quests", "island_actions", "island_vitals", "island_history", "island_surface", "island_scroll", "island_notice", "island_inbox", "island_toasts", "island_constants", "smart_island", "island_feed_kit", "island_share", "island_quest_notices", "island_loot", "island_hearth", "island_reputation", "island_professions", "island_mail", "island_invites", "island_buffs", "island_recap", "island_experience", "island_react", "island_warnings", "action_shortcuts", "bags_layout", "bags_item_level", "bags_junk", "bags_categories", "bags_pins", "bags_assign", "bags_alts", "bags_recent", "bags_folds", "bags_headers", "bags_chips", "bags_search", "bags_marker", "bags", "bar_layouts", "bar_slots" }) do
+		for _, file in ipairs({ "world", "module", "tooltips", "blizzard_settings", "quest_interface", "flight_time", "friend_conveniences", "useful_tooltips", "auto_loot", "quest_automation", "auto_repair", "sell_junk", "open_containers", "fonts", "hide_clutter", "auto_responses", "chat_tweaks", "coordinates", "quest_levels", "reward_marks", "cinematic_skip", "camera", "swing_timers", "unit_names", "nameplate_kinds", "nameplate_view", "npc_titles", "quest_nameplates", "quest_tracker", "mail", "tooltip_cursor", "chat_format", "radial_wheel", "radial_menu", "island_capsule", "island_row", "island_grid", "island_section", "island_blocks", "island_reaction", "island_summary", "island_quests", "island_actions", "island_vitals", "island_history", "island_surface", "island_scroll", "island_notice", "island_inbox", "island_toasts", "island_constants", "smart_island", "island_feed_kit", "island_share", "island_quest_notices", "island_loot", "island_hearth", "island_reputation", "island_professions", "island_mail", "island_invites", "island_buffs", "island_recap", "island_experience", "island_react", "island_warnings", "action_shortcuts", "bags_layout", "bags_item_level", "bags_junk", "bags_categories", "bags_pins", "bags_assign", "bags_alts", "bags_recent", "bags_folds", "bags_headers", "bags_chips", "bags_search", "bags_marker", "bags", "bar_layouts", "bar_slots" }) do
 			if not left_out[file] then
 				local chunk = assert(loadfile(source(file)))
 				setfenv(chunk, env)
@@ -444,7 +444,7 @@ return function(root, check)
 	env.GetNumLootItems = function() return 3 end
 	env.GetLootSlotInfo = function(slot) return nil, nil, nil, nil, nil, slot == 2 end
 	env.LootSlot = function(slot) looted[#looted + 1] = slot end
-	addon.module.set("faster_loot", "enabled", true)
+	addon.module.set("auto_loot", "enabled", true)
 	event("LOOT_OPENED", false)
 	check("fast looting respects manual loot", #looted == 0)
 	event("LOOT_OPENED", true)

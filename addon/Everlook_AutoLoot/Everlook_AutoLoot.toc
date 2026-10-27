@@ -6,4 +6,4 @@
 ## Group: Everlook
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
 
-faster_loot.lua
+auto_loot.lua
