@@ -12,6 +12,6 @@ The textures are:
 - `Interface\Minimap\UI-Minimap-Background`
 - `Interface\Minimap\UI-Minimap-ZoomButton-Highlight`
 
-Hovering shows "Everlook" and "Click to open the settings." Either mouse button toggles the Everlook settings page. `/everlook` does the same and takes no arguments. Esc, Options, AddOns, Everlook reaches the same page.
+Hovering shows "Everlook" and "Click to open the settings." Either mouse button toggles the Everlook settings page. `/everlook`, or `/el` for short, does the same and takes no arguments. Esc, Options, AddOns, Everlook reaches the same page.
 
 The page is `Settings.RegisterVerticalLayoutCategory`. Module options are subpages (`Settings.RegisterVerticalLayoutSubcategory`): Quests, Vendors, Loot and mail, Social, Chat, Tooltips, Map, Action bars, Bags, Nameplates, Text and names, Combat, Screen and camera, Loading, Smart island, and Radial menu. Performance is a canvas subpage when the scheduler exposes one. Debug is added only when the client has a taint log or a module reports a problem. See [qol.md](qol.md).

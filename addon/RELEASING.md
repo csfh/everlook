@@ -14,7 +14,7 @@ The version in `addon/Everlook/Everlook.toc` is what ships when that line change
 ## Smoke list
 
 - Login and `/reload` give no Lua error.
-- `/everlook` opens settings, and every module page opens. `/everlook` with extra words still only toggles that page.
+- `/everlook` and `/el` open settings, and every module page opens. Either with extra words still only toggles that page.
 - The island shows level and the quest, opens on hover, closes, and a notice appears (a vendor visit or mail).
 - Bags open, close, and search (if Bags is on).
 - Quest dialog: accept and turn in with quest automation on, and a PvP-flagging quest is left to the player.

@@ -211,7 +211,7 @@ local function showing_everlook()
 	return false
 end
 
--- The minimap icon and /everlook both come here: open the Everlook page, or
+-- The minimap icon and /everlook (or /el) all come here: open the Everlook page, or
 -- close the settings window if it is already showing Everlook or one of its subpages.
 function Everlook.settings.toggle()
 	ensure()
@@ -228,6 +228,7 @@ function Everlook.settings.toggle()
 end
 
 SLASH_EVERLOOK1 = "/everlook"
+SLASH_EVERLOOK2 = "/el"
 SlashCmdList = SlashCmdList or {}
 SlashCmdList.EVERLOOK = function(message, ...)
 	return Everlook.settings.toggle(message, ...)

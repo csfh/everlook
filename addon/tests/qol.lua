@@ -2013,9 +2013,9 @@ return function(root, check)
 	opened = nil
 	addon2.settings.toggle()
 	check("the toggle opens the page when the panel is closed", opened == 42 and hidden_panels == 4)
-	check("/everlook is the only command and it toggles the page",
-		env2.SLASH_EVERLOOK1 == "/everlook" and env2.SLASH_EVERLOOK2 == nil and env2.SLASH_EVERLOOKQOL1 == nil
-		and env2.SlashCmdList.EVERLOOKQOL == nil)
+	check("/everlook and its short form /el are the only commands, one handler for both",
+		env2.SLASH_EVERLOOK1 == "/everlook" and env2.SLASH_EVERLOOK2 == "/el" and env2.SLASH_EVERLOOK3 == nil
+		and env2.SLASH_EVERLOOKQOL1 == nil and env2.SlashCmdList.EVERLOOKQOL == nil)
 	opened = nil
 	env2.SettingsPanel.shown = false
 	env2.SlashCmdList.EVERLOOK("")
