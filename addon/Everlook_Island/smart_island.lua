@@ -2553,6 +2553,9 @@ local function apply(enabled)
 	bound_history()
 	if not enabled then
 		hide()
+		-- The idle fade starts over: the pill comes back whole, and its quiet seconds count again.
+		idle.since, idle.target = nil, nil
+		call(frame, "SetAlpha", 1)
 		return
 	end
 	ensure_frame()

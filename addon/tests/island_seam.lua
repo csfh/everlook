@@ -293,6 +293,23 @@ return function(root, check, island_world, quest_world, secret_stat)
 		check("turning the option off keeps it visible", island_frame.alpha == 1)
 	end
 	do
+		-- Turned off and on again from the settings page while the pill had faded.
+		local addon, _, _, state, afters, _, frames = island_world()
+		addon.module.set("smart_island", "enabled", true)
+		local island_frame
+		for _, candidate in ipairs(frames) do if candidate.name == "EverlookSmartIsland" then island_frame = candidate end end
+		addon.module.set("smart_island", "hide_when_idle", true)
+		state.time = state.time + 6
+		for _, after in ipairs(afters) do after.callback() end
+		check("a quiet pill has faded before it is turned off", island_frame.alpha == 0)
+		addon.module.set("smart_island", "enabled", false)
+		addon.module.set("smart_island", "enabled", true)
+		check("turned off and on again while quiet, the pill is back for its quiet seconds", island_frame.alpha == 1)
+		state.time = state.time + 6
+		for _, after in ipairs(afters) do after.callback() end
+		check("and fades once those seconds are up", island_frame.alpha == 0)
+	end
+	do
 		local function with_character(env)
 			env.UnitGUID = function() return "Player-1-00000001" end
 			env.GetServerTime = function() return 1000000 end
