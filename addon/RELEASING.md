@@ -19,6 +19,7 @@ The version in `addon/Everlook/Everlook.toc` is what ships when that line change
 - Bags open, close, and search (if Bags is on).
 - Quest dialog: accept and turn in with quest automation on, and a PvP-flagging quest is left to the player.
 - An item tooltip and a creature tooltip show the Everlook id lines once.
+- With cinematic skip on: a cinematic and a movie close as they start, a cinematic during a vehicle ride keeps playing with you still in the vehicle, and no "blocked" message appears.
 - A full client restart, then login: nothing blank, no error.
 
 ## After
