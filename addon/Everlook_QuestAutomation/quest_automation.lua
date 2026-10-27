@@ -75,7 +75,8 @@ local function read_facts(event)
 	local facts = {
 		event = event,
 		paused = module.paused(),
-		in_combat = InCombatLockdown and InCombatLockdown() or false,
+		-- A combat state the client does not report holds automation back, as combat does.
+		in_combat = type(InCombatLockdown) ~= "function" or not not InCombatLockdown(),
 		options = { accept = module.get(id, "accept"), turn_in = module.get(id, "turn_in"), repeatable = module.get(id, "repeatable") },
 	}
 	if facts.paused or facts.in_combat then return facts end

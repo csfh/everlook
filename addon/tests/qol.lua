@@ -433,6 +433,11 @@ return function(root, check)
 		event("QUEST_DETAIL")
 		check("a quest whose PvP flag the client cannot report stays manual", accepted == before + 1)
 		env.QuestFlagsPVP = function() return false end
+		local combat = env.InCombatLockdown
+		env.InCombatLockdown = nil
+		event("QUEST_DETAIL")
+		check("a quest stays manual when the client cannot say whether you are in combat", accepted == before + 1)
+		env.InCombatLockdown = combat
 	end
 
 	local looted = {}
