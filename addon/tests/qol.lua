@@ -5555,6 +5555,23 @@ return function(root, check)
 				check("open professions uses the profession book", opened == true)
 			end
 			do
+				-- GetProfessions gives nil for an empty slot: here one primary profession and fishing,
+				-- with no second primary, no archaeology and no cooking.
+				local addon, env, event = island_world()
+				addon.module.set("smart_island", "enabled", true)
+				local skills = { [1] = { "Blacksmithing", 20, 164 }, [4] = { "Fishing", 20, 356 } }
+				env.GetProfessions = function() return 1, nil, nil, 4, nil end
+				env.GetProfessionInfo = function(slot)
+					local row = skills[slot]
+					return row[1], nil, row[2], 300, 0, 0, row[3]
+				end
+				addon.module.set("smart_island", "feed_professions", true)
+				skills[4][2] = 60
+				event("SKILL_LINES_CHANGED")
+				local notice = notice_key(addon, "professions:1")
+				check("a profession after an empty slot is still followed", notice and notice.text == "Fishing reached 50")
+			end
+			do
 				local addon, env, event, state, _, tickers, frames = island_world()
 				addon.module.set("smart_island", "enabled", true)
 				local pending = true

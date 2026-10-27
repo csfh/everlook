@@ -4,12 +4,18 @@ local kit = Everlook.island_feed_kit
 local plain_number, now, option, dismiss, notify = kit.plain_number, kit.now, kit.option, kit.dismiss, kit.notify
 local state = {}
 
+-- GetProfessions gives a slot for each profession and nil for an empty one, and # cannot be
+-- trusted across those holes, so the values are counted.
+local function slots_of(...)
+	return { n = select("#", ...), ... }
+end
+
 -- A notice when a profession passes a 25-point mark or a recipe is learned.
 local function profession_rows()
 	if type(GetProfessions) ~= "function" or type(GetProfessionInfo) ~= "function" then return nil end
-	local slots = { GetProfessions() }
+	local slots = slots_of(GetProfessions())
 	local rows = {}
-	for index = 1, #slots do
+	for index = 1, slots.n do
 		local slot = plain_number(slots[index])
 		if slot and slot % 1 == 0 and slot >= 1 then
 			local name, _, skill, _, _, _, skill_line = GetProfessionInfo(slot)
