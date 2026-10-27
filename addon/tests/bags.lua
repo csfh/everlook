@@ -755,6 +755,15 @@ return function(root, check)
 		check("turning it back on shows them again", frame.buttons[3].texts[1].shown and frame.buttons[3].texts[1].content == "201")
 		addon.module.set("bags", "enabled", false)
 		check("disabling the module hides every label", not frame.buttons[3].texts[1].shown)
+
+		-- Turned off from the settings page while the bag is closed, then the bag is opened again.
+		addon.module.set("bags", "enabled", true)
+		check("the labels are back with the module", frame.buttons[3].texts[1].shown)
+		frame.IsShown = function() return false end
+		addon.module.set("bags", "enabled", false)
+		frame.IsShown = function() return true end
+		frame:UpdateItems()
+		check("disabling the module while the bag is closed leaves no label for its next opening", not frame.buttons[3].texts[1].shown)
 	end
 
 	do

@@ -595,6 +595,8 @@ local function apply(enabled)
 			chips.hide()
 			unpark_all()
 		end
+		-- Labels live on the slot buttons, and once the module is off nothing refreshes them when the bag opens.
+		if not (enabled and module.get(id, "item_level")) then show_labels(frame, false) end
 		changed = false
 		return
 	end
