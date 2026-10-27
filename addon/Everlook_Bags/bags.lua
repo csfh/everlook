@@ -467,10 +467,11 @@ end
 local function say_where_else(tooltip, data)
 	if not (module.enabled(id) and module.get(id, "remember") == true) then return end
 	local item_id = data and data.id
-	if not junk.valid(item_id) or Everlook.tooltips.done(id, tooltip, item_id) then return end
+	-- Taken before counting, so a tooltip rebuilt for an item no other character has is not
+	-- counted again across every character on each rebuild.
+	if not junk.valid(item_id) or not Everlook.tooltips.once(id, tooltip, item_id) then return end
 	local others, warband = alts.others(alts.data(), current_key(), item_id)
 	if #others == 0 and warband == 0 then return end
-	Everlook.tooltips.once(id, tooltip, item_id)
 	local function line(left, right)
 		if type(tooltip.AddDoubleLine) == "function" then
 			tooltip:AddDoubleLine(left, right, 1, 1, 1, 0.7, 0.7, 0.7)
