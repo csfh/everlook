@@ -13,18 +13,22 @@ local function version_of(addon)
 	if ok and type(version) == "string" and version ~= "" then return version end
 end
 
--- The module addons that report a version other than the core's, as a sorted list of names.
+-- The module and extension addons that report a version other than the core's, as a sorted
+-- list of names. An island feed is its own folder that only extends the island, so it is
+-- reached through its host.
 function Everlook.install.mismatches()
 	local core = version_of("Everlook")
 	if not core then return {} end
 	local seen, found = {}, {}
+	local function compare(addon)
+		if seen[addon] then return end
+		seen[addon] = true
+		local version = version_of(addon)
+		if version and version ~= core then found[#found + 1] = addon end
+	end
 	for _, module in ipairs(Everlook.module.modules) do
-		local addon = module.addon
-		if not seen[addon] then
-			seen[addon] = true
-			local version = version_of(addon)
-			if version and version ~= core then found[#found + 1] = addon end
-		end
+		compare(module.addon)
+		for _, extension in ipairs(module.extensions) do compare(extension.addon) end
 	end
 	table.sort(found)
 	return found, core

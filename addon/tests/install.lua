@@ -15,7 +15,12 @@ return function(root, check)
 		chunk("Everlook", Everlook)
 		return Everlook, logged_in
 	end
-	local modules = { { addon = "Everlook_Bags" }, { addon = "Everlook_Island" }, { addon = "Everlook_Island" }, { addon = "Everlook_Fonts" } }
+	local modules = {
+		{ addon = "Everlook_Bags", extensions = {} },
+		{ addon = "Everlook_Island", extensions = { { addon = "Everlook_IslandLoot" } } },
+		{ addon = "Everlook_Island", extensions = {} },
+		{ addon = "Everlook_Fonts", extensions = {} },
+	}
 
 	local addon, login = load({ Everlook = "0.28.0", Everlook_Bags = "0.28.0", Everlook_Island = "0.28.0", Everlook_Fonts = "0.28.0" }, modules)
 	login()
@@ -25,6 +30,10 @@ return function(root, check)
 	login()
 	check("a folder from another release is named once, with what to do", addon.said and addon.said:find("Everlook_Bags, Everlook_Fonts", 1, true)
 		and addon.said:find("0.28.0", 1, true) and addon.said:find("unzip", 1, true))
+
+	addon, login = load({ Everlook = "0.28.0", Everlook_Bags = "0.28.0", Everlook_Island = "0.28.0", Everlook_IslandLoot = "0.27.2" }, modules)
+	login()
+	check("an extension's folder from another release is named too", addon.said and addon.said:find("Everlook_IslandLoot", 1, true))
 
 	addon, login = load({ Everlook = "0.28.0", Everlook_Bags = "0.28.0" }, modules)
 	login()
