@@ -6,7 +6,7 @@ The version in `addon/Everlook/Everlook.toc` is what ships when that line change
 
 ## Before the push
 
-1. `just prepush addon`. It runs the Lua tests, the script tests, the luac checks, and the harness against this repository's `addon/`.
+1. `just prepush addon`. It runs the Lua tests, the script tests, the luac checks, and the harness against this repository's `addon/`, then fails if a commit subject since `origin/main` is over 100 characters, because the release notes are made from subjects.
 2. `just addon sync`, then log in on the current client with the modules the push touches turned on.
 3. Walk the list below. Skip anything the push did not touch, and say which were skipped.
 4. Watch the Lua error display (`/console scriptErrors 1` if it is off) and the Everlook Debug page.
