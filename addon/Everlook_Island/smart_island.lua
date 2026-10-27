@@ -104,10 +104,7 @@ function island.pin_quest(quest_id)
 	return changed
 end
 
-local function usable(value)
-	if issecretvalue and issecretvalue(value) then return false end
-	return value ~= nil
-end
+local usable = Everlook.readable
 
 local finite = Everlook.finite
 

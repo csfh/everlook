@@ -13,10 +13,7 @@ local ICONS = { generic = true, money = true, bags = true, repair = true, level 
 local SEVERITIES = { info = true, success = true, warning = true, error = true }
 local PRESENTATIONS = { toast = true, status = true, inbox = true }
 
-local function usable(value)
-	if issecretvalue and issecretvalue(value) then return false end
-	return value ~= nil
-end
+local usable = Everlook.readable
 
 local finite = Everlook.finite
 

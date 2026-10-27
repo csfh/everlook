@@ -13,9 +13,7 @@ plates.KINDS = {
 	"enemy_npc", "enemy_player", "friendly_npc", "friendly_player", "name_only", "simplified", "widgets_only", "forbidden", "personal",
 }
 
-local function plain(value)
-	return value ~= nil and not (issecretvalue and issecretvalue(value))
-end
+local plain = Everlook.readable
 plates.plain = plain
 
 -- A plate or its frame answering a yes-or-no question, or nil when it cannot say.

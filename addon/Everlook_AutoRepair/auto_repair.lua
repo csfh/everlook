@@ -5,9 +5,7 @@ local id = "auto_repair"
 local pending, merchant_open
 local next_result = 0
 
-local function readable(value)
-	return not (issecretvalue and issecretvalue(value)) and value ~= nil
-end
+local readable = Everlook.readable
 
 local function amount(value)
 	return readable(value) and type(value) == "number" and value == value and value >= 0 and value < math.huge

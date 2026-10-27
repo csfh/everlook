@@ -9,10 +9,7 @@ Everlook.island_vitals = vitals
 local state = {}
 local snapshot = {}
 
-local function usable(value)
-	if issecretvalue and issecretvalue(value) then return false end
-	return value ~= nil
-end
+local usable = Everlook.readable
 
 local finite = Everlook.finite
 

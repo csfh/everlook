@@ -55,6 +55,9 @@ do
 	check("nil, a hidden number, NaN, the infinities and a numeric string are not finite",
 		masked.finite(nil) == false and masked.finite(42) == false and masked.finite(0 / 0) == false
 		and masked.finite(math.huge) == false and masked.finite(-math.huge) == false and masked.finite("7") == false)
+	check("a value that is there and public is readable, false included",
+		masked.readable(7) == true and masked.readable("text") == true and masked.readable(false) == true)
+	check("nil and a hidden value are not readable", masked.readable(nil) == false and masked.readable(42) == false)
 end
 
 do

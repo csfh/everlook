@@ -18,9 +18,7 @@ local target, offered
 -- True while the button carries an action that has not been cleared yet.
 local armed = false
 
-local function usable(value)
-	return value ~= nil and not (issecretvalue and issecretvalue(value))
-end
+local usable = Everlook.readable
 
 local function in_combat()
 	return InCombatLockdown and InCombatLockdown()

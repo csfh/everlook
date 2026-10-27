@@ -7,9 +7,7 @@ local interval = 0
 local next_trip = 0
 local update, start_watch, stop_watch
 
-local function readable(value)
-	return not (issecretvalue and issecretvalue(value)) and value ~= nil
-end
+local readable = Everlook.readable
 
 local number = Everlook.finite
 

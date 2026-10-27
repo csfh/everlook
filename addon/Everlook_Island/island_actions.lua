@@ -10,10 +10,7 @@ local INTERACTIONS = { buttons = true, expand = true, inbox = true }
 local TYPES = { callback = true, item = true, spell = true }
 local hooks = {}
 
-local function usable(value)
-	if issecretvalue and issecretvalue(value) then return false end
-	return value ~= nil
-end
+local usable = Everlook.readable
 
 local function plain(value, maximum)
 	return usable(value) and type(value) == "string" and #value <= maximum and value:find("%S") ~= nil

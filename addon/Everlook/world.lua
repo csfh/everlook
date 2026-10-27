@@ -26,6 +26,12 @@ function Everlook.public(value)
 	end
 end
 
+-- Whether a value is there and can be read: not nil and not hidden. The hidden
+-- check comes first, so a hidden value is never compared.
+function Everlook.readable(value)
+	return Everlook.world.usable(value) and value ~= nil
+end
+
 -- Whether a value is a number that can be compared and shown: public, and
 -- neither NaN nor infinite.
 function Everlook.finite(value)

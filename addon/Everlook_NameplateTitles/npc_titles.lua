@@ -10,9 +10,7 @@ local SOURCE = "everlook_titles"
 -- gives the nameplate view a subtitle line for it, and for every other NPC with a title, read from the second line of the unit's tooltip.
 local CVARS = { "nameplateShowFriendlyNpcs", "UnitNameNPC", "UnitNameFriendlySpecialNPCName" }
 
-local function plain(value)
-	return value ~= nil and not (issecretvalue and issecretvalue(value))
-end
+local plain = Everlook.readable
 
 local function text_of(row)
 	if not plain(row) or type(row) ~= "table" then return nil end

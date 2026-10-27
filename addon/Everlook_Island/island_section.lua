@@ -30,10 +30,7 @@ local GAPS = { within = true, near = true, section = true }
 
 section.limits = { sections = 12, blocks = 30, bytes = 8192, order_min = 100, order_max = 999, order_default = 500, expires_max = 3600 }
 
-local function usable(value)
-	if issecretvalue and issecretvalue(value) then return false end
-	return value ~= nil
-end
+local usable = Everlook.readable
 
 local function plain_table(value)
 	return usable(value) and type(value) == "table" and getmetatable(value) == nil
