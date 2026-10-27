@@ -8,14 +8,7 @@ local vitals = Everlook.island_vitals
 local state = {}
 local snapshot = vitals.snapshot()
 
-local function usable(value)
-	if issecretvalue and issecretvalue(value) then return false end
-	return value ~= nil
-end
-
-local function finite(value)
-	return usable(value) and type(value) == "number" and value == value and value > -math.huge and value < math.huge
-end
+local finite = Everlook.finite
 
 local function option(key)
 	return Everlook.module.get("smart_island", key)

@@ -6,9 +6,7 @@ local kit = {}
 Everlook.island_feed_kit = kit
 
 function kit.plain_number(value)
-	if issecretvalue and issecretvalue(value) then return nil end
-	if type(value) ~= "number" or value ~= value or value == math.huge or value == -math.huge then return nil end
-	return value
+	if Everlook.finite(value) then return value end
 end
 
 function kit.now()

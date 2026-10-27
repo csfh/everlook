@@ -18,9 +18,7 @@ local function usable(value)
 	return value ~= nil
 end
 
-local function finite(value)
-	return usable(value) and type(value) == "number" and value == value and value > -math.huge and value < math.huge
-end
+local finite = Everlook.finite
 
 local function plain_string(value, maximum)
 	return usable(value) and type(value) == "string" and #value <= maximum and value:find("%S") ~= nil

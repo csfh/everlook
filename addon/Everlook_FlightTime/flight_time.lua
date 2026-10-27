@@ -11,9 +11,7 @@ local function readable(value)
 	return not (issecretvalue and issecretvalue(value)) and value ~= nil
 end
 
-local function number(value)
-	return readable(value) and type(value) == "number" and value == value and value > -math.huge and value < math.huge
-end
+local number = Everlook.finite
 
 local function island_feed()
 	return Everlook.island and type(Everlook.island.notify) == "function"

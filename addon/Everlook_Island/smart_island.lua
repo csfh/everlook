@@ -109,9 +109,7 @@ local function usable(value)
 	return value ~= nil
 end
 
-local function finite(value)
-	return usable(value) and type(value) == "number" and value == value and value > -math.huge and value < math.huge
-end
+local finite = Everlook.finite
 
 local function call(object, method, ...)
 	local fn = object and object[method]

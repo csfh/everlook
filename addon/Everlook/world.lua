@@ -26,6 +26,12 @@ function Everlook.public(value)
 	end
 end
 
+-- Whether a value is a number that can be compared and shown: public, and
+-- neither NaN nor infinite.
+function Everlook.finite(value)
+	return Everlook.world.usable(value) and type(value) == "number" and value == value and value > -math.huge and value < math.huge
+end
+
 function Everlook.say(text)
 	if type(text) ~= "string" or text == "" then
 		return

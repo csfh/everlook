@@ -34,9 +34,7 @@ local function public(value)
 	return not (issecretvalue and issecretvalue(value))
 end
 
-local function number(value)
-	return public(value) and type(value) == "number" and value == value and value > -math.huge and value < math.huge
-end
+local number = Everlook.finite
 
 local function quest_id(value)
 	return number(value) and value >= 1 and value <= 9007199254740991 and value % 1 == 0

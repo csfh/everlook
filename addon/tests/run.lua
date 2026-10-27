@@ -49,6 +49,12 @@ do
 	check("a public value comes back", hidden.public(7) == 7 and hidden.secret(7) == false)
 	check("a hidden guid is not a creature", hidden.npcs.creature_id("hidden") == nil)
 	check("a hidden link is not an item", hidden.items.id_from_link("hidden") == nil)
+	local masked = load_core({ issecretvalue = function(value) return value == 42 end })
+	check("a public number that is neither NaN nor infinite is finite",
+		masked.finite(7) == true and masked.finite(0) == true and masked.finite(-2.5) == true)
+	check("nil, a hidden number, NaN, the infinities and a numeric string are not finite",
+		masked.finite(nil) == false and masked.finite(42) == false and masked.finite(0 / 0) == false
+		and masked.finite(math.huge) == false and masked.finite(-math.huge) == false and masked.finite("7") == false)
 end
 
 do

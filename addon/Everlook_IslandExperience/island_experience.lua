@@ -39,11 +39,7 @@ local function secret(value)
 	return issecretvalue and issecretvalue(value) and true or false
 end
 
-local function plain_number(value)
-	if secret(value) then return nil end
-	if type(value) ~= "number" or value ~= value or value == math.huge or value == -math.huge then return nil end
-	return value
-end
+local plain_number = Everlook.island_feed_kit.plain_number
 
 local function whole(value)
 	value = plain_number(value)
