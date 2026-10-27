@@ -8,7 +8,7 @@
 
 use crate::api::{self, Signature};
 use crate::runtime::Shared;
-use crate::world::{AnimKind, Anchor, Class, Id, Point, Rect, Strata, TipLine, SCREEN_HEIGHT, SCREEN_WIDTH};
+use crate::world::{AnimKind, Anchor, Class, Id, Point, Rect, Strata, TipLine, SCREEN_HEIGHT};
 use mlua::{Function, IntoLuaMulti, Lua, MultiValue, Table, Value};
 use std::collections::HashMap;
 
@@ -1351,11 +1351,6 @@ fn checked(lua: &Lua, class: Class, signature: &Signature, function: Function) -
         }
         function.call::<MultiValue>(values)
     })
-}
-
-#[allow(dead_code)]
-pub fn screen_size() -> (f32, f32) {
-    (SCREEN_WIDTH, SCREEN_HEIGHT)
 }
 
 /// The font objects: one global table for each of Blizzard's named fonts, and `CreateFont` for more. A
