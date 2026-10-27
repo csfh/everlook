@@ -18,11 +18,7 @@ local MAX_HISTORY = 8
 
 local floor = math.floor
 
-local function clock()
-	if type(debugprofilestop) == "function" then
-		return debugprofilestop()
-	end
-end
+local clock = Everlook.clock
 
 local began = clock()
 

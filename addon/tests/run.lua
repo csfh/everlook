@@ -64,6 +64,9 @@ do
 	check("call runs a method the object has, with its arguments, and gives back what it returns", size == 9 and word == "grown")
 	check("call does nothing for a method the object lacks, a value that is not a method, or no object",
 		masked.call(widget, "Shrink") == nil and masked.call(widget, "size") == nil and masked.call(nil, "Grow", 1, 1) == nil and widget.size == 9)
+	local timed = load_core({ debugprofilestop = function() return 1234.5 end })
+	check("the clock reads the game's profiling timer in milliseconds", timed.clock() == 1234.5)
+	check("without that timer the clock gives nothing", masked.clock() == nil)
 	check("text is a readable string with something in it, up to the length given",
 		masked.text("Inspect", 7) == true and masked.text(" a ", 3) == true)
 	check("a longer, blank, empty, missing or non-string value is not text",

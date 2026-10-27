@@ -43,9 +43,11 @@ return function(root, check)
 		if setup then
 			setup(env, game)
 		end
-		local chunk = assert(loadfile(source("sched.lua")))
-		setfenv(chunk, env)
-		chunk("Everlook", Everlook)
+		for _, file in ipairs({ "world.lua", "sched.lua" }) do
+			local chunk = assert(loadfile(source(file)))
+			setfenv(chunk, env)
+			chunk("Everlook", Everlook)
+		end
 		game.spend = function(ms)
 			now = now + ms
 		end

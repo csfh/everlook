@@ -42,11 +42,7 @@ local HISTORY = 60
 local history = {}
 local history_at = 0
 
-local function clock()
-	if type(debugprofilestop) == "function" then
-		return debugprofilestop()
-	end
-end
+local clock = Everlook.clock
 
 local function now()
 	if type(GetTime) == "function" then

@@ -187,9 +187,7 @@ local SLICE_MS = 4
 local job
 local task
 
-local function clock()
-	if type(debugprofilestop) == "function" then return debugprofilestop() end
-end
+local clock = Everlook.clock
 
 local function restyle_regions(frame, kept, people_fonts, names, offset, ...)
 	for index = 1, select("#", ...) do

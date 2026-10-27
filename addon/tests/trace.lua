@@ -35,9 +35,11 @@ return function(root, check)
 		if setup then
 			setup(env, game)
 		end
-		local chunk = assert(loadfile(source("trace.lua")))
-		setfenv(chunk, env)
-		chunk("Everlook", Everlook)
+		for _, file in ipairs({ "world.lua", "trace.lua" }) do
+			local chunk = assert(loadfile(source(file)))
+			setfenv(chunk, env)
+			chunk("Everlook", Everlook)
+		end
 		game.fire = function(event, ...)
 			game.frames[1].OnEvent(game.frames[1], event, ...)
 		end

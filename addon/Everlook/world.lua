@@ -27,6 +27,11 @@ function Everlook.public(value)
 	end
 end
 
+-- The game's profiling timer in milliseconds, or nil on a client without it.
+function Everlook.clock()
+	if type(debugprofilestop) == "function" then return debugprofilestop() end
+end
+
 -- Calls a method when the object has one and gives back what it returns. A
 -- widget the client does not make, or one older than the method, is left alone.
 function Everlook.call(object, method, ...)
