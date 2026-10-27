@@ -132,7 +132,7 @@ return function(root, check)
 	-- Wiring, on a stand-in for C_EditMode that hands out copies like the game does.
 	local function world(options)
 		options = options or {}
-		local state = { saved = options.saved or { layout("Mine", ACCOUNT, 1) }, active = options.active or 4, calls = {}, edit_mode = false, combat = false, ready = true, valid_names = true }
+		local state = { saved = options.saved or { layout("Mine", ACCOUNT, 1) }, active = options.active or 4, calls = {}, edit_mode = false, combat = false, ready = options.ready ~= false, valid_names = true, callbacks = {} }
 		local addon, env, loaded, fire
 		local function copy(value)
 			if type(value) ~= "table" then return value end
@@ -165,6 +165,13 @@ return function(root, check)
 				end,
 				IsValidLayoutName = function() return state.valid_names end,
 			},
+			-- The game's callback registry, with only the two calls the module may make.
+			EventRegistry = setmetatable({
+				RegisterCallback = function(_, event, func, owner) state.callbacks[event] = { func = func, owner = owner } end,
+				UnregisterCallback = function(_, event, owner)
+					if state.callbacks[event] and state.callbacks[event].owner == owner then state.callbacks[event] = nil end
+				end,
+			}, { __index = function(_, key) error("EventRegistry has no " .. tostring(key)) end }),
 		}
 		if options.bars then
 			-- The game's own action bar toggles for Action Bar 2 to 8, and a clock with timers.
@@ -189,6 +196,16 @@ return function(root, check)
 	end
 	local function layout_named(state, name)
 		for _, item in ipairs(state.saved) do if item.layoutName == name then return item end end
+	end
+	-- As the game's ExitEditMode does: Edit Mode is marked closed, then EditMode.Exit is sent.
+	local function leave_edit_mode(state)
+		state.edit_mode = false
+		local callback = state.callbacks["EditMode.Exit"]
+		if callback then callback.func(callback.owner) end
+	end
+	local function switched_to(state, index)
+		for _, call in ipairs(state.calls) do if call == "active:" .. index then return true end end
+		return false
 	end
 
 	do
@@ -402,6 +419,58 @@ return function(root, check)
 		addon, _, state = world({ saved = full })
 		addon.module.set("action_bar_slots", "enabled", true)
 		check("a full set of character layouts stops it", #state.calls == 0 and #state.saved == 5)
+	end
+
+	do
+		-- Turned off while Edit Mode is open, it switches back once Edit Mode closes, though its own
+		-- events stop when it is off. Neither combat ending nor a login is what finishes it here.
+		local addon, env, state, fire = world()
+		addon.module.set("action_bar_slots", "enabled", true)
+		state.edit_mode = true
+		local count = #state.calls
+		addon.module.set("action_bar_slots", "enabled", false)
+		check("turning it off in Edit Mode switches nothing yet", #state.calls == count and state.active == 5)
+		leave_edit_mode(state)
+		check("closing Edit Mode switches back to the layout that was in use", state.calls[#state.calls] == "active:4" and state.active == 4)
+		check("and drops the way back", env.EverlookDB.qol.action_bar_slots.switched["Player-1"] == nil)
+		check("and stops watching for Edit Mode to close", state.callbacks["EditMode.Exit"] == nil)
+		count = #state.calls
+		state.edit_mode = true
+		leave_edit_mode(state)
+		fire("EDIT_MODE_LAYOUTS_UPDATED")
+		check("closing Edit Mode again changes nothing", #state.calls == count)
+
+		-- Turned on again before Edit Mode closes: there is nothing to switch back.
+		addon, _, state = world()
+		addon.module.set("action_bar_slots", "enabled", true)
+		state.edit_mode = true
+		addon.module.set("action_bar_slots", "enabled", false)
+		addon.module.set("action_bar_slots", "enabled", true)
+		leave_edit_mode(state)
+		check("turned on again before Edit Mode closes, it does not switch back", not switched_to(state, 4) and state.active == 5)
+		check("and is not left watching", state.callbacks["EditMode.Exit"] == nil)
+
+		-- The player picks another layout in Edit Mode: that one stays.
+		addon, env, state = world()
+		addon.module.set("action_bar_slots", "enabled", true)
+		state.edit_mode = true
+		addon.module.set("action_bar_slots", "enabled", false)
+		state.active = 3
+		count = #state.calls
+		leave_edit_mode(state)
+		check("a layout picked in Edit Mode stays when it closes", #state.calls == count and state.active == 3)
+		check("and the way back is dropped", env.EverlookDB.qol.action_bar_slots.switched["Player-1"] == nil)
+		check("and it stops watching", state.callbacks["EditMode.Exit"] == nil)
+
+		-- Logging in with it off before the game has handed out its layouts.
+		local db = { qol = { action_bar_slots = { switched = { ["Player-1"] = { name = "Mine", type = ACCOUNT } } } } }
+		local later
+		_, _, later, fire = world({ db = db, saved = { layout("Mine", ACCOUNT, 1), layout("Everlook Slots", CHARACTER, 0) }, active = 5, ready = false })
+		check("logging in with it off before the layouts arrive switches nothing yet", #later.calls == 0)
+		later.ready = true
+		fire("EDIT_MODE_LAYOUTS_UPDATED")
+		check("it switches back when the layouts arrive", later.calls[1] == "active:4" and later.active == 4)
+		check("and drops the way back then", db.qol.action_bar_slots.switched["Player-1"] == nil)
 	end
 
 	do

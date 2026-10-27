@@ -8,7 +8,8 @@ local id = "action_bar_slots"
 -- The game already has this setting: Always Show Buttons, per bar, in Edit Mode. A preset
 -- layout cannot be changed, so this keeps a layout named Everlook Slots with it turned off on the
 -- two bars above the main bar and switches to it. Everything goes through C_EditMode as
--- plain data. No Blizzard frame is called, hooked or written to.
+-- plain data, and the game's EditMode.Exit callback says when Edit Mode closes. No Blizzard
+-- frame is called, hooked or written to.
 
 -- The settings are one for the account, but the layout in use belongs to a character, and a
 -- character layout exists for the one that made it. So what to switch back to is kept per
@@ -64,11 +65,37 @@ local function switch_on()
 	end
 end
 
-local function switch_off()
+-- Turned off while Edit Mode is open, or before the game has handed out its layouts, the switch
+-- back has to wait, and the module's own events stop once it is off. So it watches by itself
+-- until the way back is used or the module is turned on again. Closing Edit Mode without saving
+-- sends no EDIT_MODE_LAYOUTS_UPDATED, only the EditMode.Exit callback.
+local watcher = CreateFrame("Frame")
+local watching = false
+local switch_off
+
+local function watch(on)
+	if on == watching then return end
+	watching = on
+	local callbacks = type(EventRegistry) == "table" and EventRegistry or nil
+	if on then
+		if not pcall(watcher.RegisterEvent, watcher, "EDIT_MODE_LAYOUTS_UPDATED") then
+			module.unsupported_events.EDIT_MODE_LAYOUTS_UPDATED = true
+		end
+		if callbacks then callbacks:RegisterCallback("EditMode.Exit", switch_off, watcher) end
+	else
+		watcher:UnregisterEvent("EDIT_MODE_LAYOUTS_UPDATED")
+		if callbacks then callbacks:UnregisterCallback("EditMode.Exit", watcher) end
+	end
+end
+
+watcher:SetScript("OnEvent", function() switch_off() end)
+
+switch_off = function()
 	local all, guid = records("switched")
-	if not all or not all[guid] then return end
+	if not all or not all[guid] then return watch(false) end
 	local c, info, presets = ready()
-	if not c then return end
+	if not c then return watch(true) end
+	watch(false)
 	local previous = all[guid]
 	all[guid] = nil
 	-- Only when the player is still on the layout this made. A layout they chose stays.
@@ -103,7 +130,12 @@ local function bars(enabled)
 end
 
 apply = function(enabled)
-	if enabled then switch_on() else switch_off() end
+	if enabled then
+		watch(false)
+		switch_on()
+	else
+		switch_off()
+	end
 	bars(enabled)
 end
 
