@@ -79,6 +79,9 @@ return function(root, check, island_world, quest_world, secret_stat)
 			and whole(0 / 0) == nil and whole(math.huge) == nil and whole("12") == nil)
 		check("experience detail keeps no rule of its own for a whole reading",
 			not read_source("island_experience.lua"):find("local function whole", 1, true))
+		check("island feeds read an item link's id through the core, with no parser of their own",
+			not read_source("island_share.lua"):find("item:(%d+)", 1, true)
+			and not read_source("island_loot.lua"):find("item:(%d+)", 1, true))
 	end
 
 	do

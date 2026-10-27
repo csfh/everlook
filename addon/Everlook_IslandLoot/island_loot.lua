@@ -69,12 +69,6 @@ local function pattern_from(format_text)
 	return known or nil
 end
 
-local function item_id_from(link)
-	if type(link) ~= "string" then return nil end
-	local id = link:match("item:(%d+)")
-	return id and tonumber(id) or nil
-end
-
 local function item_name(link, item_id)
 	local name = type(link) == "string" and link:match("%[(.-)%]") or nil
 	if type(name) == "string" and name:find("%S") then return name end
@@ -126,7 +120,7 @@ local function loot(message)
 	end
 	if type(message) ~= "string" or (issecretvalue and issecretvalue(message)) then return end
 	local link, count = loot_link(message)
-	local item_id = item_id_from(link)
+	local item_id = Everlook.items.id_from_link(link)
 	count = plain_number(count)
 	if not item_id or not count or count < 1 then return end
 	if not C_Item or not C_Item.GetItemQualityByID then return end

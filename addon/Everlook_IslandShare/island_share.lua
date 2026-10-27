@@ -65,13 +65,6 @@ local function item_link(link)
 	return link
 end
 
-local function id_from_link(link)
-	if secret(link) or type(link) ~= "string" then return nil end
-	local digits = link:match("item:(%d+)")
-	if not digits then return nil end
-	return safe_id(tonumber(digits))
-end
-
 local function unit_subject()
 	if type(UnitExists) ~= "function" then return nil end
 	local exists = UnitExists("mouseover")
@@ -91,7 +84,7 @@ local function item_subject()
 	local name, link = GameTooltip:GetItem()
 	name = plain_name(name)
 	if not name then return nil end
-	return { kind = "item", name = name, link = item_link(link), id = id_from_link(link) }
+	return { kind = "item", name = name, link = item_link(link), id = safe_id(Everlook.items.id_from_link(link)) }
 end
 
 local function quest_subject()
