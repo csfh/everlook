@@ -14,8 +14,7 @@ end
 
 -- %s, %d, %%, and positional %1$s / %2$d. One item capture, and at most one count.
 -- Anything else fails closed so a locale cannot announce the wrong text.
-local function pattern_from(format_text)
-	if type(format_text) ~= "string" or format_text == "" or (issecretvalue and issecretvalue(format_text)) then return nil end
+local function compile(format_text)
 	local parts = {}
 	local captures, link_at, count_at = 0, nil, nil
 	local index = 1
@@ -54,6 +53,20 @@ local function pattern_from(format_text)
 	end
 	if not link_at or (count_at and captures ~= 2) or (not count_at and captures ~= 1) then return nil end
 	return { pattern = "^" .. table.concat(parts) .. "$", link = link_at, count = count_at }
+end
+
+-- The LOOT_ITEM globals are still read on every loot line, but each format string is turned
+-- into a pattern only once, as the experience feed does with its kill lines.
+local compiled = {}
+
+local function pattern_from(format_text)
+	if type(format_text) ~= "string" or format_text == "" or (issecretvalue and issecretvalue(format_text)) then return nil end
+	local known = compiled[format_text]
+	if known == nil then
+		known = compile(format_text) or false
+		compiled[format_text] = known
+	end
+	return known or nil
 end
 
 local function item_id_from(link)
