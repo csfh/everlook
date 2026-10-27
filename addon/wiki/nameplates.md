@@ -12,7 +12,7 @@ A plate is one of these, told apart from what the plate says about itself (`IsSh
 | Kind | What the view does |
 | --- | --- |
 | `enemy_npc`, `enemy_player`, `friendly_npc`, `friendly_player` | Names left-aligned, a lead mark across both rows, a subtitle under the health bar. |
-| `name_only` | A friendly player shown with only a name. Name left-aligned, a one-row lead mark, a subtitle under the name. |
+| `name_only` | A friendly player shown with only a name. No health bar to align to, so the name stays centred, with a one-row lead mark beside the text and a subtitle under the name. |
 | `simplified`, `widgets_only`, `forbidden`, `personal` | Left exactly as the game made them. |
 
 The first six come from what the client's plates were seen to hold. The last four are drawn from Blizzard's own code
