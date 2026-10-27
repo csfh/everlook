@@ -224,12 +224,6 @@ function quests.skip(id)
 	return true
 end
 
-function quests.release_skip(id)
-	if not quest_id(id) or not skipped[id] then return false end
-	skipped[id] = nil
-	return true
-end
-
 function quests.suggestion()
 	if not (options.planning or options.feed_planning) then return end
 	local record = suggested and records[suggested]
@@ -407,15 +401,6 @@ end
 -- The painter reads the live records and never writes them. The distance sits on
 -- a shallow copy so the ordered plan keeps the figure it was ranked with.
 -- Pass copy_all for a view that outside readers may keep.
--- Whether the open island has a quest column to fill: a quest to follow, or
--- quests to suggest after it. Without either, the island has no use for it.
-function quests.has_content()
-	local view = quests.view()
-	if not view then return false end
-	if view.current then return true end
-	return #quests.route(view) > 0
-end
-
 function quests.view(copy_all)
 	if not options.enabled then return end
 	local current, reason = context()
