@@ -41,8 +41,11 @@ module.register({
 	},
 	events = { "PARTY_INVITE_REQUEST", "DUEL_REQUESTED" },
 	on_event = function(event, name)
-		if module.paused() or (InCombatLockdown and InCombatLockdown()) then return end
-		if event == "PARTY_INVITE_REQUEST" and trusted(name) and AcceptGroup then
+		-- Fails closed: without a combat check nothing is answered, and a trusted invite the
+		-- client cannot accept is left on screen, never declined.
+		if module.paused() or type(InCombatLockdown) ~= "function" or InCombatLockdown() then return end
+		if event == "PARTY_INVITE_REQUEST" and trusted(name) then
+			if type(AcceptGroup) ~= "function" then return end
 			AcceptGroup()
 			if StaticPopup_Hide then StaticPopup_Hide("PARTY_INVITE") end
 		elseif event == "PARTY_INVITE_REQUEST" and module.get(id, "decline_others") and DeclineGroup then

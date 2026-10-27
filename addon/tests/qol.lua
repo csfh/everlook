@@ -469,6 +469,17 @@ return function(root, check)
 	event("PARTY_INVITE_REQUEST", "Stranger")
 	check("Shift pauses declining", declined == 1)
 	env.IsShiftKeyDown = function() return false end
+	do
+		local accept, combat = env.AcceptGroup, env.InCombatLockdown
+		env.AcceptGroup = nil
+		event("PARTY_INVITE_REQUEST", "Alice-Home")
+		check("a friend's invite is never declined when the client cannot accept it", declined == 1)
+		env.AcceptGroup = accept
+		env.InCombatLockdown = nil
+		event("PARTY_INVITE_REQUEST", "Stranger")
+		check("without a combat check nothing is accepted or declined", declined == 1)
+		env.InCombatLockdown = combat
+	end
 	addon.module.set("friend_conveniences", "decline_others", false)
 
 	;(function()
