@@ -966,8 +966,10 @@ local function exit_toast(entry)
 	return true
 end
 
+-- A notice that never toasted stays in the inbox until it is seen or dismissed, so nothing times
+-- it out while it is unread. Once seen, it runs out like any other.
 toast_timer = function(entry, seconds)
-	if not entry or entry.removed then
+	if not entry or entry.removed or (entry.quiet and entry.unread) then
 		if entry then entry.timer, entry.expires_at, entry.remaining = nil, nil, nil end
 		return
 	end
@@ -1591,7 +1593,12 @@ inspect_rows = function()
 			C_Timer.After(0.75, function()
 				if entry.read_timer ~= token or not opened() or not module.enabled(id) then return end
 				for _, current in ipairs(notices) do
-					if current == entry then entry.unread, entry.read_timer = false, nil; paint(); return end
+					if current == entry then
+						entry.unread, entry.read_timer = false, nil
+						if entry.quiet then toast_timer(entry, entry.duration) end
+						paint()
+						return
+					end
 				end
 			end)
 		end
@@ -1781,6 +1788,7 @@ function island.notify(payload)
 	local kept_quiet = (not usable(combat) or combat == true) and not module.get(id, "combat_toasts") and priority(entry) == 1
 		and not actions.protected(entry)
 	if module.get(id, "do_not_disturb") and priority(entry) < 3 then kept_quiet = true end
+	entry.quiet = presentation == "toast" and (kept_quiet or not module.get(id, "toasts"))
 	if presentation == "toast" and not kept_quiet and module.get(id, "toasts") and (entry.node or not opened()) then
 		show_toast(entry)
 	elseif presentation ~= "toast" or kept_quiet then
@@ -2745,7 +2753,7 @@ registered = module.register({
 		source_repair = { name = "Show confirmed repair results", default = true, description = "Posts a notice once Auto repair has finished, naming the cost and whether the guild bank or your own gold paid. The request itself, a vendor you close before it finishes, a cost the client hides, and a result after three seconds stay quiet, gold short of the cost warns on the Island, and Auto repair has to be on.", presets = { Quiet = true, Standard = true, Informative = true } },
 		source_sell = { name = "Show confirmed junk sales", default = true, description = "Posts one notice for the junk copper that has left your bags once selling stops. A visit that sells nothing stays quiet, an item still in the bag stays out of the total, a total the client hides stays quiet, turning this off leaves the sale and its chat line alone, and Sell junk has to be on.", presets = { Quiet = true, Standard = true, Informative = true } },
 		source_flight = { name = "Show flight activity", default = false, description = "Shows this flight on the Island while you are in the air, with the elapsed time, adding the learned time left once a finished flight on that route has been recorded and saying when that estimate is exceeded. On the ground it stays quiet, the closed Island shows the flight mark and the time left or else the elapsed time, with a destination of 16 bytes or fewer beside it, a longer name or one with a vertical bar or a line break stays off that line, landing posts an arrival notice, turning this off clears the flight without that notice, and Flight time must also be on.", presets = { Quiet = false, Standard = true, Informative = true } },
-		do_not_disturb = { name = "Do not disturb", default = false, description = "Only errors show as toasts. Every other notice goes to the inbox, where the unread count still shows. Stays on until you turn it off.", presets = { Quiet = false, Standard = false, Informative = false } },
+		do_not_disturb = { name = "Do not disturb", default = false, description = "Only errors show as toasts. Every other notice goes to the inbox, where the unread count still shows, and stays there until you have seen it. Stays on until you turn it off.", presets = { Quiet = false, Standard = false, Informative = false } },
 		toast_count = { name = "Toasts on screen", default = 3, min = 1, max = 4, step = 1, description = "How many toasts can show at once below the island. Others wait in a short queue, with warnings first.", presets = { Quiet = 2, Standard = 3, Informative = 4 } },
 		inbox_size = { name = "Inbox size", default = 10, min = 10, max = 30, step = 5, description = "How many notices the open island keeps. When it is full, the oldest routine notice goes first, and warnings and notices that need a decision are kept longest." },
 		toasts = { name = "Show notification toasts", default = true, description = "Shows notifications below the Island, as many at once as Toasts on screen allows. Turning this off clears that stack and the waiting line and keeps the history, a card frozen in combat cannot leave until combat ends, and opening the Island shows the history instead.", presets = { Quiet = true, Standard = true, Informative = true } },

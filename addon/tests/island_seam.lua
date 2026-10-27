@@ -248,6 +248,51 @@ return function(root, check, island_world, quest_world, secret_stat)
 		check("do not disturb still toasts an error", #addon.smart_island.view().toasts == 1)
 	end
 	do
+		-- A notice that never toasts, under Do not disturb, kept quiet in combat or with toasts off,
+		-- stays in the inbox until it is seen or dismissed. The inbox size still caps it.
+		local function run_out(afters, seconds)
+			for index = 1, #afters do
+				local timer = afters[index]
+				if timer.delay == seconds and not timer.done then timer.done = true; timer.callback() end
+			end
+		end
+		local addon, env, _, state, afters = island_world()
+		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("smart_island", "do_not_disturb", true)
+		addon.island.notify({ source = "Test", key = "quiet", text = "Routine", duration = 4 })
+		run_out(afters, 4)
+		check("a notice do not disturb kept from toasting outlasts its duration", notice_key(addon, "quiet") ~= nil)
+		-- Held, not tapped, so letting go closes it again.
+		env.everlook_smart_island_key("down")
+		state.time = state.time + 2
+		run_out(afters, 0.75)
+		check("opening the island lets it be seen", notice_key(addon, "quiet") and notice_key(addon, "quiet").unread == false)
+		env.everlook_smart_island_key("up")
+		check("and letting go closes it", addon.smart_island.view().mode ~= "open")
+		run_out(afters, 4)
+		check("once seen it goes when its time runs out", notice_key(addon, "quiet") == nil)
+
+		addon, env, _, _, afters = island_world()
+		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("smart_island", "toasts", false)
+		addon.island.notify({ source = "Test", key = "untoasted", text = "Routine", duration = 4 })
+		run_out(afters, 4)
+		check("with toasts off a notice outlasts its duration in the inbox", notice_key(addon, "untoasted") ~= nil)
+
+		addon, env, _, _, afters = island_world()
+		addon.module.set("smart_island", "enabled", true)
+		env.InCombatLockdown = function() return true end
+		addon.island.notify({ source = "Test", key = "fight", text = "Routine", duration = 4 })
+		run_out(afters, 4)
+		check("a routine notice kept quiet in combat outlasts its duration", notice_key(addon, "fight") ~= nil)
+
+		addon = island_world()
+		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("smart_island", "do_not_disturb", true)
+		for index = 1, 12 do addon.island.notify({ source = "Test", key = "q" .. index, text = "Quiet " .. index }) end
+		check("the inbox size still caps notices that never toasted", #addon.smart_island.view().notices == 10)
+	end
+	do
 		local addon = island_world()
 		addon.module.set("smart_island", "enabled", true)
 		addon.module.set("smart_island", "size", 120)
