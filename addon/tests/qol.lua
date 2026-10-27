@@ -379,8 +379,9 @@ return function(root, check)
 	local accepted, rewards = 0, {}
 	env.AcceptQuest = function() accepted = accepted + 1 end
 	-- Only names that appear in Blizzard's own code: the quest frame asks
-	-- GetQuestMoneyToGet and C_QuestLog.IsRepeatableQuest(GetQuestID()).
+	-- GetQuestMoneyToGet, QuestFlagsPVP and C_QuestLog.IsRepeatableQuest(GetQuestID()).
 	env.GetQuestID = function() return 1 end
+	env.QuestFlagsPVP = function() return false end
 	env.GetQuestMoneyToGet = function() return 0 end
 	env.C_QuestLog = { IsRepeatableQuest = function() return false end }
 	env.GetNumQuestChoices = function() return 2 end
@@ -429,6 +430,9 @@ return function(root, check)
 		event("QUEST_DETAIL")
 		check("a quest that does not flag PvP is accepted", accepted == before + 1)
 		env.QuestFlagsPVP = nil
+		event("QUEST_DETAIL")
+		check("a quest whose PvP flag the client cannot report stays manual", accepted == before + 1)
+		env.QuestFlagsPVP = function() return false end
 	end
 
 	local looted = {}

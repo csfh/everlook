@@ -93,7 +93,8 @@ local function read_facts(event)
 	else
 		facts.repeatable_blocked = repeatable()
 		facts.can_accept = AcceptQuest ~= nil
-		facts.pvp = QuestFlagsPVP ~= nil and QuestFlagsPVP() or false
+		-- A PvP flag the client does not report is treated as one, as an unreported cost is.
+		facts.pvp = QuestFlagsPVP == nil or QuestFlagsPVP()
 		facts.auto_accept = QuestGetAutoAccept ~= nil and QuestGetAutoAccept() or false
 		facts.can_acknowledge = AcknowledgeAutoAcceptQuest ~= nil
 		facts.costs_money = costs_money()
