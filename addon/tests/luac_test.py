@@ -78,6 +78,16 @@ class LuacTest(unittest.TestCase):
                 stray.append(f"{path.relative_to(ADDON)}: {name}")
         self.assertEqual(sorted(set(stray)), [])
 
+    def test_only_everlook_and_el_are_slash_commands(self):
+        # The settings page is the way in; a feature gets a control there, not a command of its own.
+        commands, handlers = set(), set()
+        for path in lua_files():
+            text = path.read_text(encoding="utf-8")
+            commands.update(re.findall(r"^\s*SLASH_\w+\s*=\s*\"([^\"]*)\"", text, re.M))
+            handlers.update(re.findall(r"\bSlashCmdList\.(\w+)\s*=", text))
+        self.assertLessEqual(commands, {"/everlook", "/el"})
+        self.assertEqual(handlers, {"EVERLOOK"})
+
 
 if __name__ == "__main__":
     unittest.main()

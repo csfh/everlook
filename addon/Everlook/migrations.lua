@@ -38,6 +38,10 @@ local steps = {
 	function(db)
 		purge(db)
 	end,
+	-- 3: drop the reports the removed /everlookplates and /islandmouse probes wrote.
+	function(db)
+		db.plate_anatomy, db.island_mouse = nil, nil
+	end,
 }
 
 Everlook.migrations.current = #steps

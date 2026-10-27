@@ -94,6 +94,11 @@ do
 	addon.migrations.run(newer)
 	check("a newer file keeps its schema and its settings, and still loses the collection",
 		newer.schema == addon.migrations.current + 3 and newer.qol == qol and newer.world == nil)
+	local probed = { schema = 2, plate_anatomy = { lines = { "x" } }, island_mouse = { plain = {} }, qol = { fonts = { enabled = true } } }
+	addon.migrations.run(probed)
+	check("a file from before the probes went loses their reports and keeps its settings",
+		probed.plate_anatomy == nil and probed.island_mouse == nil and probed.qol.fonts.enabled == true
+		and probed.schema == addon.migrations.current)
 end
 
 local kept = {

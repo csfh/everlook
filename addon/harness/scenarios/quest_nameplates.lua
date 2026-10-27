@@ -77,11 +77,3 @@ harness.snapshot("Left of the name only")
 Everlook.module.set("nameplates", "layout", "bar_left")
 harness.snapshot("Left of the health bar only")
 for _, e in ipairs(harness.errors()) do print("script error:", e) end
-
--- The anatomy probe reads a plate's parts without failing, and keeps what it found where a reload writes it out.
-SlashCmdList.EVERLOOKPLATES()
-local anatomy = EverlookDB and EverlookDB.plate_anatomy
-harness.check("the anatomy probe keeps a report", anatomy ~= nil and #anatomy.lines > 5)
-local joined = table.concat(anatomy and anatomy.lines or {}, "\n")
-harness.check("it lists the plate's name, health bar container and level", joined:find("name = FontString", 1, true) ~= nil and joined:find("HealthBarsContainer = Frame", 1, true) ~= nil)
-for _, e in ipairs(harness.errors()) do print("script error:", e) end

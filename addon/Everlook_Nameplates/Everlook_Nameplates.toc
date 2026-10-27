@@ -8,4 +8,3 @@
 
 nameplate_kinds.lua
 nameplate_view.lua
-nameplate_probe.lua
