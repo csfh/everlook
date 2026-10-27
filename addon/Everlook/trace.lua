@@ -1,4 +1,4 @@
-local addonName, Everlook = ...
+local addon_name, Everlook = ...
 
 -- Where the time goes when the game loads or reloads. The core loads first
 -- among the Everlook addons, so this file starts the clock, notes when each
@@ -110,7 +110,7 @@ local function summary(reload)
 	return {
 		at = ledger.at,
 		reload = reload,
-		saved = marks["addon:" .. addonName] and marks.core_files and tenths(marks["addon:" .. addonName] - marks.core_files) or nil,
+		saved = marks["addon:" .. addon_name] and marks.core_files and tenths(marks["addon:" .. addon_name] - marks.core_files) or nil,
 		login = marks.login,
 		enter = marks.enter,
 		done = marks.loading_done,
@@ -167,7 +167,7 @@ if type(CreateFrame) == "function" then
 end
 
 -- The saved variables exist once this addon has loaded.
-EventUtil.ContinueOnAddOnLoaded(addonName, function()
+EventUtil.ContinueOnAddOnLoaded(addon_name, function()
 	EverlookDB = EverlookDB or {}
 	EverlookDB.loadTrace = ledger
 end)

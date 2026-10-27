@@ -1,4 +1,4 @@
-local addonName, Everlook = ...
+local addon_name, Everlook = ...
 
 local ICON = "Interface\\AddOns\\Everlook\\assets\\logo.tga"
 local DEFAULT_ANGLE = 160
@@ -103,7 +103,7 @@ local function CreateButton()
 	button:Show()
 end
 
-EventUtil.ContinueOnAddOnLoaded(addonName, function()
+EventUtil.ContinueOnAddOnLoaded(addon_name, function()
 	EverlookDB = EverlookDB or {}
 
 	local minimap = EverlookDB.minimap

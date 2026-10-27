@@ -5,9 +5,9 @@
 `minimap.lua` uses the addon-load helper:
 
 ```lua
-local addonName = ...
+local addon_name = ...
 
-EventUtil.ContinueOnAddOnLoaded(addonName, function()
+EventUtil.ContinueOnAddOnLoaded(addon_name, function()
 	EverlookDB = EverlookDB or {}
 end)
 ```
