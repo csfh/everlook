@@ -1,8 +1,9 @@
 local addonName, Everlook = ...
 
 -- Module addons are separate addons, and a global is the only table they can
--- share with this one. Everlook.module and Everlook.island are the supported
--- interface for other addons.
+-- share with this one. Everlook.module, Everlook.island, Everlook.nameplates
+-- (plates.provide) and Everlook.bags (is_junk) are the supported interface for
+-- other addons.
 _G.Everlook = Everlook
 
 Everlook.world = {}
