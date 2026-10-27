@@ -8,7 +8,6 @@ local SOURCE = "everlook_titles"
 -- The client draws an NPC's name and <title> in the world as engine text, which an addon cannot restyle. A friendly
 -- NPC's nameplate is a frame, so it takes the same name style as a player's. Nameplates carry no title, so this
 -- gives the nameplate view a subtitle line for it, and for every other NPC with a title, read from the second line of the unit's tooltip.
-local CVARS = { "nameplateShowFriendlyNpcs", "UnitNameNPC", "UnitNameFriendlySpecialNPCName" }
 
 local plain = Everlook.readable
 
@@ -66,9 +65,19 @@ local function current_value(name)
 	if type(value) == "string" and not Everlook.secret(value) then return value end
 end
 
--- What each setting was is kept, and put back when this goes off, but only where the setting
--- still holds what this set: a choice the player made in Options meanwhile is theirs. Setting
--- them again, after combat or another change, takes such a choice as the one to put back.
+-- Options' NPC Names dropdown writes the two name settings together, so they are one choice.
+local GROUPS = { { "nameplateShowFriendlyNpcs" }, { "UnitNameNPC", "UnitNameFriendlySpecialNPCName" } }
+
+local function holds_ours(group)
+	for _, name in ipairs(group) do
+		if current_value(name) ~= WANTED[name] then return false end
+	end
+	return true
+end
+
+-- What each choice was is kept, and put back when this goes off, but only where it still holds
+-- what this set: a choice the player made in Options meanwhile is theirs. Setting them again,
+-- after combat or another change, takes such a choice as the one to put back.
 local function switch_names(enabled)
 	if type(InCombatLockdown) ~= "function" or InCombatLockdown() or not GetCVar or not SetCVar then return end
 	EverlookDB = EverlookDB or {}
@@ -78,15 +87,20 @@ local function switch_names(enabled)
 			saved = {}
 			EverlookDB.npc_titles_cvars = saved
 		end
-		for _, name in ipairs(CVARS) do
-			local current = current_value(name)
-			if current ~= nil and (saved[name] == nil or current ~= WANTED[name]) then saved[name] = current end
-			SetCVar(name, WANTED[name])
+		for _, group in ipairs(GROUPS) do
+			if saved[group[1]] == nil or not holds_ours(group) then
+				for _, name in ipairs(group) do saved[name] = current_value(name) end
+			end
+			for _, name in ipairs(group) do SetCVar(name, WANTED[name]) end
 		end
 	elseif type(EverlookDB.npc_titles_cvars) == "table" then
-		for _, name in ipairs(CVARS) do
-			local value = EverlookDB.npc_titles_cvars[name]
-			if type(value) == "string" and current_value(name) == WANTED[name] then SetCVar(name, value) end
+		local saved = EverlookDB.npc_titles_cvars
+		for _, group in ipairs(GROUPS) do
+			if holds_ours(group) then
+				for _, name in ipairs(group) do
+					if type(saved[name]) == "string" then SetCVar(name, saved[name]) end
+				end
+			end
 		end
 		EverlookDB.npc_titles_cvars = nil
 	end

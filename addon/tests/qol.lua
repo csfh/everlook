@@ -882,22 +882,25 @@ return function(root, check)
 		title_env.InCombatLockdown = function() return true end
 		titles.module.set("npc_titles", "enabled", true)
 		check("combat leaves the game's settings alone", cvars.UnitNameNPC == "1")
-		-- A player whose NPC names were already off turns them on in Options while this runs.
+		-- Options' NPC Names dropdown writes the two name settings together (Blizzard_SettingsDefinitions_Frame/
+		-- Nameplates.lua:362-385 at 12.0.0): "All NPCs" is NPC 1 and special 0, "Friendly special" is NPC 0 and special 1.
+		local function dropdown(npc, special) cvars.UnitNameNPC, cvars.UnitNameFriendlySpecialNPCName = npc, special end
 		title_env.InCombatLockdown = function() return false end
 		titles.module.set("npc_titles", "enabled", false)
-		cvars.UnitNameNPC = "0"
+		dropdown("1", "0")
 		titles.module.set("npc_titles", "enabled", true)
-		cvars.UnitNameNPC = "1"
+		dropdown("0", "1")
 		titles.module.set("npc_titles", "enabled", false)
-		check("a setting the player changed meanwhile is kept when the module lets go", cvars.UnitNameNPC == "1"
-			and cvars.nameplateShowFriendlyNpcs == "0" and cvars.UnitNameFriendlySpecialNPCName == "1")
-		cvars.UnitNameNPC = "0"
+		check("a dropdown pick made meanwhile is kept whole when the module lets go",
+			cvars.UnitNameNPC == "0" and cvars.UnitNameFriendlySpecialNPCName == "1" and cvars.nameplateShowFriendlyNpcs == "0")
+		dropdown("1", "0")
 		titles.module.set("npc_titles", "enabled", true)
-		cvars.UnitNameNPC = "1"
+		dropdown("0", "1")
 		title_event("PLAYER_REGEN_ENABLED")
-		check("after combat the module sets its own values again", cvars.UnitNameNPC == "0")
+		check("after combat the module sets its own values again", cvars.UnitNameNPC == "0" and cvars.UnitNameFriendlySpecialNPCName == "0")
 		titles.module.set("npc_titles", "enabled", false)
-		check("and the player's pick from before that comes back when it lets go", cvars.UnitNameNPC == "1")
+		check("and the dropdown pick from before that comes back whole when it lets go",
+			cvars.UnitNameNPC == "0" and cvars.UnitNameFriendlySpecialNPCName == "1")
 	end
 
 	local names, name_env, name_event = load_qol()
