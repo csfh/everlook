@@ -882,6 +882,22 @@ return function(root, check)
 		title_env.InCombatLockdown = function() return true end
 		titles.module.set("npc_titles", "enabled", true)
 		check("combat leaves the game's settings alone", cvars.UnitNameNPC == "1")
+		-- A player whose NPC names were already off turns them on in Options while this runs.
+		title_env.InCombatLockdown = function() return false end
+		titles.module.set("npc_titles", "enabled", false)
+		cvars.UnitNameNPC = "0"
+		titles.module.set("npc_titles", "enabled", true)
+		cvars.UnitNameNPC = "1"
+		titles.module.set("npc_titles", "enabled", false)
+		check("a setting the player changed meanwhile is kept when the module lets go", cvars.UnitNameNPC == "1"
+			and cvars.nameplateShowFriendlyNpcs == "0" and cvars.UnitNameFriendlySpecialNPCName == "1")
+		cvars.UnitNameNPC = "0"
+		titles.module.set("npc_titles", "enabled", true)
+		cvars.UnitNameNPC = "1"
+		title_event("PLAYER_REGEN_ENABLED")
+		check("after combat the module sets its own values again", cvars.UnitNameNPC == "0")
+		titles.module.set("npc_titles", "enabled", false)
+		check("and the player's pick from before that comes back when it lets go", cvars.UnitNameNPC == "1")
 	end
 
 	local names, name_env, name_event = load_qol()

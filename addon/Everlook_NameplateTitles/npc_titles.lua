@@ -58,23 +58,35 @@ local function subtitle(unit, _, plate)
 end
 
 -- The nameplate settings that turn the engine's NPC text off and the friendly
--- NPC nameplates on. What they were is kept, and put back when this goes off.
+-- NPC nameplates on, and the value this sets for each.
+local WANTED = { nameplateShowFriendlyNpcs = "1", UnitNameNPC = "0", UnitNameFriendlySpecialNPCName = "0" }
+
+local function current_value(name)
+	local value = GetCVar(name)
+	if type(value) == "string" and not Everlook.secret(value) then return value end
+end
+
+-- What each setting was is kept, and put back when this goes off, but only where the setting
+-- still holds what this set: a choice the player made in Options meanwhile is theirs. Setting
+-- them again, after combat or another change, takes such a choice as the one to put back.
 local function switch_names(enabled)
 	if type(InCombatLockdown) ~= "function" or InCombatLockdown() or not GetCVar or not SetCVar then return end
 	EverlookDB = EverlookDB or {}
 	if enabled and module.get(id, "use_nameplates") then
-		if type(EverlookDB.npc_titles_cvars) ~= "table" then
-			local original = {}
-			for _, name in ipairs(CVARS) do original[name] = GetCVar(name) end
-			EverlookDB.npc_titles_cvars = original
+		local saved = EverlookDB.npc_titles_cvars
+		if type(saved) ~= "table" then
+			saved = {}
+			EverlookDB.npc_titles_cvars = saved
 		end
-		SetCVar("nameplateShowFriendlyNpcs", "1")
-		SetCVar("UnitNameNPC", "0")
-		SetCVar("UnitNameFriendlySpecialNPCName", "0")
+		for _, name in ipairs(CVARS) do
+			local current = current_value(name)
+			if current ~= nil and (saved[name] == nil or current ~= WANTED[name]) then saved[name] = current end
+			SetCVar(name, WANTED[name])
+		end
 	elseif type(EverlookDB.npc_titles_cvars) == "table" then
 		for _, name in ipairs(CVARS) do
 			local value = EverlookDB.npc_titles_cvars[name]
-			if type(value) == "string" then SetCVar(name, value) end
+			if type(value) == "string" and current_value(name) == WANTED[name] then SetCVar(name, value) end
 		end
 		EverlookDB.npc_titles_cvars = nil
 	end
@@ -95,7 +107,7 @@ module.register({
 	name = "NPC names on nameplates",
 	description = "NPCs get the same name style as players, with their title under the name, such as Drink Vendor or Trade Supplies, whether they are friendly, neutral or hostile. The game draws an NPC's own name and title as engine text that an addon cannot restyle, so this uses friendly NPC nameplates instead. The title is a line on the Nameplates view, which does the placing and needs to be on for a title to show.",
 	options = {
-		use_nameplates = { name = "Switch the game's NPC names to nameplates", default = true, description = "Turns on friendly NPC nameplates and turns off the game's own NPC names for friendly special NPCs, such as trainers and flight masters. Turning this module off, or this option, puts those settings back as they were." },
+		use_nameplates = { name = "Switch the game's NPC names to nameplates", default = true, description = "Turns on friendly NPC nameplates and turns off the game's own NPC names for friendly special NPCs, such as trainers and flight masters. Turning this module off, or this option, puts those settings back as they were, or as you set them in Options since." },
 	},
 	apply = apply,
 	out_of_combat = true,
