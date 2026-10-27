@@ -31,4 +31,4 @@ Cloudflare Pages:
 | Output directory | `dist` |
 | Node.js | 22 |
 
-The page lists the modules from their TOC files at build time, so a new module shows up on the next build. `www/wrangler.toml` sets `pages_build_output_dir` only. Nothing here creates a Cloudflare project or a custom domain.
+The page lists the modules from their TOC files at build time, so a new module shows up on the next build. These settings live in the Pages project, not in a Wrangler file. Nothing here creates a Cloudflare project or a custom domain.
