@@ -29,7 +29,7 @@ been seen in the client. When the client disagrees, fix the harness and fix this
 | 21 | `harness.census()` counts the frames made, the event registrations on them, and the shown frames with an `OnUpdate` script. Only counts are asserted (`scenarios/perf_budget.lua`). | the harness's own bookkeeping |
 | 22 | `Frame:RegisterUnitEvent(event, unit...)` registers the event like `RegisterEvent`, and counts in `harness.census()`. The harness does not filter by unit, since a scenario fires each event by hand. | the game sends the event only for those units; the harness does not model that |
 
-`/islandmouse` in the addon prints what the client says is under the pointer. Its output settles rows 4 to 8.
+The addon's former `/islandmouse` printed what the client said was under the pointer, and its output settled rows 4 to 8. `island_mouse()` in `scenarios/lib/islandmouse.lua` replays it here; the addon no longer has the command.
 
 | 23 | `UNIT_DIED` and `PARTY_KILL` are both accepted by `RegisterEvent` and fire with a readable string GUID in the open world (build 70374), though wow-ui-source 12.0.0 has no `PARTY_KILL` event. `CanLootUnit(guid)` returns `hasLoot, canLoot` and reads `false, true` for an empty corpse the player killed. `GetQuestLogRewardXP(questID)` returns two numbers. The harness does not model any of them. | a check in the client, 2026-10-15 |
 | 24 | In combat on build 70374 an addon may call `HideUIPanel(SettingsPanel)` and `SetPassThroughButtons` on an unprotected frame without an error. A `SetMaxLines(1)` text had its full width right after `SetText`; the blank-after-cold-start claim was not reproduced. The harness allows both. | a check in the client, 2026-10-15 | 

@@ -62,7 +62,7 @@ end
 
 local function report_for(experiment)
 	harness.move(x, y)
-	SlashCmdList.EVERLOOKISLANDMOUSE(experiment)
+	island_mouse(experiment)
 	harness.advance(3.1)
 	local kept = EverlookDB.island_mouse[experiment == "" and "plain" or experiment]
 	local gets, level
@@ -78,7 +78,7 @@ panel:SetFrameLevel(50)
 local observed = { [""] = "root", noroot = "pin", noclip = "pin", raise = "pin", mouse = "root" }
 for _, experiment in ipairs({ "", "noroot", "noclip", "raise", "mouse" }) do
 	local got, level = report_for(experiment)
-	harness.check("failure, panel at 50, /islandmouse " .. (experiment == "" and "(plain)" or experiment) .. ": " .. observed[experiment] .. " gets the mouse, as the client reported (" .. got .. (level and (" L" .. level) or "") .. ")", got == observed[experiment])
+	harness.check("failure, panel at 50, experiment " .. (experiment == "" and "(plain)" or experiment) .. ": " .. observed[experiment] .. " gets the mouse, as the client reported (" .. got .. (level and (" L" .. level) or "") .. ")", got == observed[experiment])
 end
 local _, raised_level = report_for("raise")
 harness.check("and raising the panel raised the Pin button with it, to the L55 the client reported", raised_level == 55)

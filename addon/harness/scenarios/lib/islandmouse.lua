@@ -7,12 +7,11 @@ local function call(object, method, ...)
 end
 local island = { view = function() return Everlook.smart_island.view() end }
 
--- /islandmouse: what the game says is under the pointer, for when a control does not answer. Hover the
--- control within three seconds of typing it. "/islandmouse click" presses the Clear history link without
--- the mouse, which tells a covered link from one whose click does nothing.
-SLASH_EVERLOOKISLANDMOUSE1 = "/islandmouse"
-SlashCmdList = SlashCmdList or {}
-SlashCmdList.EVERLOOKISLANDMOUSE = function(argument)
+-- island_mouse(argument): what the game says is under the pointer, for when a control does not answer, as
+-- the client's /islandmouse command once reported it. The pointer goes on the control within three seconds.
+-- "click" presses the Clear history link without the mouse, which tells a covered link from one whose
+-- click does nothing. It is a plain function: Everlook registers no slash command besides its own.
+function island_mouse(argument)
 	-- A missing method gives no value at all, which tostring refuses, and a restricted frame raises an error
 	-- when it is measured, so every read goes through here.
 	local function str(...) return tostring((...)) end
