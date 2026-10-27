@@ -332,14 +332,6 @@ return function(root, check)
 	end
 
 	do
-		-- A way back left by an earlier version, with no Everlook Slots layout to go with it, starts again.
-		local db = { qol = { action_bar_slots = { enabled = true, switched = { ["Player-1"] = { name = "Modern", type = PRESET } } } } }
-		local _, _, state = world({ db = db, saved = { layout("Everlook", ACCOUNT, 1) }, active = 4 })
-		check("the layout is made when the record has none behind it", layout_named(state, "Everlook Slots") ~= nil and state.active == 5)
-		check("the player's own Everlook layout is the way back", db.qol.action_bar_slots.switched["Player-1"].name == "Everlook")
-	end
-
-	do
 		-- Starting up puts the player on the slots layout, once. A layout they pick later stays.
 		local db = { qol = { action_bar_slots = { enabled = true, switched = { ["Player-1"] = { name = "Mine", type = ACCOUNT } } } } }
 		local addon, _, state, fire = world({ db = db, saved = { layout("Mine", ACCOUNT, 1), layout("Everlook Slots", CHARACTER, 0) }, active = 4 })

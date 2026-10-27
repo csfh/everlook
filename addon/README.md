@@ -1,6 +1,6 @@
 # Everlook addon
 
-Quality-of-life tweaks for World of Warcraft, and the settings page their modules share. Each `Everlook_<Name>` folder is a module addon that depends on the core (`Everlook`) and starts disabled. The addon does not collect world data. `Everlook/migrations.lua` clears old collection keys from `EverlookDB` on every load. Notes for people changing it are in [wiki/README.md](wiki/README.md).
+Quality-of-life tweaks for World of Warcraft, and the settings page their modules share. Each `Everlook_<Name>` folder is a module addon that depends on the core (`Everlook`) and starts disabled. The addon does not collect world data. Notes for people changing it are in [wiki/README.md](wiki/README.md).
 
 ## Install
 

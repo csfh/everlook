@@ -48,8 +48,7 @@ local function switch_on()
 	if not all then return end
 	local c, info, presets = ready()
 	if not c then return end
-	-- A way back with no layout behind it, left by an earlier version, is not done.
-	if ensured and all[guid] and layouts.ours(info, presets) then return end
+	if ensured and all[guid] then return end
 	local result = layouts.prepare(info, presets, c)
 	if not result then return end
 	if result.created and C_EditMode.IsValidLayoutName(layouts.NAME) ~= true then return end

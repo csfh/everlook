@@ -18,7 +18,7 @@ local function load_core(extra)
 	local Everlook = {}
 	local env = setmetatable(extra or {}, { __index = _G })
 	env.EventUtil = { ContinueOnAddOnLoaded = function() end }
-	for _, file in ipairs({ "world", "migrations" }) do
+	for _, file in ipairs({ "world" }) do
 		local chunk = assert(loadfile(source(file)))
 		setfenv(chunk, env)
 		chunk("Everlook", Everlook)
@@ -72,33 +72,6 @@ do
 	check("a longer, blank, empty, missing or non-string value is not text",
 		masked.text("Inspect", 6) == false and masked.text("   ", 8) == false and masked.text("", 8) == false
 		and masked.text(nil, 8) == false and masked.text(42, 8) == false and masked.text(7, 8) == false)
-end
-
-do
-	local addon = load_core()
-	local db = {
-		world = { npcs = {} }, pages = {}, journey = {}, secret = "x",
-		qol = { fonts = { enabled = true }, journey = { on = true } },
-		minimap = { angle = 1 }, experience = { gained = 2 }, schema = 1,
-	}
-	addon.migrations.run(db)
-	check("the purge drops collection keys and keeps quality-of-life settings",
-		db.world == nil and db.pages == nil and db.journey == nil and db.secret == nil
-		and db.qol.fonts.enabled == true and db.qol.journey == nil
-		and db.minimap.angle == 1 and db.experience.gained == 2)
-	check("a purged file is at the current schema", db.schema == addon.migrations.current)
-	addon.migrations.run(db)
-	check("purging again changes nothing", db.qol.fonts.enabled == true and db.schema == addon.migrations.current)
-	local newer = { schema = addon.migrations.current + 3, world = {}, qol = { fonts = {} } }
-	local qol = newer.qol
-	addon.migrations.run(newer)
-	check("a newer file keeps its schema and its settings, and still loses the collection",
-		newer.schema == addon.migrations.current + 3 and newer.qol == qol and newer.world == nil)
-	local probed = { schema = 2, plate_anatomy = { lines = { "x" } }, island_mouse = { plain = {} }, qol = { fonts = { enabled = true } } }
-	addon.migrations.run(probed)
-	check("a file from before the probes went loses their reports and keeps its settings",
-		probed.plate_anatomy == nil and probed.island_mouse == nil and probed.qol.fonts.enabled == true
-		and probed.schema == addon.migrations.current)
 end
 
 local kept = {
