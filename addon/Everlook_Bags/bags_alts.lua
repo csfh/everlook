@@ -11,9 +11,7 @@ local alts = {
 	WARBAND_BANK = { 12, 13, 14, 15, 16 },
 }
 
-local function secret(value)
-	return issecretvalue and issecretvalue(value)
-end
+local secret = Everlook.secret
 
 -- { [bag] = { [slot] = { item_id, count, quality } } } for the given bags, or
 -- nil when the client has no container API.

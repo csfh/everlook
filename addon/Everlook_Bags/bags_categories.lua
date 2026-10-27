@@ -28,9 +28,7 @@ local PRESETS = {
 	professions = { "Reagent", "Tradegoods", "Recipe", "Profession" },
 }
 
-local function secret(value)
-	return issecretvalue and issecretvalue(value)
-end
+local secret = Everlook.secret
 
 local function preset_of(class_id)
 	local names = Enum and Enum.ItemClass

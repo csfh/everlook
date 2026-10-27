@@ -11,9 +11,7 @@ local recent = { LIMIT = 12 }
 local list = {}
 list.__index = list
 
-local function secret(value)
-	return issecretvalue and issecretvalue(value)
-end
+local secret = Everlook.secret
 
 -- The totals worth keeping: whole positive item ids with a real count.
 local function clean(totals)

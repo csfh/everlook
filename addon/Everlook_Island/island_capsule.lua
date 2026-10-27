@@ -41,9 +41,7 @@ local MARK_KEYS = { atlas = true, item_id = true, spell_id = true }
 local RUN_KEYS = { text = true, tone = true, icon = true, atlas = true, item_id = true, spell_id = true, money = true }
 local PAD, GAP, MARK = 8, 4, 16
 
-local function secret(value)
-	return issecretvalue and issecretvalue(value)
-end
+local secret = Everlook.secret
 
 local function plain_table(value)
 	return type(value) == "table" and getmetatable(value) == nil

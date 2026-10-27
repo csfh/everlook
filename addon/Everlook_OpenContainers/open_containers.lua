@@ -36,9 +36,7 @@ local function blocked()
 	return false
 end
 
-local function secret(value)
-	return type(issecretvalue) == "function" and issecretvalue(value)
-end
+local secret = Everlook.secret
 
 local function loot_count()
 	local count = GetNumLootItems()

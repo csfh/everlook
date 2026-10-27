@@ -14,9 +14,7 @@ local function standing_label(reaction)
 	return label
 end
 
-local function secret(value)
-	return issecretvalue and issecretvalue(value)
-end
+local secret = Everlook.secret
 
 local function faction_rows()
 	if not C_Reputation or not C_Reputation.GetNumFactions or not C_Reputation.GetFactionDataByIndex then return nil end

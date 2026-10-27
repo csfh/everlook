@@ -35,9 +35,7 @@ local function enabled()
 	return Everlook.module and Everlook.module.enabled and Everlook.module.enabled("smart_island") == true
 end
 
-local function secret(value)
-	return issecretvalue and issecretvalue(value) and true or false
-end
+local secret = Everlook.secret
 
 local plain_number = Everlook.island_feed_kit.plain_number
 

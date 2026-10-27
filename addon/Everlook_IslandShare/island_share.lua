@@ -19,9 +19,7 @@ BINDING_NAME_EVERLOOK_SHARE = "Share what you are pointing at"
 
 local last_kind, last_name, last_at
 
-local function secret(value)
-	return issecretvalue and issecretvalue(value) and true or false
-end
+local secret = Everlook.secret
 
 local function plain_name(value)
 	if secret(value) or type(value) ~= "string" then return nil end

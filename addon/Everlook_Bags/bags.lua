@@ -57,9 +57,7 @@ local solo
 -- Slots that already listen for a middle-click. A listener cannot be taken off, so it checks the settings.
 local listening = setmetatable({}, { __mode = "k" })
 
-local function secret(value)
-	return issecretvalue and issecretvalue(value)
-end
+local secret = Everlook.secret
 
 -- The scale the game gave the bag on its last anchoring pass, and whether this module has
 -- changed it since. A share of the game's scale is taken from the first, never from the second.
