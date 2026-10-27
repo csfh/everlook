@@ -12,10 +12,6 @@ function field(toc, key) {
   return match ? match[1].trim() : "";
 }
 
-function plainTitle(title) {
-  return title.replace(/\|c[0-9a-fA-F]{8}/g, "").replace(/\|r/g, "").replace(/\s+/g, " ").trim();
-}
-
 function modules() {
   const folders = readdirSync(addonRoot, { withFileTypes: true })
     .filter((entry) => entry.isDirectory() && /^Everlook(_[A-Za-z0-9]+)?$/.test(entry.name))
@@ -27,7 +23,6 @@ function modules() {
     return {
       folder,
       name,
-      title: plainTitle(field(toc, "Title")) || name,
       notes: field(toc, "Notes"),
       version: field(toc, "Version"),
       island: name === "Island" || name.startsWith("Island"),
