@@ -30,9 +30,7 @@ local function note_activity(item)
 	if #activity > ACTIVITY_MAX then table.remove(activity, 1) end
 end
 
-local function public(value)
-	return not (issecretvalue and issecretvalue(value))
-end
+local secret = Everlook.secret
 
 local number = Everlook.finite
 
@@ -41,7 +39,7 @@ local function quest_id(value)
 end
 
 local function text(value, fallback)
-	if public(value) and type(value) == "string" and value ~= "" then return value:sub(1, 1024) end
+	if not secret(value) and type(value) == "string" and value ~= "" then return value:sub(1, 1024) end
 	return fallback
 end
 
@@ -64,7 +62,7 @@ local function distance(id, force)
 	distances[id] = { time = time }
 	if not C_QuestLog or not C_QuestLog.GetDistanceSqToQuest then return end
 	local squared, local_quest = C_QuestLog.GetDistanceSqToQuest(id)
-	if public(local_quest) and local_quest == true and number(squared) and squared >= 0 then
+	if not secret(local_quest) and local_quest == true and number(squared) and squared >= 0 then
 		distances[id].value = math.sqrt(squared)
 		return distances[id].value
 	end
@@ -73,13 +71,13 @@ end
 local function objectives(id, watched, time)
 	local rows = C_QuestLog.GetQuestObjectives and C_QuestLog.GetQuestObjectives(id)
 	local result, previous, current = {}, baseline[id], {}
-	if not public(rows) or type(rows) ~= "table" then return result end
+	if secret(rows) or type(rows) ~= "table" then return result end
 	for index, row in ipairs(rows) do
-		if public(row) and type(row) == "table" then
+		if not secret(row) and type(row) == "table" then
 			local fulfilled, required, finished = row.numFulfilled, row.numRequired, row.finished
 			fulfilled = number(fulfilled) and fulfilled >= 0 and fulfilled or nil
 			required = number(required) and required > 0 and required or nil
-			if not public(finished) or type(finished) ~= "boolean" then finished = nil end
+			if secret(finished) or type(finished) ~= "boolean" then finished = nil end
 			local fraction = fulfilled and required and math.min(1, fulfilled / required) or nil
 			if finished == true then fraction = 1 end
 			current[index] = { count = fulfilled, finished = finished }
@@ -183,13 +181,13 @@ local function scan(force)
 			for index = 1, count do
 				local info = C_QuestLog.GetInfo(index)
 				-- The log groups quests under a zone heading, so the heading names where they are.
-				if public(info) and type(info) == "table" and public(info.isHeader) and info.isHeader then zone = text(info.title, nil) end
-				if public(info) and type(info) == "table" and quest_id(info.questID) and public(info.isHeader) and not info.isHeader then
+				if not secret(info) and type(info) == "table" and not secret(info.isHeader) and info.isHeader then zone = text(info.title, nil) end
+				if not secret(info) and type(info) == "table" and quest_id(info.questID) and not secret(info.isHeader) and not info.isHeader then
 					local id, level = info.questID, info.level
 					local ready = C_QuestLog.ReadyForTurnIn and C_QuestLog.ReadyForTurnIn(id)
 					local record = { id = id, title = text(info.title, "Quest #" .. id), watched = watched[id] == true,
 						level = number(level) and level >= 1 and level or nil,
-						ready = public(ready) and ready == true, distance = distance(id, true), objectives = objectives(id, watched[id], time), zone = zone }
+						ready = not secret(ready) and ready == true, distance = distance(id, true), objectives = objectives(id, watched[id], time), zone = zone }
 					rank(record, player_level)
 					if not next_records[id] then next_records[id], next_order[#next_order + 1] = record, record end
 				end
@@ -258,7 +256,7 @@ end
 -- are radians counterclockwise from north, so the arrow turns by their
 -- difference. A separation under a yard has no direction.
 local function xy(position)
-	if not public(position) or type(position) ~= "table" then return end
+	if secret(position) or type(position) ~= "table" then return end
 	local x, y
 	if type(position.GetXY) == "function" then x, y = position:GetXY() else x, y = position.x, position.y end
 	if number(x) and number(y) then return x, y end
@@ -302,10 +300,10 @@ end
 local function pin_on(quest_id, map_id)
 	if not C_QuestLog or not C_QuestLog.GetQuestsOnMap or not number(map_id) then return end
 	local pins = C_QuestLog.GetQuestsOnMap(map_id)
-	if not public(pins) or type(pins) ~= "table" then return end
+	if secret(pins) or type(pins) ~= "table" then return end
 	for index = 1, #pins do
 		local pin = pins[index]
-		local id = public(pin) and type(pin) == "table" and pin.questID
+		local id = not secret(pin) and type(pin) == "table" and pin.questID
 		if number(id) and id == quest_id and number(pin.x) and number(pin.y) then
 			return number(pin.mapID) and pin.mapID or map_id, pin.x, pin.y
 		end
@@ -315,7 +313,7 @@ end
 local function parent_map(map_id)
 	if not C_Map or not C_Map.GetMapInfo or not number(map_id) then return end
 	local info = C_Map.GetMapInfo(map_id)
-	if not public(info) or type(info) ~= "table" then return end
+	if secret(info) or type(info) ~= "table" then return end
 	local parent = info.parentMapID
 	if number(parent) and parent > 0 and parent ~= map_id then return parent end
 end
