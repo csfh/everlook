@@ -115,7 +115,11 @@ local function set_timestamps(hidden)
 		end
 		SetCVar(cvar, "none")
 	elseif EverlookDB.timestampsBefore ~= nil then
-		SetCVar(cvar, EverlookDB.timestampsBefore)
+		-- Only the "none" this set is put back. A format the player picked since then is theirs.
+		local current = GetCVar(cvar)
+		if type(current) == "string" and not (issecretvalue and issecretvalue(current)) and current == "none" then
+			SetCVar(cvar, EverlookDB.timestampsBefore)
+		end
 		EverlookDB.timestampsBefore = nil
 	end
 end
@@ -135,7 +139,7 @@ module.register({
 	name = "Compact chat lines",
 	description = "Shows say, yell, party, raid, guild, officer, instance, and whisper lines as a short label (S, Y, P, PL, R, RL, RW, G, O, I, IL, W, or To), the name, then the message, with no brackets, and a numbered channel as its number. The label takes that chat's color, or white when that chat has none, the name keeps its class color and the message keeps the color the game gives it, a system line, an emote, text the client hides, and a line already showing stay as they are, the option Hide the game's chat timestamps starts on and stays separate, turning this off puts the game's own format back for new lines and, while that option is still on, puts back the timestamp choice from before this was turned on, and a client with none of those chat formats or with no timestamp choice it can save is left alone.",
 	options = {
-		hide_timestamps = { name = "Hide the game's chat timestamps", default = true, description = "While Compact chat lines is on, this sets Timestamps in Options, Social to None and keeps the choice that was in place when that hide started. Turning this off, or turning Compact chat lines off while this stays on, puts that choice back when one was saved, the next hide keeps the choice in place then, and a client that cannot read or save the current choice is left alone." },
+		hide_timestamps = { name = "Hide the game's chat timestamps", default = true, description = "While Compact chat lines is on, this sets Timestamps in Options, Social to None and keeps the choice that was in place when that hide started. Turning this off, or turning Compact chat lines off while this stays on, puts that choice back when one was saved and Timestamps still says None, so a choice you made there since stays, the next hide keeps the choice in place then, and a client that cannot read or save the current choice is left alone." },
 	},
 	events = { "UPDATE_CHAT_COLOR", "UPDATE_CHAT_WINDOWS", "UPDATE_FLOATING_CHAT_WINDOWS" },
 	on_event = function() apply(true) end,

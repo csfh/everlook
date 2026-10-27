@@ -1048,6 +1048,11 @@ return function(root, check)
 	check("enabling again hides the timestamp choice the player has now", chat_env.timestamps == "none")
 	chat.module.set("chat_format", "enabled", false)
 	check("turning it off restores that later choice", chat_env.timestamps == "|cffff9900%H:%M|r ")
+	chat.module.set("chat_format", "enabled", true)
+	-- The player picks a format in Options, Social while the module has timestamps hidden.
+	chat_env.timestamps = "%I:%M "
+	chat.module.set("chat_format", "enabled", false)
+	check("a format the player picked meanwhile is kept, not overwritten", chat_env.timestamps == "%I:%M " and chat_env.EverlookDB.timestampsBefore == nil)
 	do
 		-- A reload in the middle: a new session with the same saved variables, and the game still holding "none".
 		chat_env.timestamps = "%H:%M "
