@@ -433,11 +433,6 @@ end
 
 -- Native presentation stays private too. The Island supplies its existing
 -- font, surface, hover and control helpers so quest rows share the inbox.
-local function call(object, method, ...)
-	local fn = object and object[method]
-	if type(fn) == "function" then return fn(object, ...) end
-end
-
 function quests.distance_text(record)
 	if record and record.distance then return "~" .. math.floor(record.distance + 0.5) .. " yd" end
 	return "Distance unavailable"

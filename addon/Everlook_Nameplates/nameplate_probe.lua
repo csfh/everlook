@@ -1,7 +1,6 @@
 local addon_name = ...
 local Everlook = Everlook
 local plates = Everlook.nameplates
-local plain = plates.plain
 
 -- Temporary: /everlookplates writes down what each visible nameplate is made of in this client, to read after a reload.
 -- Nameplates are built by the game's own code, which differs between clients, so what a plate holds is looked up here
