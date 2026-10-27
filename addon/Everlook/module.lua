@@ -69,7 +69,7 @@ local function decimals(number)
 end
 
 -- A slider's value held between its ends and on its steps, counted from the minimum.
-local function on_step(option, value)
+local function snap(option, value)
 	local step = option.step or 1
 	value = option.min + math.floor((value - option.min) / step + 0.5) * step
 	value = math.max(option.min, math.min(option.max, value))
@@ -89,7 +89,7 @@ local function fill_defaults(id, options)
 	end
 end
 
-registry.snap = on_step
+registry.snap = snap
 
 -- The errors below name what they are about, as the registration errors do. They are raised
 -- with error() and not assert(), because assert would build the message on every call.
@@ -106,7 +106,7 @@ function registry.get(id, key)
 	if option and not (issecretvalue and issecretvalue(value)) and type(value) == type(option.default) and allowed(option, value) then
 		if type(value) == "number" then
 			if value ~= value or value == math.huge or value == -math.huge then return option.default end
-			if option.min then return on_step(option, value) end
+			if option.min then return snap(option, value) end
 		end
 		return value
 	end
@@ -165,7 +165,7 @@ function registry.set(id, key, value)
 	if type(value) == "number" and not (value == value and value > -math.huge and value < math.huge) then
 		error("Invalid number for Everlook option " .. id .. "." .. key)
 	end
-	if option.min then value = on_step(option, value) end
+	if option.min then value = snap(option, value) end
 	if value == option.default then value = nil end
 	saved(id)[key] = value
 	apply(module)
