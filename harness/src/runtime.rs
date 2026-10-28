@@ -581,6 +581,12 @@ fn install_harness(lua: &Lua, shared: &Shared) -> Result<()> {
             result
         })?,
     )?;
+    // The addon folders in the order the game loads them.
+    let s = shared.clone();
+    table.set(
+        "addons",
+        lua.create_function(move |lua, ()| lua.create_sequence_from(load_order(&s.addons).map_err(mlua::Error::external)?))?,
+    )?;
     // The key bindings an addon declares in its Bindings.xml, which the game reads apart from the table of contents.
     let s = shared.clone();
     table.set(
@@ -613,6 +619,39 @@ fn install_harness(lua: &Lua, shared: &Shared) -> Result<()> {
     let s = shared.clone();
     table.set("output", lua.create_function(move |lua, _: ()| lua.create_sequence_from(s.output.borrow().clone()))?)?;
     lua.globals().set("harness", table)?;
+    Ok(())
+}
+
+/// The addon folders under `addons` (each a folder with a table of contents of its own name) in the order the
+/// game loads them: by name, ignoring case, with the addons named in a folder's `## Dependencies` before it.
+pub fn load_order(addons: &Path) -> std::io::Result<Vec<String>> {
+    let mut names: Vec<String> = std::fs::read_dir(addons)?
+        .filter_map(|entry| entry.ok())
+        .map(|entry| entry.file_name().to_string_lossy().into_owned())
+        .filter(|name| addons.join(name).join(format!("{name}.toc")).is_file())
+        .collect();
+    names.sort_by_key(|name| name.to_lowercase());
+    let mut order = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+    for name in &names {
+        visit_dependencies_first(addons, name, &mut seen, &mut order)?;
+    }
+    Ok(order)
+}
+
+fn visit_dependencies_first(addons: &Path, name: &str, seen: &mut std::collections::HashSet<String>, order: &mut Vec<String>) -> std::io::Result<()> {
+    if !seen.insert(name.to_string()) {
+        return Ok(());
+    }
+    let toc = std::fs::read_to_string(addons.join(name).join(format!("{name}.toc")))?;
+    for line in toc.lines() {
+        if let Some(list) = line.strip_prefix("## Dependencies:") {
+            for dependency in list.split(',').map(str::trim).filter(|dependency| !dependency.is_empty()) {
+                visit_dependencies_first(addons, dependency, seen, order)?;
+            }
+        }
+    }
+    order.push(name.to_string());
     Ok(())
 }
 

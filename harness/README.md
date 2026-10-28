@@ -22,7 +22,8 @@ cargo run -- serve scenarios/island_mouse.lua             # the same, live: hove
 cargo run -- gen-api /tmp/wow-ui-source     # rebuild api/widgets.json and api/fonts.json
 ```
 
-A scenario is a Lua file. It loads addons with `harness.load_addon`, sets the world through `game`
+A scenario is a Lua file. It loads addons with `harness.load_addon` (`harness.addons()` lists them in the game's load
+order), sets the world through `game`
 (`scenarios/lib/game.lua`), and looks and pushes with `harness.rect`, `hit`, `move`, `click`, `wheel`,
 `event`, `advance` and `check`.
 

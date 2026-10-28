@@ -1,15 +1,9 @@
--- Every Everlook addon at once, the way a player has them: each loads, the game logs in, a few seconds pass,
--- and no script raised an error.
+-- Every Everlook addon at once, the way a player has them and in the order the game loads them: each loads,
+-- the game logs in, a few seconds pass, and no script raised an error.
 harness.include("lib/game.lua")
 game.quests()
-local names = { "Everlook", "Everlook_Fonts", "Everlook_Island" }
-for _, name in ipairs({ "ActionBarSlots", "ActionShortcuts", "AutoLoot", "AutoRepair", "AutoResponses", "Bags", "CameraDistance", "ChatLayout", "CinematicSkip", "CompactChat",
-	"FlightTime", "FriendConveniences", "GroundEffects", "HideClutter", "IslandBuffs", "IslandExperience", "IslandHearth", "IslandInvites", "IslandLoot",
-	"IslandMail", "IslandProfessions", "IslandQuestNotices", "IslandReactions", "IslandRecap", "IslandReputation", "IslandShare", "IslandWarnings",
-	"MinimapCoordinates", "Nameplates", "NameplateTitles", "OpenContainers", "Optimize", "QuestAutomation", "QuestLevels", "QuestNameplates", "QuestTextSize", "RadialMenu", "RewardMarks", "SellJunk",
-	"SwingTimers", "TakeMail", "TooltipCursor", "TrackerTextSize", "UnitFrameNames", "UsefulTooltips" }) do
-	names[#names + 1] = "Everlook_" .. name
-end
+local names = harness.addons()
+harness.check("the core loads first", names[1] == "Everlook")
 -- Every module is off until its player turns it on, so turn them all on to see them work.
 local ids = {}
 local register
