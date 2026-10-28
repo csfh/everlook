@@ -1,7 +1,7 @@
 local addon_name = ...
 local Everlook = Everlook
 local module = Everlook.module
-local id = "quest_interface"
+local id = "quest_text_size"
 local originals = {}
 
 -- QuestInfo.lua already sets the full description with SetText. The public 12.0.0 interface never

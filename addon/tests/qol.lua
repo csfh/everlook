@@ -1412,9 +1412,9 @@ return function(root, check)
 		GetCVar = function() cvar_calls = cvar_calls + 1 end,
 		SetCVar = function() cvar_calls = cvar_calls + 1 end,
 	}
-	addon2.module.set("quest_interface", "enabled", true)
+	addon2.module.set("quest_text_size", "enabled", true)
 	check("quest interface enlarges quest text without a console variable", font.size == 16 and cvar_calls == 0)
-	addon2.module.set("quest_interface", "enabled", false)
+	addon2.module.set("quest_text_size", "enabled", false)
 	check("quest interface restores the previous text size", font.size == 12 and cvar_calls == 0)
 
 	do
@@ -1424,22 +1424,22 @@ return function(root, check)
 		env2.GetCVar = function(name) return values[name] end
 		env2.SetCVar = function(name, value) sets[#sets + 1] = name .. "=" .. value; values[name] = value end
 		env2.EverlookDB = env2.EverlookDB or {}
-		addon2.module.set("quest_interface", "enabled", true)
+		addon2.module.set("quest_text_size", "enabled", true)
 		check("the at once option is off by default and the variable is left alone", #sets == 0 and values.instantQuestText == "0")
-		addon2.module.set("quest_interface", "instant_text", true)
+		addon2.module.set("quest_text_size", "instant_text", true)
 		check("turned on, it sets the variable and keeps the player's value", values.instantQuestText == "1" and env2.EverlookDB.instantTextBefore == "0")
-		addon2.module.set("quest_interface", "enabled", false)
+		addon2.module.set("quest_text_size", "enabled", false)
 		check("turning the module off puts the player's value back and forgets it", values.instantQuestText == "0" and env2.EverlookDB.instantTextBefore == nil)
-		addon2.module.set("quest_interface", "enabled", true)
+		addon2.module.set("quest_text_size", "enabled", true)
 		values.instantQuestText = "1"
-		addon2.module.set("quest_interface", "instant_text", false)
+		addon2.module.set("quest_text_size", "instant_text", false)
 		check("turning the option off puts the saved value back", values.instantQuestText == "0")
 		values.instantQuestText = nil
 		local before = #sets
-		addon2.module.set("quest_interface", "instant_text", true)
+		addon2.module.set("quest_text_size", "instant_text", true)
 		check("a client with no such variable is left alone", #sets == before and env2.EverlookDB.instantTextBefore == nil)
-		addon2.module.set("quest_interface", "instant_text", false)
-		addon2.module.set("quest_interface", "enabled", false)
+		addon2.module.set("quest_text_size", "instant_text", false)
+		addon2.module.set("quest_text_size", "enabled", false)
 		env2.GetCVar, env2.SetCVar = nil, nil
 	end
 
@@ -1954,16 +1954,16 @@ return function(root, check)
 	check("every module appears on exactly one page", count == module_count)
 	check("module options are grouped under their enable toggle", #children == expected - module_count)
 	local sample = children[1]
-	registered.Everlook_QoL_quest_interface_enabled.set(false)
+	registered.Everlook_QoL_quest_text_size_enabled.set(false)
 	check("disabled module options cannot be changed in the UI", not sample.predicate())
-	registered.Everlook_QoL_quest_interface_enabled.set(true)
+	registered.Everlook_QoL_quest_text_size_enabled.set(true)
 	check("enabling a module makes its options available", sample.predicate())
-	check("subpage toggles retain saved preferences", registered.Everlook_QoL_quest_interface_enabled.get())
+	check("subpage toggles retain saved preferences", registered.Everlook_QoL_quest_text_size_enabled.get())
 	registered.Everlook_QoL_fonts_size_offset.set(100)
 	check("settings clamp font size to supported range", addon2.module.get("fonts", "size_offset") == 8)
 	check("a slider that counts things shows its number", sliders.Everlook_QoL_smart_island_toast_count.format(3) == "3")
 	check("every text size is in points", sliders.Everlook_QoL_fonts_size_offset.format(3) == "3 pt" and sliders.Everlook_QoL_unit_names_extra.format(4) == "4 pt"
-		and sliders.Everlook_QoL_quest_interface_text_size.format(16) == "16 pt" and sliders.Everlook_QoL_quest_tracker_text_size.format(16) == "16 pt")
+		and sliders.Everlook_QoL_quest_text_size_text_size.format(16) == "16 pt" and sliders.Everlook_QoL_quest_tracker_text_size.format(16) == "16 pt")
 	check("the Island's position is in pixels", sliders.Everlook_QoL_smart_island_position_x.format(-103) == "-103 px" and sliders.Everlook_QoL_smart_island_position_top.format(12) == "12 px")
 	check("a slider with a unit shows it after the number", sliders.Everlook_QoL_smart_island_size.format(105) == "105%" and sliders.Everlook_QoL_chat_layout_fade_seconds.format(120) == "120 s")
 	check("a label shows the step the value will be stored on", sliders.Everlook_QoL_smart_island_size.format(97) == "95%" and sliders.Everlook_QoL_smart_island_size.format(98) == "100%")
