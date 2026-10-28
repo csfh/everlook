@@ -842,8 +842,8 @@ return function(root, check)
 		title_env.SetCVar = function(name, value) cvars[name] = value; set_calls[#set_calls + 1] = name end
 		title_env.InCombatLockdown = function() return false end
 		titles.module.set("nameplates", "enabled", true)
-		titles.module.set("npc_titles", "use_nameplates", false)
-		titles.module.set("npc_titles", "enabled", true)
+		titles.module.set("nameplate_titles", "use_nameplates", false)
+		titles.module.set("nameplate_titles", "enabled", true)
 		check("turning the module on without the setting leaves the game's settings alone", #set_calls == 0)
 		title_event("NAME_PLATE_UNIT_ADDED", "nameplate1")
 		local line = lines.nameplate1[1]
@@ -873,32 +873,32 @@ return function(root, check)
 		title_event("NAME_PLATE_UNIT_ADDED", "nameplate1")
 		check("a secret title is skipped", line.shown == false)
 		title_env.issecretvalue = nil
-		titles.module.set("npc_titles", "use_nameplates", true)
+		titles.module.set("nameplate_titles", "use_nameplates", true)
 		check("the setting turns friendly NPC nameplates on and the game's NPC names off",
 			cvars.nameplateShowFriendlyNpcs == "1" and cvars.UnitNameNPC == "0" and cvars.UnitNameFriendlySpecialNPCName == "0")
-		titles.module.set("npc_titles", "enabled", false)
+		titles.module.set("nameplate_titles", "enabled", false)
 		check("turning the module off puts the game's settings back",
 			cvars.nameplateShowFriendlyNpcs == "0" and cvars.UnitNameNPC == "1" and cvars.UnitNameFriendlySpecialNPCName == "1")
 		title_env.InCombatLockdown = function() return true end
-		titles.module.set("npc_titles", "enabled", true)
+		titles.module.set("nameplate_titles", "enabled", true)
 		check("combat leaves the game's settings alone", cvars.UnitNameNPC == "1")
 		-- Options' NPC Names dropdown writes the two name settings together (Blizzard_SettingsDefinitions_Frame/
 		-- Nameplates.lua:362-385 at 12.0.0): "All NPCs" is NPC 1 and special 0, "Friendly special" is NPC 0 and special 1.
 		local function dropdown(npc, special) cvars.UnitNameNPC, cvars.UnitNameFriendlySpecialNPCName = npc, special end
 		title_env.InCombatLockdown = function() return false end
-		titles.module.set("npc_titles", "enabled", false)
+		titles.module.set("nameplate_titles", "enabled", false)
 		dropdown("1", "0")
-		titles.module.set("npc_titles", "enabled", true)
+		titles.module.set("nameplate_titles", "enabled", true)
 		dropdown("0", "1")
-		titles.module.set("npc_titles", "enabled", false)
+		titles.module.set("nameplate_titles", "enabled", false)
 		check("a dropdown pick made meanwhile is kept whole when the module lets go",
 			cvars.UnitNameNPC == "0" and cvars.UnitNameFriendlySpecialNPCName == "1" and cvars.nameplateShowFriendlyNpcs == "0")
 		dropdown("1", "0")
-		titles.module.set("npc_titles", "enabled", true)
+		titles.module.set("nameplate_titles", "enabled", true)
 		dropdown("0", "1")
 		title_event("PLAYER_REGEN_ENABLED")
 		check("after combat the module sets its own values again", cvars.UnitNameNPC == "0" and cvars.UnitNameFriendlySpecialNPCName == "0")
-		titles.module.set("npc_titles", "enabled", false)
+		titles.module.set("nameplate_titles", "enabled", false)
 		check("and the dropdown pick from before that comes back whole when it lets go",
 			cvars.UnitNameNPC == "0" and cvars.UnitNameFriendlySpecialNPCName == "1")
 	end
