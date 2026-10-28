@@ -1,7 +1,7 @@
 local addon_name = ...
 local Everlook = Everlook
 local module = Everlook.module
-local id = "camera"
+local id = "camera_distance"
 local cvar = "cameraDistanceMaxZoomFactor"
 
 -- The factor from before this was turned on is kept in the saved variables, not in this session: after a

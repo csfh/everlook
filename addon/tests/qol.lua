@@ -1928,7 +1928,7 @@ return function(root, check)
 		and page_of_variable.Everlook_QoL_sell_junk_enabled == "Vendors" and page_of_variable.Everlook_QoL_fonts_size_offset == "Text and names"
 		and page_of_variable.Everlook_QoL_bags_enabled == "Bags" and page_of_variable.Everlook_QoL_action_bar_slots_enabled == "Action bars"
 		and page_of_variable.Everlook_QoL_nameplates_enabled == "Nameplates" and page_of_variable.Everlook_QoL_swing_timers_enabled == "Combat"
-		and page_of_variable.Everlook_QoL_camera_enabled == "Screen and camera"
+		and page_of_variable.Everlook_QoL_camera_distance_enabled == "Screen and camera"
 		and page_of_variable.Everlook_QoL_quest_automation_enabled == "Quests" and page_of_variable.Everlook_QoL_smart_island_enabled == "Smart island"
 		and page_of_variable.Everlook_QoL_take_mail_enabled == "Loot and mail")
 	local module_count = #addon2.module.modules
