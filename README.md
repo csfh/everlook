@@ -7,7 +7,7 @@ addon/    The addons: the Everlook core and its Everlook_<Name> modules, with th
 www/      Static site (Vite) for Cloudflare Pages. Output is www/dist
 ```
 
-Everlook tweaks the default interface. Each module starts off, and you turn on the ones you want from the Everlook settings page. It does not collect or upload data. An older saved file loses the keys the old data collection wrote on load.
+Everlook tweaks the default interface. Each module starts off, and you turn on the ones you want from the Everlook settings page. It collects no data.
 
 ## Addon
 

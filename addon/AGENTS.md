@@ -1,4 +1,4 @@
-This is a World of Warcraft quality-of-life addon. It does not collect world data, sign uploads, or keep a journey.
+This is a World of Warcraft quality-of-life addon. It collects no data.
 
 The minimap button is `EverlookMinimapButton`. It shows `assets/logo.tga`.
 
