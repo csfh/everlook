@@ -272,6 +272,22 @@ class LayoutTest(unittest.TestCase):
         # auto_release knows one form, "## Version: x.y.z", so any other spelling fails here, before a push.
         self.assertTrue(auto_release.SEMVER.fullmatch(auto_release.current_addon_version(ADDON)))
 
+    def test_a_module_id_is_its_folder_name(self):
+        # A module lives in Everlook_<Name>, where the name is its id in CamelCase. Extensions call
+        # module.extend instead and are left out.
+        for folder in self.folders():
+            ids = []
+            for path in sorted(folder.glob("*.lua")):
+                text = path.read_text()
+                for call in re.finditer(r"module\.register\(\{(.{0,600})", text, re.S):
+                    found = re.search(r'\bid = "([a-z_]+)"', call.group(1)) or re.search(r'^local id = "([a-z_]+)"', text, re.M)
+                    ids.append(found.group(1) if found else None)
+            if not ids or folder.name == "Everlook":
+                continue
+            with self.subTest(addon=folder.name):
+                expected = re.sub(r"(?<!^)(?=[A-Z])", "_", folder.name.removeprefix("Everlook_")).lower()
+                self.assertEqual(ids, [expected])
+
     NAMEPLATE_PROVIDERS = {"QuestNameplates", "NameplateTitles"}
 
     def test_modules_depend_on_everlook_and_sit_in_its_group(self):
