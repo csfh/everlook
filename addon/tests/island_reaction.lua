@@ -1,6 +1,6 @@
 -- Island reaction: the arithmetic of a brief flash on the island's body, then how the island shows it.
 return function(root, check, lib)
-	local island_world, quest_world = lib.island_world, lib.quest_world
+	local island_world = lib.island_world
 	local function near(actual, expected) return actual ~= nil and math.abs(actual - expected) < 1e-9 end
 
 	do
@@ -184,36 +184,5 @@ return function(root, check, lib)
 		check("a callback may return a reaction and a notice together", #addon.island.view().notices == 1 and addon.island.view().notices[1].text == "Level up")
 		event("UPDATE_EXHAUSTION")
 		check("a reaction that does not exist is reported to the error handler", #errors == 1 and errors[1]:find("invalid_reaction", 1, true) ~= nil)
-	end
-
-	-- ISLAND_LAYOUT_DIR=<dir> writes a kill on the open panel and an error on the closed chip at their peak.
-	do
-		local dir = os.getenv("ISLAND_LAYOUT_DIR")
-		if dir then
-			local layout = dofile(root .. "/tests/lib/layout.lua")
-			local function dump(name, make_world, kind, open_it)
-				local addon, env, event, state, _, _, frames = make_world()
-				addon.module.set("island", "enabled", true)
-				addon.module.set("island", "reduced_motion", false)
-				local top
-				for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then top = frame end end
-				if open_it then
-					addon.module.set("island", "reduced_motion", true)
-					top.scripts.OnClick(top, "LeftButton")
-					addon.module.set("island", "reduced_motion", false)
-				end
-				layout.settle(frames)
-				state.time = 800
-				env.Everlook.island.react(kind)
-				state.time = 800.06
-				for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookIsland" then frame.scripts.OnUpdate(frame, 0.06) end end
-				local handle = assert(io.open(dir .. "/" .. name .. ".json", "w"))
-				handle:write(layout.export(frames, top, env.GetTime()))
-				handle:close()
-			end
-			dump("react_open", quest_world, "level", true)
-			dump("react_closed", island_world, "error", false)
-			dump("react_closed_kill", island_world, "kill", false)
-		end
 	end
 end

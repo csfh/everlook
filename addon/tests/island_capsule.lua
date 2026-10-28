@@ -201,15 +201,6 @@ return function(root, check, lib)
 			return addon, env, event, state, tickers, frames, top
 		end
 
-		local function dump(name, frames, top)
-			local dir = os.getenv("ISLAND_LAYOUT_DIR")
-			if not dir then return end
-			layout.settle(frames)
-			local handle = assert(io.open(dir .. "/cap_" .. name .. ".txt", "w"))
-			handle:write(layout.describe(frames, top))
-			handle:close()
-		end
-
 		local states = {}
 
 		-- The wide quest capsule.
@@ -217,7 +208,6 @@ return function(root, check, lib)
 			local addon, _, _, _, _, frames, top = ready(quest_world)
 			addon.module.set("island", "quest_context", true)
 			layout.settle(frames)
-			dump("wide", frames, top)
 			states.wide = { addon = addon, frames = frames, top = top }
 		end
 
@@ -227,7 +217,6 @@ return function(root, check, lib)
 			addon.module.set("island", "quest_context", true)
 			addon.module.set("island", "quest_title", false)
 			layout.settle(frames)
-			dump("compact", frames, top)
 		end
 
 		-- With an unread count.
@@ -236,7 +225,6 @@ return function(root, check, lib)
 			addon.module.set("island", "quest_context", true)
 			env.Everlook.island.notify({ source = "Test", key = "unread", text = "Something new", presentation = "inbox" })
 			layout.settle(frames)
-			dump("unread", frames, top)
 		end
 
 		-- A status with a mark, trailing text and progress.
@@ -245,14 +233,12 @@ return function(root, check, lib)
 			env.Everlook.island.notify({ source = "Test", key = "flight", text = "Flying to Ratchet", presentation = "status",
 				capsule = { text = "Ratchet", icon = "flight", trailing = "0:30", progress = 0.5 } })
 			layout.settle(frames)
-			dump("status", frames, top)
 		end
 
 		-- The level chip.
 		do
 			local addon, _, _, _, _, frames, top = ready(island_world)
 			layout.settle(frames)
-			dump("chip", frames, top)
 		end
 	end
 	do

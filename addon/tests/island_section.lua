@@ -182,16 +182,6 @@ return function(root, check, lib)
 				tooltip = { title = "Ragnaros", lines = { "Fire Lord" } } },
 		} }))
 		open(addon, frames)
-		local function dump(name, frames_list, env_list)
-			local dir = os.getenv("ISLAND_LAYOUT_DIR")
-			if not dir then return end
-			local top
-			for _, frame in ipairs(frames_list) do if frame.name == "EverlookIsland" then top = frame end end
-			local handle = assert(io.open(dir .. "/" .. name .. ".json", "w"))
-			handle:write(layout.export(frames_list, top, env_list.GetTime()))
-			handle:close()
-		end
-		dump("sections_b", frames, env)
 		check("a section in pane B shows its title, text and row", find_text(frames, "BOSSES") and find_text(frames, "Phase two starts at 40 percent.")
 			and find_text(frames, "Ragnaros") and find_text(frames, "3/8"))
 
@@ -293,14 +283,6 @@ return function(root, check, lib)
 			and bags_cell.top - gold_cell.bottom == 8 and bags_cell.left == gold_cell.left)
 		check("a cell's text starts 36 in, past its gauge", gold_label.left - gold_cell.left == 36)
 		check("a meter shows its label and its value", find_text(frames, "Raid cleared") ~= nil and find_text(frames, "3/8") ~= nil)
-		local dir = os.getenv("ISLAND_LAYOUT_DIR")
-		if dir then
-			local top
-			for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then top = frame end end
-			local handle = assert(io.open(dir .. "/sections_both.json", "w"))
-			handle:write(layout.export(frames, top, env.GetTime()))
-			handle:close()
-		end
 		-- A heading button's outline, not just its words, ends on the inset.
 		local measure = layout.new()
 		local island_rect
@@ -384,13 +366,6 @@ return function(root, check, lib)
 					if type(region.text) == "string" and region.text:find("ready to turn in", 1, true) and region.shown ~= false then return region.text end
 				end
 			end
-		end
-		if os.getenv("ISLAND_LAYOUT_DIR") then
-			local top
-			for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then top = frame end end
-			local handle = assert(io.open(os.getenv("ISLAND_LAYOUT_DIR") .. "/card.json", "w"))
-			handle:write(layout.export(frames, top, env.GetTime()))
-			handle:close()
 		end
 		local text = ready_label()
 		check("a quest that can be handed in says so in green, the color the capsule's ring turns", text and text:find("|cff80e6a6ready to turn in|r", 1, true) ~= nil)

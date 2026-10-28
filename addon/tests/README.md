@@ -5,7 +5,7 @@ Three layers, from cheapest to closest to the game. All of them run before a pus
 | Layer | Run with | What it proves |
 | --- | --- | --- |
 | Lua suite | `lua5.1 tests/run.lua` | Module logic on plain Lua 5.1 with stand-ins for the game's API. Fast; runs in public CI. |
-| Script and layout checks | `python3 tests/scripts_test.py`, `python3 tests/luac_test.py`, `cd scripts && python3 -m unittest risky_uses_test` | The packed release (folders, versions, media, checksums, the same bytes twice), that every TOC lists real files, `luac5.1` limits (200 locals, 60 upvalues) and stray globals. Run in public CI. |
+| Script and layout checks | `python3 tests/scripts_test.py`, `python3 tests/luac_test.py` | The packed release (folders, versions, media, checksums, the same bytes twice), that every TOC lists real files, `luac5.1` limits (200 locals, 60 upvalues) and stray globals. Run in public CI. |
 | Harness | `just test harness` from the repository root | The real addon files on frames with the game's strata, mouse, clock and animation rules (`harness/`). |
 
 Rules for writing a test (they come from mistakes already made):

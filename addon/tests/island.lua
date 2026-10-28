@@ -29,15 +29,6 @@ return function(root, check, lib)
 				if object.point[4] == 0 then quest_pane = object else notice_pane = object end
 			end
 		end
-		if os.getenv("ISLAND_LAYOUT_DIR") then
-			local layout = dofile(root .. "/tests/lib/layout.lua")
-			local top
-			for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then top = frame end end
-			layout.settle(frames)
-			local handle = assert(io.open(os.getenv("ISLAND_LAYOUT_DIR") .. "/experience.json", "w"))
-			handle:write(layout.export(frames, top, env.GetTime()))
-			handle:close()
-		end
 		-- 720 wide on the 12-column grid: pane A is five columns, so the divider is at 12 + 276 + 12 = 300.
 		check("the island is two columns wide when there is a quest to show", addon.island.view().width == 720)
 		check("Status and the quests share the left edge, and the notifications start at the divider and the inset", status and quests_heading
@@ -795,26 +786,10 @@ return function(root, check, lib)
 		-- Reduced motion snaps the closed pill and the open panel to their final size, which the fake frames cannot animate.
 		addon.module.set("island", "reduced_motion", true)
 		layout.settle(frames)
-		local closed_root
-		for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then closed_root = frame end end
-		if os.getenv("ISLAND_LAYOUT_DIR") then
-			local handle = assert(io.open(os.getenv("ISLAND_LAYOUT_DIR") .. "/closed.json", "w"))
-			handle:write(layout.export(frames, closed_root, env.GetTime()))
-			handle:close()
-		end
 		local root_frame
 		for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then root_frame = frame end end
 		root_frame.scripts.OnClick(root_frame, "LeftButton")
 		layout.settle(frames)
-		-- Run with ISLAND_LAYOUT=1 to print every region's rectangle, relative to the island's corner.
-		if os.getenv("ISLAND_LAYOUT") then print(layout.describe(frames, root_frame)) end
-		-- ISLAND_LAYOUT_DIR=<dir> also writes open.json for scripts/island_layout_html.py.
-		local dump_dir = os.getenv("ISLAND_LAYOUT_DIR")
-		if dump_dir then
-			local handle = assert(io.open(dump_dir .. "/open.json", "w"))
-			handle:write(layout.export(frames, root_frame, env.GetTime()))
-			handle:close()
-		end
 		local problems = layout.lint(frames, { skip = function(frame) return frame.name == "EverlookIslandResting" end })
 		check("nothing in the open island sits outside the frame that holds it, and no two lines of text overlap", #problems == 0)
 		if #problems > 0 then print(table.concat(problems, "\n")) end
