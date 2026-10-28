@@ -1,8 +1,7 @@
 -- Fonts: sets chat and player names in Manrope and the rest of the interface in Expressway, and waits while you are in combat.
 return function(root, check, lib)
 	local load_all = lib.load_all
-	local addon2, env2, event2, hooks, tickers, frames = load_all()
-	-- The quest interface checks below reuse this font.
+	local addon, env, event, hooks, _, frames = load_all()
 	local font
 	do
 		local expressway = "Interface\\AddOns\\Everlook_Fonts\\assets\\expressway.ttf"
@@ -44,7 +43,7 @@ return function(root, check, lib)
 		function chat_frame:SetFont(path, size, flags)
 			if self.fontObject == chat_font then
 				self.fontObject = font_object(chat_font:GetFont())
-				env2["table: chat frame"] = self.fontObject
+				env["table: chat frame"] = self.fontObject
 			end
 			self.fontObject:SetFont(path, size, flags)
 		end
@@ -61,120 +60,120 @@ return function(root, check, lib)
 		local tooltip_name = following_text(tooltip_header)
 		local regions = { region, protected_region, chat_line, nameplate_name, player_name, level_text, tooltip_name }
 		local font_frame = { GetRegions = function() return unpack(regions) end }
-		env2.EnumerateFrames = function(previous) if not previous then return font_frame end end
-		env2.TestFont = font
-		env2.ChatFontNormal = chat_font
-		env2.ChatFrame1 = chat_frame
-		env2.CHAT_FRAMES = { "ChatFrame1" }
-		env2.SystemFont_NamePlate = nameplate_font
-		env2.GameTooltipHeaderText = tooltip_header
-		env2.GameFontNormalSmall = unit_font
-		env2.PlayerName = player_name
-		env2.PartyFrame = {
+		env.EnumerateFrames = function(previous) if not previous then return font_frame end end
+		env.TestFont = font
+		env.ChatFontNormal = chat_font
+		env.ChatFrame1 = chat_frame
+		env.CHAT_FRAMES = { "ChatFrame1" }
+		env.SystemFont_NamePlate = nameplate_font
+		env.GameTooltipHeaderText = tooltip_header
+		env.GameFontNormalSmall = unit_font
+		env.PlayerName = player_name
+		env.PartyFrame = {
 			active = {},
-			PartyMemberFramePool = { EnumerateActive = function() return pairs(env2.PartyFrame.active) end },
+			PartyMemberFramePool = { EnumerateActive = function() return pairs(env.PartyFrame.active) end },
 			InitializePartyMemberFrames = function(self) self.active[party_member] = true end,
 		}
-		env2.DefaultCompactUnitFrameSetup = function() end
-		env2.STANDARD_TEXT_FONT = "original.ttf"
-		env2.DAMAGE_TEXT_FONT = "original.ttf"
-		env2.UNIT_NAME_FONT = "Fonts\\FRIZQT__.TTF"
-		env2.UNIT_NAME_FONT_ROMAN = "Fonts\\FRIZQT__.TTF"
-		env2.NAMEPLATE_FONT = "GameFontWhite"
-		addon2.module.set("fonts", "enabled", true)
+		env.DefaultCompactUnitFrameSetup = function() end
+		env.STANDARD_TEXT_FONT = "original.ttf"
+		env.DAMAGE_TEXT_FONT = "original.ttf"
+		env.UNIT_NAME_FONT = "Fonts\\FRIZQT__.TTF"
+		env.UNIT_NAME_FONT_ROMAN = "Fonts\\FRIZQT__.TTF"
+		env.NAMEPLATE_FONT = "GameFontWhite"
+		addon.module.set("fonts", "enabled", true)
 		check("Expressway sets interface text and skips forbidden regions", region.path == expressway and protected_region.path == "protected.ttf")
 		check("Expressway replaces the interface fonts and their globals",
-			font.path == expressway and unit_font.path == expressway and env2.STANDARD_TEXT_FONT == expressway and env2.DAMAGE_TEXT_FONT == expressway)
+			font.path == expressway and unit_font.path == expressway and env.STANDARD_TEXT_FONT == expressway and env.DAMAGE_TEXT_FONT == expressway)
 		check("chat windows and the chat font use Manrope at the window's size",
 			select(1, chat_frame:GetFont()) == manrope and select(2, chat_frame:GetFont()) == 16 and chat_font.path == manrope)
 		check("nameplates and names on unit frames use Manrope", nameplate_font.path == manrope and player_name.path == manrope)
 		check("the name at the top of a tooltip uses Manrope and keeps following its font", tooltip_header.path == manrope and tooltip_name.path == nil)
-		check("names drawn in the world use Manrope", env2.UNIT_NAME_FONT == manrope and env2.UNIT_NAME_FONT_ROMAN == manrope)
-		check("NAMEPLATE_FONT names a font object, so it stays", env2.NAMEPLATE_FONT == "GameFontWhite")
+		check("names drawn in the world use Manrope", env.UNIT_NAME_FONT == manrope and env.UNIT_NAME_FONT_ROMAN == manrope)
+		check("NAMEPLATE_FONT names a font object, so it stays", env.NAMEPLATE_FONT == "GameFontWhite")
 		check("chat lines and nameplate text keep following their fonts", chat_line.path == nil and nameplate_name.path == nil)
-		addon2.module.set("fonts", "size_offset", 2)
+		addon.module.set("fonts", "size_offset", 2)
 		check("font size adjustment avoids compounding", font.size == 14)
 		check("text that follows a replaced font gets the adjustment once", player_name.size == 12 and level_text.size == 12)
 		check("chat windows keep the size set on their tab", select(2, chat_frame:GetFont()) == 16)
-		event2("ADDON_LOADED")
+		event("ADDON_LOADED")
 		check("font refresh preserves configured size", font.size == 14 and player_name.size == 12 and select(2, chat_frame:GetFont()) == 16)
 		local late_text = following_text(unit_font)
 		regions[#regions + 1] = late_text
-		event2("ADDON_LOADED")
+		event("ADDON_LOADED")
 		check("text that appears later gets Expressway with the adjustment once", late_text.path == expressway and late_text.size == 12)
 		do
-			local walks, enumerate = 0, env2.EnumerateFrames
-			env2.EnumerateFrames = function(previous)
+			local walks, enumerate = 0, env.EnumerateFrames
+			env.EnumerateFrames = function(previous)
 				if not previous then walks = walks + 1 end
 				return enumerate(previous)
 			end
-			addon2.module.set("fonts", "size_offset", 2)
-			event2("PLAYER_ENTERING_WORLD", false, false)
-			event2("PLAYER_ENTERING_WORLD", false, false)
+			addon.module.set("fonts", "size_offset", 2)
+			event("PLAYER_ENTERING_WORLD", false, false)
+			event("PLAYER_ENTERING_WORLD", false, false)
 			check("a zone change walks no frames again", walks == 0)
-			event2("PLAYER_ENTERING_WORLD", true, false)
+			event("PLAYER_ENTERING_WORLD", true, false)
 			check("a login or a reload walks them once", walks == 1)
 			walks = 0
-			env2.InCombatLockdown = function() return true end
-			event2("ADDON_LOADED")
+			env.InCombatLockdown = function() return true end
+			event("ADDON_LOADED")
 			check("a pass in combat waits", walks == 0)
-			env2.InCombatLockdown = function() return false end
-			event2("PLAYER_REGEN_ENABLED")
+			env.InCombatLockdown = function() return false end
+			event("PLAYER_REGEN_ENABLED")
 			check("the pass blocked by combat runs when it ends", walks == 1)
 			walks = 0
-			event2("PLAYER_REGEN_ENABLED")
-			event2("PLAYER_REGEN_ENABLED")
+			event("PLAYER_REGEN_ENABLED")
+			event("PLAYER_REGEN_ENABLED")
 			check("a combat end with nothing blocked walks no frames", walks == 0)
 			local sets = 0
 			local font_set, region_set = font.SetFont, region.SetFont
 			font.SetFont = function(...) sets = sets + 1; return font_set(...) end
 			region.SetFont = function(...) sets = sets + 1; return region_set(...) end
-			event2("PLAYER_ENTERING_WORLD", true, false)
+			event("PLAYER_ENTERING_WORLD", true, false)
 			check("a second pass sets no font that is already right", sets == 0)
 			font.SetFont, region.SetFont = font_set, region_set
 			-- Loads in one burst are answered by one pass, a slice at a time.
 			walks = 0
 			local steps, wakes, step = 0, 0, nil
-			local sched_before, profile_before, frame_before = addon2.sched, env2.debugprofilestop, env2.CreateFrame
-			addon2.sched = { task = function(_, opts) step = opts.step return { wake = function() wakes = wakes + 1 end } end }
-			env2.debugprofilestop = function() steps = steps + 1 return steps * 5 end
-			env2.CreateFrame = env2.CreateFrame or function() end
+			local sched_before, profile_before, frame_before = addon.sched, env.debugprofilestop, env.CreateFrame
+			addon.sched = { task = function(_, opts) step = opts.step return { wake = function() wakes = wakes + 1 end } end }
+			env.debugprofilestop = function() steps = steps + 1 return steps * 5 end
+			env.CreateFrame = env.CreateFrame or function() end
 			local many, index_of = {}, {}
 			for index = 1, 100 do
 				many[index] = { GetRegions = function() end }
 				index_of[many[index]] = index
 			end
-			local counted = env2.EnumerateFrames
-			env2.EnumerateFrames = function(previous)
+			local counted = env.EnumerateFrames
+			env.EnumerateFrames = function(previous)
 				if not previous then walks = walks + 1 end
 				return many[previous and index_of[previous] + 1 or 1]
 			end
-			for index = 1, 300 do env2["junk_global_" .. index] = { GetObjectType = function() return "Frame" end } end
-			event2("ADDON_LOADED")
-			event2("ADDON_LOADED")
-			event2("ADDON_LOADED")
+			for index = 1, 300 do env["junk_global_" .. index] = { GetObjectType = function() return "Frame" end } end
+			event("ADDON_LOADED")
+			event("ADDON_LOADED")
+			event("ADDON_LOADED")
 			check("a burst of loaded addons wakes the task and walks nothing yet", wakes == 3 and walks == 0 and step ~= nil)
 			local slices = 0
 			while step(1.5) and slices < 100 do slices = slices + 1 end
 			check("the pass is cut into slices, in the globals as well as the frames, and walks the frames once", slices >= 6 and walks == 1)
 			check("and nothing is left to do after it", step(1.5) == false and walks == 1)
-			addon2.sched, env2.debugprofilestop, env2.CreateFrame = sched_before, profile_before, frame_before
-			env2.EnumerateFrames = counted
-			for index = 1, 300 do env2["junk_global_" .. index] = nil end
-			env2.EnumerateFrames = enumerate
+			addon.sched, env.debugprofilestop, env.CreateFrame = sched_before, profile_before, frame_before
+			env.EnumerateFrames = counted
+			for index = 1, 300 do env["junk_global_" .. index] = nil end
+			env.EnumerateFrames = enumerate
 		end
-		env2.PartyFrame:InitializePartyMemberFrames()
+		env.PartyFrame:InitializePartyMemberFrames()
 		check("a party member's name uses Manrope", party_member.Name.path == manrope and party_member.PetFrame.Name.path == manrope)
 		hooks.DefaultCompactUnitFrameSetup(compact_frame)
 		check("a raid-style frame's name uses Manrope", compact_frame.name.path == manrope and compact_frame.name.size == 12)
-		env2.InCombatLockdown = function() return true end
-		addon2.module.set("fonts", "enabled", false)
+		env.InCombatLockdown = function() return true end
+		addon.module.set("fonts", "enabled", false)
 		check("font restoration waits for combat to end", font.path ~= "original.ttf")
-		env2.InCombatLockdown = function() return false end
-		event2("PLAYER_REGEN_ENABLED")
+		env.InCombatLockdown = function() return false end
+		event("PLAYER_REGEN_ENABLED")
 		check("font restoration restores anonymous text regions", region.path == "chat.ttf" and region.size == 10)
 		check("font restoration restores size and path after combat",
-			font.path == "original.ttf" and font.size == 12 and env2.STANDARD_TEXT_FONT == "original.ttf" and env2.DAMAGE_TEXT_FONT == "original.ttf")
+			font.path == "original.ttf" and font.size == 12 and env.STANDARD_TEXT_FONT == "original.ttf" and env.DAMAGE_TEXT_FONT == "original.ttf")
 		check("font restoration puts chat back at the window's size",
 			select(1, chat_frame:GetFont()) == "Fonts\\ARIALN.TTF" and select(2, chat_frame:GetFont()) == 16 and chat_font.path == "Fonts\\ARIALN.TTF" and chat_font.size == 14)
 		local function game_font(text)
@@ -183,14 +182,14 @@ return function(root, check, lib)
 		end
 		check("font restoration puts the game's font back on names and later text",
 			game_font(player_name) and game_font(level_text) and game_font(late_text) and game_font(party_member.Name) and game_font(compact_frame.name)
-			and nameplate_font.path == "Fonts\\FRIZQT__.TTF" and env2.UNIT_NAME_FONT == "Fonts\\FRIZQT__.TTF" and env2.UNIT_NAME_FONT_ROMAN == "Fonts\\FRIZQT__.TTF")
-		env2.GetLocale = function() return "koKR" end
-		addon2.module.set("fonts", "enabled", true)
+			and nameplate_font.path == "Fonts\\FRIZQT__.TTF" and env.UNIT_NAME_FONT == "Fonts\\FRIZQT__.TTF" and env.UNIT_NAME_FONT_ROMAN == "Fonts\\FRIZQT__.TTF")
+		env.GetLocale = function() return "koKR" end
+		addon.module.set("fonts", "enabled", true)
 		check("Fonts leaves a Korean or Chinese client's fonts, which neither font can draw",
-			font.path == "original.ttf" and env2.STANDARD_TEXT_FONT == "original.ttf" and select(1, chat_frame:GetFont()) == "Fonts\\ARIALN.TTF")
-		addon2.module.set("fonts", "enabled", false)
-		env2.GetLocale = nil
-		env2.PartyFrame, env2.DefaultCompactUnitFrameSetup = nil, nil
+			font.path == "original.ttf" and env.STANDARD_TEXT_FONT == "original.ttf" and select(1, chat_frame:GetFont()) == "Fonts\\ARIALN.TTF")
+		addon.module.set("fonts", "enabled", false)
+		env.GetLocale = nil
+		env.PartyFrame, env.DefaultCompactUnitFrameSetup = nil, nil
 	end
 
 	do

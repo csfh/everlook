@@ -1,7 +1,7 @@
 -- Settings: the native settings page: its subpages, rows, sliders and the /everlook command.
 return function(root, check, lib)
 	local source, load_all = lib.source, lib.load_all
-	local addon2, env2, event2, hooks, tickers, frames = load_all()
+	local addon, env = load_all()
 	local registered, pages, headers, rows = {}, 0, {}, {}
 	local root_category = { GetID = function() return 42 end }
 	local layout = { AddInitializer = function(_, row) rows[#rows + 1] = row end }
@@ -13,10 +13,10 @@ return function(root, check, lib)
 		end, AddSearchTags = function(self, ...) self.tags = { ... } end }
 	end
 	local opened = nil
-	addon2.sched = { frame = {}, page = function() return addon2.sched.frame end }
+	addon.sched = { frame = {}, page = function() return addon.sched.frame end }
 	local scanned = 0
-	addon2.scan = { now = function() scanned = scanned + 1 end }
-	env2.Settings = {
+	addon.scan = { now = function() scanned = scanned + 1 end }
+	env.Settings = {
 		RegisterVerticalLayoutCategory = function(name)
 			assert(name == "Everlook"); pages = pages + 1; return root_category, layout
 		end,
@@ -52,16 +52,16 @@ return function(root, check, lib)
 		CreateSlider = function(_, proxy, options) sliders[proxy.variable] = options; return control() end,
 		OpenToCategory = function(id) opened = id end,
 	}
-	env2.CreateSettingsListSectionHeaderInitializer = function(name)
+	env.CreateSettingsListSectionHeaderInitializer = function(name)
 		return { name = name }
 	end
-	env2.CreateSettingsButtonInitializer = function(name, _, click, _, search)
+	env.CreateSettingsButtonInitializer = function(name, _, click, _, search)
 		assert(search ~= nil); return { name = name, click = click }
 	end
-	env2.EventUtil.ContinueOnAddOnLoaded = function(_, callback) callback() end
-	env2.EventUtil.ContinueOnPlayerLogin = function(callback) callback() end
-	env2.MinimalSliderWithSteppersMixin = { Label = { Right = "right" } }
-	local settings = assert(loadfile(source("settings"))); setfenv(settings, env2); settings("Everlook", addon2)
+	env.EventUtil.ContinueOnAddOnLoaded = function(_, callback) callback() end
+	env.EventUtil.ContinueOnPlayerLogin = function(callback) callback() end
+	env.MinimalSliderWithSteppersMixin = { Label = { Right = "right" } }
+	local settings = assert(loadfile(source("settings"))); setfenv(settings, env); settings("Everlook", addon)
 	check("native settings register one Everlook page", pages == 1)
 	check("every option carries its module's name as a search tag", (function()
 		local tagged_count = 0
@@ -71,24 +71,24 @@ return function(root, check, lib)
 		return tagged_count == #children and #children > 0
 	end)())
 		check("modules can add native settings buttons after their options", settings_buttons["Preview notifications"] and settings_buttons["Reset Island position"])
-	check("preview has no effect when the module is off", settings_buttons["Preview notifications"].click() == false and #addon2.island.view().notices == 0)
-	addon2.module.set("island", "enabled", true)
+	check("preview has no effect when the module is off", settings_buttons["Preview notifications"].click() == false and #addon.island.view().notices == 0)
+	addon.module.set("island", "enabled", true)
 	settings_buttons["Preview notifications"].click()
-	local preview_notices = addon2.island.view().notices
+	local preview_notices = addon.island.view().notices
 	check("native preview adds warning, coins and longer local examples", #preview_notices == 3 and preview_notices[1].severity == "warning" and preview_notices[2].money == 12345 and preview_notices[3].detail)
-	addon2.module.set("island", "position_x", 103)
-	addon2.module.set("island", "position_top", 13)
-	check("dragging the Island lands on the pixel it was dropped on", addon2.module.get("island", "position_x") == 103 and addon2.module.get("island", "position_top") == 13)
+	addon.module.set("island", "position_x", 103)
+	addon.module.set("island", "position_top", 13)
+	check("dragging the Island lands on the pixel it was dropped on", addon.module.get("island", "position_x") == 103 and addon.module.get("island", "position_top") == 13)
 	settings_buttons["Reset Island position"].click()
-	check("native reset restores the position preferences", addon2.module.get("island", "position_x") == 0 and addon2.module.get("island", "position_top") == 12)
-	addon2.module.set("island", "enabled", false)
+	check("native reset restores the position preferences", addon.module.get("island", "position_x") == 0 and addon.module.get("island", "position_top") == 12)
+	addon.module.set("island", "enabled", false)
 	local subpage_names = {}
 	for index = 1, #subpages do subpage_names[index] = subpages[index].name end
 	check("each subject gets its own subpage on the left", table.concat(subpage_names, ",") == "Quests,Vendors,Loot and mail,Social,Chat,Tooltips,Map,Action bars,Bags,Nameplates,Text and names,Combat,Screen and camera,Island,Radial menu")
-	check("performance is the canvas subpage and hosts the scheduler's frame", #canvas_pages == 1 and canvas_pages[1].name == "Performance" and canvas_pages[1].frame == addon2.sched.frame)
+	check("performance is the canvas subpage and hosts the scheduler's frame", #canvas_pages == 1 and canvas_pages[1].name == "Performance" and canvas_pages[1].frame == addon.sched.frame)
 	local count, expected = 0, 0
 	for _ in pairs(registered) do count = count + 1 end
-	for _, module in ipairs(addon2.module.modules) do
+	for _, module in ipairs(addon.module.modules) do
 		for _ in pairs(module.options) do expected = expected + 1 end
 	end
 	check("the subpages include each module option exactly once", count == expected)
@@ -100,8 +100,8 @@ return function(root, check, lib)
 		and page_of_variable.Everlook_camera_distance_enabled == "Screen and camera"
 		and page_of_variable.Everlook_quest_automation_enabled == "Quests" and page_of_variable.Everlook_island_enabled == "Island"
 		and page_of_variable.Everlook_take_mail_enabled == "Loot and mail")
-	local module_count = #addon2.module.modules
-	local last = addon2.module.modules[module_count]
+	local module_count = #addon.module.modules
+	local last = addon.module.modules[module_count]
 	local function has_header(name)
 		for index = 1, #headers do
 			if headers[index] == name then return index end
@@ -117,7 +117,7 @@ return function(root, check, lib)
 		and (has_header("Session recap") or 0) > (has_header("Preview notifications") or 0)
 		and (has_header("Activity") or 0) > (has_header("Session recap") or 0))
 	count = 0
-	for _, module in ipairs(addon2.module.modules) do
+	for _, module in ipairs(addon.module.modules) do
 		if page_of_variable["Everlook_" .. module.id .. "_enabled"] then count = count + 1 end
 	end
 	check("every module appears on exactly one page", count == module_count)
@@ -129,7 +129,7 @@ return function(root, check, lib)
 	check("enabling a module makes its options available", sample.predicate())
 	check("subpage toggles retain saved preferences", registered.Everlook_quest_text_size_enabled.get())
 	registered.Everlook_fonts_size_offset.set(100)
-	check("settings clamp font size to supported range", addon2.module.get("fonts", "size_offset") == 8)
+	check("settings clamp font size to supported range", addon.module.get("fonts", "size_offset") == 8)
 	check("a slider that counts things shows its number", sliders.Everlook_island_toast_count.format(3) == "3")
 	check("every text size is in points", sliders.Everlook_fonts_size_offset.format(3) == "3 pt" and sliders.Everlook_unit_frame_names_extra.format(4) == "4 pt"
 		and sliders.Everlook_quest_text_size_text_size.format(16) == "16 pt" and sliders.Everlook_tracker_text_size_text_size.format(16) == "16 pt")
@@ -141,57 +141,57 @@ return function(root, check, lib)
 	check("a fraction shown as a percentage runs in whole percents", scale.minimum == 50 and scale.maximum == 100 and scale.step == 10 and scale.format(80) == "80%")
 	check("a percentage slider starts from the stored fraction", registered.Everlook_swing_timers_scale.default == 50 and registered.Everlook_swing_timers_scale.get() == 50)
 	registered.Everlook_swing_timers_scale.set(80)
-	check("a percentage slider stores the fraction", addon2.module.get("swing_timers", "scale") == 0.8 and registered.Everlook_swing_timers_scale.get() == 80)
+	check("a percentage slider stores the fraction", addon.module.get("swing_timers", "scale") == 0.8 and registered.Everlook_swing_timers_scale.get() == 80)
 	registered.Everlook_island_quest_distance_weight.set(150)
-	check("a quarter step shows as a whole percentage", addon2.module.get("island", "quest_distance_weight") == 1.5 and registered.Everlook_island_quest_distance_weight.get() == 150)
-	addon2.settings.toggle()
+	check("a quarter step shows as a whole percentage", addon.module.get("island", "quest_distance_weight") == 1.5 and registered.Everlook_island_quest_distance_weight.get() == 150)
+	addon.settings.toggle()
 	check("the toggle opens the Everlook page", opened == 42)
 	local hidden_panels = 0
-	env2.SettingsPanel = { shown = true, IsShown = function(self) return self.shown end, GetCurrentCategory = function() return root_category end }
-	env2.HideUIPanel = function(panel) hidden_panels = hidden_panels + 1; panel.shown = false end
+	env.SettingsPanel = { shown = true, IsShown = function(self) return self.shown end, GetCurrentCategory = function() return root_category end }
+	env.HideUIPanel = function(panel) hidden_panels = hidden_panels + 1; panel.shown = false end
 	opened = nil
-	addon2.settings.toggle()
+	addon.settings.toggle()
 	check("the toggle closes the page while it is showing", hidden_panels == 1 and opened == nil)
-	env2.SettingsPanel.shown = true
-	env2.SettingsPanel.GetCurrentCategory = function() return subpages[2] end
-	addon2.settings.toggle()
+	env.SettingsPanel.shown = true
+	env.SettingsPanel.GetCurrentCategory = function() return subpages[2] end
+	addon.settings.toggle()
 	check("the toggle closes the window from any Everlook subpage", hidden_panels == 2 and opened == nil)
-	env2.SettingsPanel.shown = true
-	env2.SettingsPanel.GetCurrentCategory = function() return canvas_pages[1] end
-	addon2.settings.toggle()
+	env.SettingsPanel.shown = true
+	env.SettingsPanel.GetCurrentCategory = function() return canvas_pages[1] end
+	addon.settings.toggle()
 	check("the toggle closes the window from the performance subpage", hidden_panels == 3 and opened == nil)
 	do
 		-- A client that refuses to close the panel is not an error for the player, and it is tried again after combat.
-		local real_hide, later = env2.HideUIPanel, nil
-		env2.HideUIPanel = function() error("blocked") end
-		addon2.after_combat = function(key, work) later = { key = key, work = work } end
-		env2.SettingsPanel.shown = true
-		env2.SettingsPanel.GetCurrentCategory = function() return root_category end
-		local ok = pcall(addon2.settings.toggle)
+		local real_hide, later = env.HideUIPanel, nil
+		env.HideUIPanel = function() error("blocked") end
+		addon.after_combat = function(key, work) later = { key = key, work = work } end
+		env.SettingsPanel.shown = true
+		env.SettingsPanel.GetCurrentCategory = function() return root_category end
+		local ok = pcall(addon.settings.toggle)
 		check("a refused close raises nothing and is queued for after combat", ok and later and later.key == "settings:close")
-		env2.HideUIPanel = real_hide
+		env.HideUIPanel = real_hide
 		later.work()
 		check("the queued close runs when combat ends", hidden_panels == 4)
-		addon2.after_combat = nil
+		addon.after_combat = nil
 	end
-	env2.SettingsPanel.shown = true
-	env2.SettingsPanel.GetCurrentCategory = function() return {} end
-	addon2.settings.toggle()
+	env.SettingsPanel.shown = true
+	env.SettingsPanel.GetCurrentCategory = function() return {} end
+	addon.settings.toggle()
 	check("the toggle switches to Everlook from another settings page", opened == 42 and hidden_panels == 4)
-	env2.SettingsPanel.shown = false
+	env.SettingsPanel.shown = false
 	opened = nil
-	addon2.settings.toggle()
+	addon.settings.toggle()
 	check("the toggle opens the page when the panel is closed", opened == 42 and hidden_panels == 4)
 	check("/everlook and its short form /el are the only commands, one handler for both",
-		env2.SLASH_EVERLOOK1 == "/everlook" and env2.SLASH_EVERLOOK2 == "/el" and env2.SLASH_EVERLOOK3 == nil
-		and env2.SLASH_EVERLOOKQOL1 == nil and env2.SlashCmdList.EVERLOOKQOL == nil)
+		env.SLASH_EVERLOOK1 == "/everlook" and env.SLASH_EVERLOOK2 == "/el" and env.SLASH_EVERLOOK3 == nil
+		and env.SLASH_EVERLOOKQOL1 == nil and env.SlashCmdList.EVERLOOKQOL == nil)
 	opened = nil
-	env2.SettingsPanel.shown = false
-	env2.SlashCmdList.EVERLOOK("")
+	env.SettingsPanel.shown = false
+	env.SlashCmdList.EVERLOOK("")
 	check("/everlook with nothing after it toggles the page", opened == 42)
 	opened = nil
 	opened = nil
-	env2.SlashCmdList.EVERLOOK(" Where ")
+	env.SlashCmdList.EVERLOOK(" Where ")
 	check("/everlook with words after it still toggles the page", opened == 42)
 	check("the Everlook page has no collection controls", rows[1] == nil)
 	do
