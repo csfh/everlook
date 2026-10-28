@@ -2,7 +2,7 @@
 ## Title: |cffffd100Everlook|r
 ## Notes: Quality-of-life tweaks for World of Warcraft, and the settings page for its module addons.
 ## Author: Christoffer Hallas
-## Version: 1.1.0
+## Version: 1.1.1
 ## SavedVariables: EverlookSaved
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
 
