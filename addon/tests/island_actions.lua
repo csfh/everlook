@@ -1,6 +1,6 @@
 -- Island actions: the buttons and secure item and spell actions on a notice, notice lifetimes, and the built-in feeds that use them.
 return function(root, check, lib)
-	local source, island_world, quest_world, fire_after, finish_animations, secret_stat = lib.source, lib.island_world, lib.quest_world, lib.fire_after, lib.finish_animations, lib.secret_stat
+	local source, island_world, quest_world, fire_after, finish_animations, secret_stat, notice_key = lib.source, lib.island_world, lib.quest_world, lib.fire_after, lib.finish_animations, lib.secret_stat, lib.notice_key
 	local function button_named(frames, label)
 		for index = 1, #frames do
 			local frame = frames[index]
@@ -452,11 +452,6 @@ return function(root, check, lib)
 			and details.point[4] == 40 and spell.point[4] == 168)
 	end
 	local function feed_tests()
-		local function notice_key(addon, key)
-			for _, notice in ipairs(addon.island.view().notices) do
-				if notice.key == key then return notice end
-			end
-		end
 		local function listed(order, id)
 			for index = 1, #(order or {}) do
 				if order[index].id == id then return true end
@@ -761,11 +756,6 @@ return function(root, check, lib)
 		end
 	end
 	local function later_feed_tests()
-		local function notice_key(addon, key)
-			for _, notice in ipairs(addon.island.view().notices) do
-				if notice.key == key then return notice end
-			end
-		end
 		do
 			local addon, env, event, _, _, _, frames = island_world()
 			addon.module.set("island", "enabled", true)
@@ -1361,4 +1351,77 @@ return function(root, check, lib)
 	lifetime_tests()
 	feed_tests()
 	later_feed_tests()
+	do
+		local addon, env, _, state, afters, _, frames = island_world()
+		addon.module.set("island", "enabled", true)
+		addon.island.notify({ source = "Test", key = "hovered", text = "Stay", duration = 4,
+			actions = { { id = "go", label = "Go", type = "callback", on_click = function() end } } })
+		local card
+		for _, frame in ipairs(frames) do if frame.bound_entry and frame.scripts.OnMouseUp then card = frame end end
+		check("a toast with buttons keeps its left clicks", card and card.pass_through ~= nil and #card.pass_through == 0)
+		local quiet
+		for _, frame in ipairs(frames) do if frame.action_id == "go" and frame.quiet then quiet = frame end end
+		local function fill_red() return quiet.quiet.fill.pieces[5].color[1] end
+		check("an action button is Stormwind blue: a thin gold outline over a bright blue fill, with near white words",
+			quiet and math.abs(quiet.label.color[1] - 235 / 255) < 0.01 and math.abs(fill_red() - 44 / 255) < 0.01
+			and quiet.quiet.edge.pieces[5].color[4] == 0.9 and quiet.quiet.edge.pieces[5].color[1] > quiet.quiet.edge.pieces[5].color[3]
+			and quiet.quiet.fill.pieces[5].color[3] > quiet.quiet.fill.pieces[5].color[1] * 2 and quiet.quiet.fill.pieces[5].color[3] > 0.8)
+		quiet.scripts.OnEnter(quiet)
+		check("it lights under the pointer and its words turn white", quiet.label.color[1] == 1 and math.abs(fill_red() - 52 / 255) < 0.01)
+		quiet.scripts.OnMouseDown(quiet)
+		check("and darkens while pressed", math.abs(fill_red() - 32 / 255) < 0.01)
+		quiet.scripts.OnLeave(quiet)
+		check("and rests again when the pointer leaves", math.abs(quiet.label.color[1] - 235 / 255) < 0.01 and math.abs(fill_red() - 44 / 255) < 0.01)
+		state.time = state.time + 3
+		card.scripts.OnEnter(card)
+		for _, after in ipairs(afters) do if not after.done then after.done = true; after.callback() end end
+		check("a hovered toast does not close when its clock runs out", #addon.island.view().toasts == 1)
+		state.time = state.time + 60
+		card.scripts.OnLeave(card)
+		local restarted
+		for _, after in ipairs(afters) do if not after.done then restarted = after.delay end end
+		check("leaving it restarts the full time", restarted == 4)
+	end
+	do
+		local addon, _, _, _, _, _, frames = island_world()
+		addon.module.set("island", "enabled", true)
+		addon.island.notify({ source = "Test", key = "two", text = "Two choices", duration = 4, interaction = "buttons",
+			actions = { { id = "yes", label = "Yes", type = "callback", on_click = function() end },
+				{ id = "later", label = "Not now", type = "callback", on_click = function() end } } })
+		local yes, later
+		for _, frame in ipairs(frames) do
+			if frame.action_id == "yes" and frame.quiet then yes = frame end
+			if frame.action_id == "later" and frame.quiet then later = frame end
+		end
+		check("the first of two actions is the blue one to press, and the other is bright silver",
+			yes and later and yes.quiet.style == "accent" and later.quiet.style == "silver"
+			and math.abs(yes.quiet.fill.pieces[5].color[1] - 44 / 255) < 0.01 and math.abs(later.quiet.fill.pieces[5].color[1] - 196 / 255) < 0.01)
+	end
+	-- Where the game can draw its gold tooltip border, the first button has it, scaled to fit.
+	do
+		local addon, env, _, _, _, _, frames = island_world()
+		addon.module.set("island", "enabled", true)
+		env.NineSliceUtil = {
+			GetLayout = function() return {} end,
+			ApplyLayoutByName = function(frame)
+				frame.TopLeftCorner = { GetHeight = function() return 33 end }
+				frame.Center = { Hide = function(self) self.hidden = true end }
+			end,
+		}
+		addon.island.notify({ source = "Test", key = "gold", text = "Two choices", duration = 4, interaction = "buttons",
+			actions = { { id = "yes", label = "Yes", type = "callback", on_click = function() end },
+				{ id = "later", label = "Not now", type = "callback", on_click = function() end } } })
+		local yes, later
+		for _, frame in ipairs(frames) do
+			if frame.action_id == "yes" and frame.quiet then yes = frame end
+			if frame.action_id == "later" and frame.quiet then later = frame end
+		end
+		local border_of = function(button) return button.quiet.border end
+		check("the first button has the game's border over its fill, scaled to fit the button, and its middle left out",
+			yes and border_of(yes) and border_of(yes).shown ~= false and border_of(yes).Center.hidden == true
+			and math.abs(border_of(yes).scale - 22 / (33 * 2 + 2)) < 1e-9)
+		check("the silver one has none, and its own thin line is kept", later and border_of(later).shown == false)
+		check("the thin gold line steps aside under the game's border",
+			yes.quiet.edge.pieces[5].color[4] == 0 and later.quiet.edge.pieces[5].color[4] == 0.9)
+	end
 end

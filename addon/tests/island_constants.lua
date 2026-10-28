@@ -1,4 +1,4 @@
--- The island's text must stay readable on its most see-through setting over the brightest ground in the game.
+-- Island constants: the island's text must stay readable on its most see-through setting over the brightest ground in the game.
 return function(root, check, lib)
 	local source = lib.source
 	local Everlook = { island_grid = { widths = { one = 1, two = 2 } } }

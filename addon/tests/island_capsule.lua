@@ -1,10 +1,9 @@
 -- Island capsule: the closed pill's one row, from the spec a producer gives a status to the states people see it in.
 return function(root, check, lib)
-
+	local island_world, quest_world, secret_stat = lib.island_world, lib.quest_world, lib.secret_stat
 	do
 		-- The capsule spec a producer gives a status: what it accepts, what it draws, and how it stays right
 		-- as it changes. Every call goes through Everlook.island, as an outside addon would make it.
-		local island_world = lib.island_world
 		local layout = dofile(root .. "/tests/lib/layout.lua")
 
 		local function world()
@@ -191,7 +190,6 @@ return function(root, check, lib)
 	do
 		-- The closed capsule in the states people see it: its resolved rectangles are written out so a change
 		-- to how it is drawn can be compared with how it was, and its measurements are held here.
-		local island_world, quest_world = lib.island_world, lib.quest_world
 		local layout = dofile(root .. "/tests/lib/layout.lua")
 
 		local function ready(world)
@@ -256,5 +254,106 @@ return function(root, check, lib)
 			layout.settle(frames)
 			dump("chip", frames, top)
 		end
+	end
+	do
+		local addon, env, _, _, afters, _, frames = island_world()
+		addon.module.set("island", "enabled", true)
+		local api = env.Everlook.island
+		local function finish_morph()
+			local island, resting
+			for _, object in ipairs(frames) do
+				if object.name == "EverlookIsland" then island = object end
+				if object.name == "EverlookIslandResting" then resting = object end
+			end
+			if island and island.scripts.OnUpdate and resting and resting.animation_groups and resting.animation_groups[1] then
+				resting.animation_groups[1].animations[1].progress = 1
+				island.scripts.OnUpdate()
+			end
+		end
+		local function shown_text(needle)
+			for _, object in ipairs(frames) do
+				for _, region in ipairs(object.regions or {}) do
+					if region.text and region.text:find(needle, 1, true) then return region.text end
+				end
+			end
+		end
+		local payload = { source = "A", key = "trip", text = "Flying to Ratchet", presentation = "status",
+			capsule = { icon = "flight", text = "1:10", trailing = "Ratchet" } }
+		local handle = api.notify(payload)
+		payload.capsule.text = "9:99"
+		local view = addon.island.view()
+		check("a copied capsule survives mutation of the caller's table", handle and view.status.capsule.text == "1:10" and view.status.capsule.trailing == "Ratchet")
+		check("a capsule morph starts from the resting width", view.shell.playing and view.shell.from == 64 and view.shell.to == view.width and view.width > 64)
+		finish_morph()
+		local settled = addon.island.view().shell.width
+		api.notify({ source = "A", key = "trip", text = "Flying to Ratchet", presentation = "status", capsule = { icon = "clock", text = "1:10", trailing = "Ratchet" } })
+		view = addon.island.view()
+		check("an icon change starts from the current width", view.shell.playing and view.shell.from == settled)
+		finish_morph()
+		env.everlook_island_key("down")
+		env.everlook_island_key("up")
+		for index = #afters, 1, -1 do
+			if afters[index].delay == 0.75 then afters[index].callback() end
+		end
+		local pill = addon.island.view().shell.width
+		api.notify({ source = "A", key = "trip", text = "Flying to Ratchet", presentation = "status", capsule = { icon = "clock", text = "1:09", trailing = "Ratchet" } })
+		view = addon.island.view()
+		check("a clock update keeps one read notice and the same pill width", view.unread_count == 0 and #view.notices == 1 and view.shell.width == pill and view.status.capsule.text == "1:09")
+		local rejected, reason = api.notify({ source = "A", key = "toast", text = "Hello", capsule = { text = "1:10" } })
+		check("a capsule on a toast is rejected", rejected == nil and reason == "invalid_capsule")
+		local secret = secret_stat()
+		env.issecretvalue = function(value) return value == secret end
+		rejected, reason = api.notify({ source = "A", key = "secret", text = "Flying", presentation = "status", capsule = { text = secret } })
+		check("a secret capsule is rejected", rejected == nil and reason == "invalid_capsule" and addon.island.view().status.capsule.text == "1:09")
+		env.issecretvalue = nil
+		rejected, reason = api.notify({ source = "A", key = "mark", text = "Flying", presentation = "status", capsule = { text = "1:10|T" } })
+		check("markup in capsule text is rejected", rejected == nil and reason == "invalid_capsule")
+		local runs = {}
+		for index = 1, 7 do runs[index] = { text = "Run" } end
+		rejected, reason = api.notify({ source = "A", key = "runs", text = "Too many", runs = runs })
+		check("a seventh run is rejected", rejected == nil and reason == "invalid_runs")
+		rejected, reason = api.notify({ source = "A", key = "atlas", text = "Bad atlas", runs = { { atlas = "Interface/Icons/Foo" } } })
+		check("a path-like atlas is rejected", rejected == nil and reason == "invalid_atlas")
+		env.GetMoneyString = function(amount) return "<coin:" .. amount .. ">" end
+		handle = api.notify({ source = "A", key = "rich", text = "Paid", runs = {
+			{ text = "Paid", tone = "primary" }, { money = -21500 }, { atlas = "Taxi_Frame_Gray" },
+		} })
+		local compiled = shown_text("|A:Taxi_Frame_Gray:16:16|a")
+		check("compiled runs contain the coin color and the atlas escape", handle and compiled and compiled:find("|cffffd166", 1, true) and compiled:find("|A:Taxi_Frame_Gray:16:16|a", 1, true))
+	end
+	do
+		local addon, env, _, _, _, _, frames = island_world()
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "reduced_motion", true)
+		env.Everlook.island.notify({ source = "A", key = "trip", text = "Flying to Ratchet", presentation = "status",
+			capsule = { icon = "flight", text = "1:10", trailing = "Ratchet" } })
+		local view = addon.island.view()
+		check("reduced motion settles on the target width in one paint", view.shell.width == view.width and view.width > 64 and view.shell.playing)
+	end
+	do
+		local addon = island_world()
+		local layout = addon.island_capsule.layout
+		local function measure(text) return #text * 7 end
+		local with_progress = layout({ text = "Flight to Stormwind", progress = 0.4 }, measure, 280)
+		check("a status capsule shows its progress as a percent in purple, not as a bar",
+			with_progress.row.badge == "40%" and with_progress.row.title == "Flight to Stormwind" and #with_progress.row.labels == 0)
+		local with_trailing = layout({ text = "Flight", trailing = "soon", progress = 0.4 }, measure, 280)
+		check("a trailing mark of its own is a label and keeps the percent away", with_trailing.row.labels[1] == "soon" and with_trailing.row.badge == nil)
+		check("with no progress there is nothing to show", layout({ text = "Flight" }, measure, 280).row.badge == nil)
+		-- The width a capsule asks for is worked out from its words with the row's own spacing:
+		-- 12 inset, the title, 12, then the trailing parts, then 12 more. With a mark the title starts at 34.
+		local plain = layout({ text = "Flight" }, measure, 280)
+		local marked = layout({ text = "Flight", icon = "flight" }, measure, 280)
+		local counted = layout({ text = "Flight", progress = 0.4 }, measure, 280)
+		check("a capsule's width is its title plus the row's insets, and a mark adds its room, 64 at the least",
+			plain.width == 66 and marked.width == 88 and counted.width == 100)
+		check("a capsule is at most 280 wide unless it asks to hold a width, and its width is even", layout({ text = string.rep("x", 100) }, measure, 400).width == 280
+			and layout({ text = "x", min_width = 320 }, measure, 400).width == 320 and layout({ text = "xxxxxxx" }, measure, 400).width % 2 == 0)
+		check("a held width is kept clear of the unread count's room", layout({ text = "x", min_width = 320 }, measure, 400, 20).width == 340)
+		local signature = addon.island_capsule.signature
+		check("a capsule's shape is what parts it has, so a new distance does not change it",
+			signature({ text = "a", labels = { "~5 yd" } }) == signature({ text = "b", labels = { "~6 yd" } })
+			and signature({ text = "a", labels = { "~5 yd" } }) ~= signature({ text = "a", labels = { "~5 yd", "12" } })
+			and signature({ text = "a" }) ~= signature({ text = "a", ring = { fraction = 0.5 } }))
 	end
 end

@@ -1,3 +1,4 @@
+-- Island share: alt-right-click a unit, item, quest, spell, or world object to say its name and show it on the island.
 return function(_, check, lib)
 	local load_all = lib.load_all
 	local function arm(env)

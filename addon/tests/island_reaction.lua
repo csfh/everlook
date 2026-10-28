@@ -1,6 +1,6 @@
--- Reactions: the arithmetic of a brief flash on the island's body, then how the island shows it.
+-- Island reaction: the arithmetic of a brief flash on the island's body, then how the island shows it.
 return function(root, check, lib)
-	local island_world, quest_world, secret_stat = lib.island_world, lib.quest_world, lib.secret_stat
+	local island_world, quest_world = lib.island_world, lib.quest_world
 	local function near(actual, expected) return actual ~= nil and math.abs(actual - expected) < 1e-9 end
 
 	do

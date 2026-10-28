@@ -1,4 +1,4 @@
--- Sections: the public contract other addons build on, and how the panes draw them.
+-- Island section: the public contract other addons build sections on, and how the panes draw them.
 -- Every call goes through Everlook.island, the way an outside addon would make it.
 return function(root, check, lib)
 	local island_world, quest_world = lib.island_world, lib.quest_world

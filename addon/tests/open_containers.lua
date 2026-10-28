@@ -1,6 +1,6 @@
 -- Open containers: opens clam shells, crates, and other containers in your bags, then takes what is inside when that loot came from the container.
 return function(root, check, lib)
-	local source, load_all = lib.source, lib.load_all
+	local load_all = lib.load_all
 	do
 		local function container_world()
 			local module, world, event, _, timers = load_all()

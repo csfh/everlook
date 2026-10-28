@@ -3,6 +3,12 @@
 return function(root)
 	local source = dofile(root .. "/tests/lib/source.lua")(root)
 	local lib = { source = source, layout = dofile(root .. "/tests/lib/layout.lua") }
+	function lib.read_source(name)
+		local handle = assert(io.open((source(name)), "r"))
+		local text = handle:read("*a")
+		handle:close()
+		return text
+	end
 
 	local function load_all(left_out)
 		left_out = left_out or {}
@@ -383,6 +389,11 @@ return function(root)
 		local toasts = addon.island.view().toasts
 		return toasts[#toasts] and toasts[#toasts].text
 	end
+	local function notice_key(addon, key)
+		for _, notice in ipairs(addon.island.view().notices) do
+			if notice.key == key then return notice end
+		end
+	end
 	-- A bar is a status bar that is showing. The island draws none of its own now.
 	local function shown_bar(frames)
 		for index = 1, #frames do
@@ -438,6 +449,6 @@ return function(root)
 		return addon, env, event, state, afters, tickers, frames
 	end
 	lib.island_world, lib.fire_after, lib.finish_animations = island_world, fire_after, finish_animations
-	lib.last_toast_text, lib.shown_bar, lib.secret_stat, lib.quest_world = last_toast_text, shown_bar, secret_stat, quest_world
+	lib.last_toast_text, lib.notice_key, lib.shown_bar, lib.secret_stat, lib.quest_world = last_toast_text, notice_key, shown_bar, secret_stat, quest_world
 	return lib
 end
