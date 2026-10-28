@@ -5,7 +5,7 @@ local module = Everlook.module
 local id = "island"
 
 BINDING_HEADER_EVERLOOK_ISLAND = "Everlook Island"
-BINDING_NAME_EVERLOOK_ISLAND = "Open smart island"
+BINDING_NAME_EVERLOOK_ISLAND = "Open the island"
 BINDING_NAME_EVERLOOK_ISLAND_DISMISS = "Dismiss top island notice"
 
 local island = {}
@@ -1997,7 +1997,7 @@ local next_subscription_id = 0
 
 local function report_event_error(event, reason)
 	local detail = plain_string(reason, 1024) and reason or "notification producer failed"
-	geterrorhandler()("Everlook Smart Island (" .. event .. "): " .. detail)
+	geterrorhandler()("Everlook Island (" .. event .. "): " .. detail)
 end
 
 local function notification_event(_, event, ...)
@@ -2072,7 +2072,7 @@ end
 -- Everlook.island is this module's table. The calls below, and `api`, are the supported interface
 -- for Everlook modules and other addons, with Everlook.module; its other fields belong to the island
 -- and can change, as can every other field on `Everlook`. It exists once this addon has loaded,
--- even while Smart island is off, and is missing when the player turns the addon off in the addon
+-- even while Island is off, and is missing when the player turns the addon off in the addon
 -- list. Another addon lists `## OptionalDeps: Everlook_Island`, checks `Everlook` and
 -- `Everlook.island` before using them, and calls with dot syntax. A call returns its result, or nil and a reason; "disabled" means Smart
 -- island is off, and nothing sent while it is off is kept or replayed. `api` below goes up only
@@ -2126,7 +2126,7 @@ end
 --
 -- register_event(event, callback) -> subscription. callback(event, ...) gets the native arguments
 -- and returns a notify payload, nil to skip, or a payload with reaction = <kind> to flash as well.
--- It runs only while Smart island is on, survives turning it off and on, and is dropped by a
+-- It runs only while Island is on, survives turning it off and on, and is dropped by a
 -- reload. Refusals: invalid_event, invalid_callback, unavailable. unregister_event(subscription)
 -- -> true or false. The arguments can be secret: check issecretvalue before comparing or
 -- formatting one.
@@ -2776,16 +2776,16 @@ actions.use({
 registered = module.register({
 	addon = addon_name, page = "island", order = 10,
 	id = id,
-	name = "Smart island",
+	name = "Island",
 	description = "While this is on, a pill at the top of the screen shows a level chip when closed, unless a quest or a status capsule replaces that chip, and level, experience, gold, durability, bag slots, and the clock when open, with toasts underneath. Hover previews it, a click or a tap of the key pins it open, a second click or tap closes it, holding the key peeks, the key is set below or under Key Bindings, turning this off hides the pill and clears its notices except a card frozen in combat, and the quest tracker and action bars stay where they are.",
 	keybinding = K.ACTION,
 	extra_keybindings = { "EVERLOOK_ISLAND_DISMISS" },
 	options = {
-		size = { name = "Island size", default = 100, min = 80, max = 150, step = 5, unit = "%", description = "Scales the Island's text, surfaces, controls, and toasts together, from 80 to 150, in steps of 5. 100 is the normal size, the position sliders stay on their own options, and this number does nothing until Smart island is on." },
+		size = { name = "Island size", default = 100, min = 80, max = 150, step = 5, unit = "%", description = "Scales the Island's text, surfaces, controls, and toasts together, from 80 to 150, in steps of 5. 100 is the normal size, the position sliders stay on their own options, and this number does nothing until Island is on." },
 		opacity = { name = "Island opacity", default = 96, min = 82, max = 100, step = 2, unit = "%", description = "How solid the Island's dark surface is. Lower it, down to 82%, to see more of the game behind the pill, toasts and open island. Text stays fully opaque, and 82% is the lowest at which every color of it still reads on the brightest ground. A lower value saved earlier reads as 82%." },
-		position_x = { name = "Horizontal position", default = 0, min = -600, max = 600, step = 1, unit = " px", description = "Moves the closed pill and the open Island left or right of the screen center, from -600 to 600, in steps of 1. Zero stays centered, a negative number moves left, a positive number moves right, Distance from top stays on its own slider, either shape is pulled back toward the center when it would leave the screen, and this number does nothing until Smart island is on. You can also hold Shift and drag the Island." },
-		position_top = { name = "Distance from top", default = 12, min = 8, max = 300, step = 1, unit = " px", description = "Sets how far the closed pill and the open Island sit below the top of the screen, from 8 to 300, in steps of 1. A larger number sits further down, Horizontal position stays on its own slider, either shape is moved back up when it would leave the screen, and this number does nothing until Smart island is on." },
-		read_time = { name = "Notification read time", default = 4, min = 3, max = 10, step = 1, unit = " s", description = "Sets how many seconds a toast stays when that notice does not set its own time, from 3 to 10, in steps of 1. A toast already showing keeps its time, time spent waiting behind ordinary toasts does not count, and a notice waiting behind cards that need a decision counts down and can leave the inbox before it appears, the countdown pauses while the Island is open or the pointer is on that toast, the toast and its inbox row leave together when the time ends, a notice that never gets a toast uses the same time in the inbox, a notice that needs a decision stays until you dismiss it, a flight or other line that stays on the Island keeps its own time, and this number does nothing until Smart island is on. Right-click a notice to dismiss it sooner." },
+		position_x = { name = "Horizontal position", default = 0, min = -600, max = 600, step = 1, unit = " px", description = "Moves the closed pill and the open Island left or right of the screen center, from -600 to 600, in steps of 1. Zero stays centered, a negative number moves left, a positive number moves right, Distance from top stays on its own slider, either shape is pulled back toward the center when it would leave the screen, and this number does nothing until Island is on. You can also hold Shift and drag the Island." },
+		position_top = { name = "Distance from top", default = 12, min = 8, max = 300, step = 1, unit = " px", description = "Sets how far the closed pill and the open Island sit below the top of the screen, from 8 to 300, in steps of 1. A larger number sits further down, Horizontal position stays on its own slider, either shape is moved back up when it would leave the screen, and this number does nothing until Island is on." },
+		read_time = { name = "Notification read time", default = 4, min = 3, max = 10, step = 1, unit = " s", description = "Sets how many seconds a toast stays when that notice does not set its own time, from 3 to 10, in steps of 1. A toast already showing keeps its time, time spent waiting behind ordinary toasts does not count, and a notice waiting behind cards that need a decision counts down and can leave the inbox before it appears, the countdown pauses while the Island is open or the pointer is on that toast, the toast and its inbox row leave together when the time ends, a notice that never gets a toast uses the same time in the inbox, a notice that needs a decision stays until you dismiss it, a flight or other line that stays on the Island keeps its own time, and this number does nothing until Island is on. Right-click a notice to dismiss it sooner." },
 		avoid_top_widgets = { name = "Stay clear of top-center widgets", default = true, description = "Move the pill below the battleground score and similar widgets while they show, so it never covers them. Your Distance from top still applies when no widget is showing." },
 		closed_xp = { name = "Experience percent on the pill", default = true, description = "Show your experience percent beside the level while the Island is closed.", presets = { Quiet = false, Standard = true, Informative = true } },
 		closed_clock = { name = "Clock on the pill", default = false, description = "Show the game time beside the level while the Island is closed.", presets = { Quiet = false, Standard = false, Informative = true } },
@@ -2845,7 +2845,7 @@ registered = module.register({
 			keys = { "do_not_disturb", "toasts", "toast_count", "inbox_size", "reactions", "reduced_motion", "combat_toasts" },
 			after = function(layout)
 				layout:AddInitializer(CreateSettingsButtonInitializer("Preview notifications", "Preview", island.preview_notifications,
-					"Show local examples with a warning, coins and a longer message. Enable Smart island first.", true))
+					"Show local examples with a warning, coins and a longer message. Enable Island first.", true))
 			end,
 		},
 		{

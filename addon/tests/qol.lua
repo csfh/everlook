@@ -1915,7 +1915,7 @@ return function(root, check)
 	addon2.module.set("island", "enabled", false)
 	local subpage_names = {}
 	for index = 1, #subpages do subpage_names[index] = subpages[index].name end
-	check("each subject gets its own subpage on the left", table.concat(subpage_names, ",") == "Quests,Vendors,Loot and mail,Social,Chat,Tooltips,Map,Action bars,Bags,Nameplates,Text and names,Combat,Screen and camera,Smart island,Radial menu")
+	check("each subject gets its own subpage on the left", table.concat(subpage_names, ",") == "Quests,Vendors,Loot and mail,Social,Chat,Tooltips,Map,Action bars,Bags,Nameplates,Text and names,Combat,Screen and camera,Island,Radial menu")
 	check("performance is the canvas subpage and hosts the scheduler's frame", #canvas_pages == 1 and canvas_pages[1].name == "Performance" and canvas_pages[1].frame == addon2.sched.frame)
 	local count, expected = 0, 0
 	for _ in pairs(registered) do count = count + 1 end
@@ -1929,7 +1929,7 @@ return function(root, check)
 		and page_of_variable.Everlook_QoL_bags_enabled == "Bags" and page_of_variable.Everlook_QoL_action_bar_slots_enabled == "Action bars"
 		and page_of_variable.Everlook_QoL_nameplates_enabled == "Nameplates" and page_of_variable.Everlook_QoL_swing_timers_enabled == "Combat"
 		and page_of_variable.Everlook_QoL_camera_distance_enabled == "Screen and camera"
-		and page_of_variable.Everlook_QoL_quest_automation_enabled == "Quests" and page_of_variable.Everlook_QoL_island_enabled == "Smart island"
+		and page_of_variable.Everlook_QoL_quest_automation_enabled == "Quests" and page_of_variable.Everlook_QoL_island_enabled == "Island"
 		and page_of_variable.Everlook_QoL_take_mail_enabled == "Loot and mail")
 	local module_count = #addon2.module.modules
 	local last = addon2.module.modules[module_count]
@@ -2568,7 +2568,7 @@ return function(root, check)
 		check("turning the module off mid-press fires nothing but still closes the wheel", button.attributes.type == nil and seen.opened == nil)
 	end
 
-	-- Smart island: a closed experience chip that opens into one data bar.
+	-- Island: a closed experience chip that opens into one data bar.
 	local function island_world()
 		local addon, env, event, hooks, tickers, frames = load_qol()
 		local afters, state = {}, {
@@ -4076,7 +4076,7 @@ return function(root, check)
 		for _, module in ipairs(island.module.modules) do
 			if module.id == "island" then found = module end
 		end
-		check("the smart island is on its own settings page", found and found.page == "island" and found.keybinding == "EVERLOOK_ISLAND")
+		check("the island is on its own settings page", found and found.page == "island" and found.keybinding == "EVERLOOK_ISLAND")
 		local names, seen, missing = {}, {}, false
 		for _, section in ipairs(found and island.module.sections(found) or {}) do
 			names[#names + 1] = section.name
@@ -4090,9 +4090,9 @@ return function(root, check)
 		end
 		check("island sections name every option once",
 			found and not missing and table.concat(names, ",") == "Presets,Placement,Opening,Closed pill,Quest display,Notices,Activity")
-		check("the smart island starts disabled", not island.module.enabled("island"))
+		check("the island starts disabled", not island.module.enabled("island"))
 		check("the island key is not the radial menu key",
-			found.keybinding ~= "CLICK EverlookRadialButton:LeftButton" and island_env.BINDING_NAME_EVERLOOK_ISLAND == "Open smart island")
+			found.keybinding ~= "CLICK EverlookRadialButton:LeftButton" and island_env.BINDING_NAME_EVERLOOK_ISLAND == "Open the island")
 		check("money formats gold, silver and copper",
 			island.island_vitals.money(1234567) == "123g 45s 67c"
 			and island.island_vitals.money(0) == "0c"
@@ -5920,7 +5920,7 @@ return function(root, check)
 			state.xp = 80
 			addon.island_experience.on_event("PLAYER_XP_UPDATE")
 			addon.module.set("island", "enabled", false)
-			check("disabling Smart island leaves the saved ledger in place",
+			check("disabling Island leaves the saved ledger in place",
 				addon.island_experience.report() == nil
 				and env.EverlookDB.island_experience["Player-1-ABC"].buckets["1000800"].total == 80)
 

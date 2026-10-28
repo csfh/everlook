@@ -63,7 +63,7 @@ const modulesSection = document.createElement("div");
 modulesSection.id = "modules";
 modulesSection.append(
   section("Modules", "Optional addons that depend on Everlook. They start disabled.", rest),
-  section("Smart island", "The island and the modules that add to it.", island, "island"),
+  section("Island", "The island and the modules that add to it.", island, "island"),
 );
 
 wrap.append(header, modulesSection);

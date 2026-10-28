@@ -16,7 +16,7 @@ local function run(action, handle)
 	local ok, failure = pcall(action.callback, handle, action.id)
 	if not ok then
 		local handler = geterrorhandler and geterrorhandler()
-		if handler then handler("Everlook Smart Island (section action): " .. tostring(failure)) end
+		if handler then handler("Everlook Island (section action): " .. tostring(failure)) end
 	end
 end
 

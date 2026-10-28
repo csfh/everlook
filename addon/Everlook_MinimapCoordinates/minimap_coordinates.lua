@@ -81,7 +81,7 @@ end
 module.register({
 	addon = addon_name, page = "map", order = 20,
 	id = id,
-	name = "Coordinates",
+	name = "Minimap coordinates",
 	description = "Shows where you are on the current map, under the minimap, as the horizontal position and then the vertical one, each with one decimal, and keeps that line current while you move. The world map stays as it is, the line stays blank when the client has no map or no position, nothing is shown when there is no minimap to attach it to or no way to keep it current, and turning this off hides it.",
 	apply = apply,
 })

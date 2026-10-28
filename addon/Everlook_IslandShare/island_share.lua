@@ -3,7 +3,7 @@ local Everlook = Everlook
 
 -- Alt-right-click names what is under the cursor. The key binding is the only
 -- listener, so secure frames stay unhooked. Say is proximity chat. The party
--- message is what another Smart island shows.
+-- message is what another player's Island shows.
 local share = {}
 Everlook.island_share = share
 
@@ -340,7 +340,7 @@ register_prefix()
 Everlook.module.extend("island", {
 	id = "share", addon = addon_name, order = 5,
 	options = {
-		share_click = { name = "Share an Alt-right-click", default = true, description = "Alt-right-click a unit, item, quest, spell, or world object to say its name and show it on the island. People in your party who have Smart island get that notice from you. A raid uses your party group. Nothing named, a secret name, and clicking yourself stay quiet. The key can be changed under Key Bindings. Turning this off stops sharing. Notices from other players stay." },
+		share_click = { name = "Share an Alt-right-click", default = true, description = "Alt-right-click a unit, item, quest, spell, or world object to say its name and show it on the island. People in your party who have Island on get that notice from you. A raid uses your party group. Nothing named, a secret name, and clicking yourself stay quiet. The key can be changed under Key Bindings. Turning this off stops sharing. Notices from other players stay." },
 	},
 	sections = { { name = "Notices", keys = { "share_click" }, before = "do_not_disturb" } },
 })

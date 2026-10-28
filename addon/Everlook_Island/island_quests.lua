@@ -1,6 +1,6 @@
 local Everlook = Everlook
 
--- Private quest context for Smart island. This observes the native log; it
+-- Private quest context for the Island. This observes the native log; it
 -- never changes tracking, accepts quests or drives navigation.
 local quests = {}
 Everlook.island_quests = quests

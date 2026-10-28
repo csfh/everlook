@@ -1,4 +1,4 @@
--- With Load faster on, Lua's collector is held from the module's file until the loading screen ends, and
+-- With Optimize on, Lua's collector is held from the module's file until the loading screen ends, and
 -- then it runs again. Held, garbage piles up; running, it is taken away as it is made.
 harness.include("lib/game.lua")
 

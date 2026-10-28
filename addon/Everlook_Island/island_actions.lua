@@ -1,6 +1,6 @@
 local Everlook = Everlook
 
--- Private action contract for Smart Island notifications. Producers pass
+-- Private action contract for Island notifications. Producers pass
 -- actions through Everlook.island.notify. This module copies and checks them,
 -- then binds the click that is allowed to run.
 local actions = {}
@@ -167,7 +167,7 @@ end
 local function report(action, err)
 	local detail = plain(err, 1024) and err or "action failed"
 	local handler = geterrorhandler and geterrorhandler()
-	if type(handler) == "function" then handler("Everlook Smart Island (action " .. action.id .. "): " .. detail) end
+	if type(handler) == "function" then handler("Everlook Island (action " .. action.id .. "): " .. detail) end
 end
 
 function actions.invoke(entry, snapshot, generation)

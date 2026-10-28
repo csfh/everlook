@@ -33,7 +33,7 @@ end
 module.register({
 	addon = addon_name, page = "tooltips", order = 30,
 	id = id,
-	name = "Tooltip at cursor",
+	name = "Tooltip cursor",
 	description = "When the game places its default tooltip, this moves that tooltip just off the mouse cursor, so the pointer stays visible, and it follows the cursor. A tooltip already on screen stays until the next one is placed, a tooltip that is not the game's default stays where it is, turning this off puts the next one back where the game places it, and nothing happens when the client has no way to move it.",
 	apply = apply,
 })

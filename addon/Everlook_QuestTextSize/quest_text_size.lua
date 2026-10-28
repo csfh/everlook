@@ -49,10 +49,10 @@ end
 
 module.register({
 	addon = addon_name, page = "quests", order = 20,
-	id = id, name = "Quest interface", description = "Sets the quest description, objectives, reward, and progress text to the size you choose, and waits while you are in combat. The quest tracker stays as it is, and turning this off puts the previous sizes back once you are out of combat.",
+	id = id, name = "Quest text size", description = "Sets the quest description, objectives, reward, and progress text to the size you choose, and waits while you are in combat. The quest tracker stays as it is, and turning this off puts the previous sizes back once you are out of combat.",
 	options = {
-		text_size = { name = "Quest text size", default = 16, min = 12, max = 24, step = 1, unit = " pt", description = "Sets the quest description, objectives, reward, and progress text to this many points, from 12 to 24. The quest tracker stays as it is, the change waits until combat ends, and this number does nothing until Quest interface is on." },
-		instant_text = { name = "Show quest text at once", default = false, description = "Turns on the game's own setting that shows a quest's text whole instead of a few letters at a time, on a client that has it. On a client without it nothing happens, the text size stays on its own option, turning this off puts back the value the game had before this was turned on, and this does nothing until Quest interface is on." },
+		text_size = { name = "Quest text size", default = 16, min = 12, max = 24, step = 1, unit = " pt", description = "Sets the quest description, objectives, reward, and progress text to this many points, from 12 to 24. The quest tracker stays as it is, the change waits until combat ends, and this number does nothing until Quest text size is on." },
+		instant_text = { name = "Show quest text at once", default = false, description = "Turns on the game's own setting that shows a quest's text whole instead of a few letters at a time, on a client that has it. On a client without it nothing happens, the text size stays on its own option, turning this off puts back the value the game had before this was turned on, and this does nothing until Quest text size is on." },
 	},
 	apply = apply, out_of_combat = true,
 	events = { "QUEST_DETAIL", "QUEST_PROGRESS", "QUEST_COMPLETE", "ADDON_LOADED" },

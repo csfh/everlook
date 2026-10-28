@@ -170,7 +170,7 @@ local function ask(self)
 	if not ok then
 		self.arrow_failed = true
 		local handler = geterrorhandler and geterrorhandler()
-		if handler then handler("Everlook Smart Island (arrow): " .. tostring(value)) end
+		if handler then handler("Everlook Island (arrow): " .. tostring(value)) end
 		return nil
 	end
 	if type(value) ~= "number" or value ~= value or value == math.huge or value == -math.huge then return nil end

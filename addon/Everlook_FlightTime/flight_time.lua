@@ -203,7 +203,7 @@ module.register({
 	id = id, name = "Flight time", description = "Shows a timer at the top of the screen for a flight you take after this is on, with the destination and the elapsed time, and remembers the route when that flight lasts more than a second. A flight already in the air stays hidden, the timer stays hidden on the ground, a shorter flight is not remembered, and reloading or turning this off during a flight discards that measurement.",
 	options = {
 		remaining = { name = "Show estimated time remaining", default = true, description = "Adds the learned time left to the timer at the top of the screen once a finished flight on this route has been recorded. Before that, or with this off, that timer keeps the destination and the elapsed time, and the Island keeps its own estimate." },
-		only_island = { name = "Show flight timer only in Island", default = false, description = "Hides the timer at the top of the screen while the Island is showing this flight. That timer stays when Smart island is off, Show flight activity is off, or the Island does not accept the notice." },
+		only_island = { name = "Show flight timer only in Island", default = false, description = "Hides the timer at the top of the screen while the Island is showing this flight. That timer stays when Island is off, Show flight activity is off, or the Island does not accept the notice." },
 	},
 	apply = apply, events = { "ADDON_LOADED" }, on_event = function() apply(true) end,
 })
