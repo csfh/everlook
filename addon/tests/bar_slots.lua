@@ -55,7 +55,7 @@ return function(root, check)
 		for key, value in pairs(extra or {}) do env[key] = value end
 		local addon = {}
 		env.Everlook = addon
-		for _, file in ipairs({ "module", "blizzard_settings", "bar_layouts", "bar_slots" }) do
+		for _, file in ipairs({ "world", "module", "blizzard_settings", "bar_layouts", "bar_slots" }) do
 			local chunk = assert(loadfile(source(file)))
 			setfenv(chunk, env)
 			chunk(file == "bar_slots" and "Everlook_ActionBarSlots" or "Everlook", addon)

@@ -57,6 +57,15 @@ function Everlook.finite(value)
 	return Everlook.world.usable(value) and type(value) == "number" and value == value and value > -math.huge and value < math.huge
 end
 
+-- The player's GUID, the key for what is kept per character, or nil while the client cannot
+-- give a readable one. Every per-character store asks here, so they all agree on the key.
+function Everlook.player_guid()
+	if type(UnitGUID) ~= "function" then return nil end
+	local guid = UnitGUID("player")
+	if not Everlook.readable(guid) or type(guid) ~= "string" or not guid:match("^Player%-") then return nil end
+	return guid
+end
+
 function Everlook.say(text)
 	if type(text) ~= "string" or text == "" then
 		return

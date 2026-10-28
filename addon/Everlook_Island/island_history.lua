@@ -16,12 +16,6 @@ local function server_now()
 	return 0
 end
 
-local function character_key()
-	local guid = UnitGUID and UnitGUID("player")
-	if issecretvalue and issecretvalue(guid) then return nil end
-	if type(guid) == "string" and guid ~= "" then return guid end
-end
-
 local function restorable(entry)
 	return not entry.persist and not entry.removed and not entry.frozen and entry.presentation ~= "status"
 		and type(entry.text) == "string" and entry.text ~= ""
@@ -37,7 +31,7 @@ end
 
 -- notices are oldest first. now is the island clock, the same one updated_at uses.
 function history.save(notices, now)
-	local key = character_key()
+	local key = Everlook.player_guid()
 	if not key then return end
 	EverlookDB = EverlookDB or {}
 	local store = type(EverlookDB.island_history) == "table" and EverlookDB.island_history or {}
@@ -61,7 +55,7 @@ end
 
 -- Returns rows with an age in seconds, oldest first. Anything malformed or older than a day is dropped.
 function history.load()
-	local key = character_key()
+	local key = Everlook.player_guid()
 	local store = EverlookDB and EverlookDB.island_history
 	local bucket = key and type(store) == "table" and store[key]
 	if type(bucket) ~= "table" or type(bucket.rows) ~= "table" or type(bucket.saved_at) ~= "number" then return {} end

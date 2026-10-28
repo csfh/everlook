@@ -78,6 +78,11 @@ class LuacTest(unittest.TestCase):
                 stray.append(f"{path.relative_to(ADDON)}: {name}")
         self.assertEqual(sorted(set(stray)), [])
 
+    def test_only_world_lua_asks_for_the_players_guid(self):
+        # Everlook.player_guid is the one rule for the key of what is kept per character.
+        callers = [path.relative_to(ADDON).as_posix() for path in lua_files() if 'UnitGUID("player")' in path.read_text()]
+        self.assertEqual(callers, ["Everlook/world.lua"])
+
     def test_only_everlook_and_el_are_slash_commands(self):
         # The settings page is the way in; a feature gets a control there, not a command of its own.
         commands, handlers = set(), set()

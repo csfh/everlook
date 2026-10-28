@@ -37,6 +37,15 @@ do
 	check("an item link gives its id", addon.items.id_from_link("item:2589") == 2589)
 	check("a coloured item link gives its id", addon.items.id_from_link("|cff9d9d9d|Hitem:2589::::::::1:::::::::|h[Linen Cloth]|h|r") == 2589)
 	check("a link that is not an item has no id", addon.items.id_from_link("spell:133") == nil)
+	local playing = load_core({ UnitGUID = function(unit) return unit == "player" and "Player-1-0A" or nil end })
+	check("the player's GUID is the key for what is kept per character", playing.player_guid() == "Player-1-0A")
+	check("no GUID, a creature's, or a client without UnitGUID gives no key",
+		load_core({ UnitGUID = function() return nil end }).player_guid() == nil
+		and load_core({ UnitGUID = function() return "Creature-0-1-0-2-448" end }).player_guid() == nil
+		and load_core({}).player_guid() == nil)
+	check("a hidden GUID gives no key", load_core({
+		UnitGUID = function() return "hidden" end, issecretvalue = function(value) return value == "hidden" end,
+	}).player_guid() == nil)
 	local said = {}
 	local talking = load_core({
 		DEFAULT_CHAT_FRAME = { AddMessage = function(_, text) said[#said + 1] = text end },

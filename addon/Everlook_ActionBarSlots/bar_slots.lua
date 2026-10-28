@@ -18,8 +18,8 @@ local function records(key)
 	local data = EverlookDB and EverlookDB.qol and EverlookDB.qol[id]
 	if not data then return nil end
 	if type(data[key]) ~= "table" then data[key] = {} end
-	local guid = type(UnitGUID) == "function" and UnitGUID("player") or nil
-	if type(guid) ~= "string" or (issecretvalue and issecretvalue(guid)) then return nil end
+	local guid = Everlook.player_guid()
+	if not guid then return nil end
 	return data[key], guid
 end
 

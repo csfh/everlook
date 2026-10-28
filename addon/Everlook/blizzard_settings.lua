@@ -19,12 +19,6 @@ local function toggle_of(key)
 	if number and number >= 2 and number <= 8 then return number - 1 end
 end
 
-local function character()
-	local guid = type(UnitGUID) == "function" and UnitGUID("player") or nil
-	if type(guid) ~= "string" or (issecretvalue and issecretvalue(guid)) then return nil end
-	return guid
-end
-
 local function changed(guid)
 	if type(EverlookDB) ~= "table" then return nil end
 	EverlookDB.qol = EverlookDB.qol or {}
@@ -89,7 +83,7 @@ function settings.ensure(key, wanted)
 	local index = toggle_of(key)
 	if not index then return false, "unknown" end
 	if type(wanted) ~= "boolean" then return false, "invalid" end
-	local guid = character()
+	local guid = Everlook.player_guid()
 	local record = guid and changed(guid)
 	if not record then return false, "unknown character" end
 	local values, why = read()
@@ -108,7 +102,7 @@ end
 function settings.release(key)
 	local index = toggle_of(key)
 	if not index then return false, "unknown" end
-	local guid = character()
+	local guid = Everlook.player_guid()
 	local record = guid and changed(guid)
 	local remembered = record and record[key]
 	if not remembered then return true end

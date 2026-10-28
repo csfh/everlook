@@ -30,9 +30,11 @@ return function(root, check)
 		for key, value in pairs(options.extra or {}) do env[key] = value end
 		local addon = {}
 		env.Everlook = addon
-		local chunk = assert(loadfile(source("blizzard_settings")))
-		setfenv(chunk, env)
-		chunk("Everlook", addon)
+		for _, file in ipairs({ "world", "blizzard_settings" }) do
+			local chunk = assert(loadfile(source(file)))
+			setfenv(chunk, env)
+			chunk("Everlook", addon)
+		end
 		-- The module file loads at time 100. The test then lets time pass.
 		function state.enter_world()
 			for _, frame in ipairs(frames) do

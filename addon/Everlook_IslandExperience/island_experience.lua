@@ -51,13 +51,6 @@ local function server_now()
 	end
 end
 
-local function character_key()
-	if type(UnitGUID) ~= "function" then return nil end
-	local guid = UnitGUID("player")
-	if secret(guid) or type(guid) ~= "string" or not guid:match("^Player%-") then return nil end
-	return guid
-end
-
 local function read_bar()
 	if type(UnitXP) ~= "function" or type(UnitXPMax) ~= "function" or type(UnitLevel) ~= "function" then return nil end
 	local xp, xp_max, level = UnitXP("player"), UnitXPMax("player"), UnitLevel("player")
@@ -151,7 +144,7 @@ end
 
 local function current()
 	if not enabled() then return nil end
-	local key = character_key()
+	local key = Everlook.player_guid()
 	local id = key or false
 	if session and session.key == id then return session end
 	if session then persist(session) end
