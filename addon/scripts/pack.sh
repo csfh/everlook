@@ -2,6 +2,7 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
+license="${root}/../LICENSE"
 core="${root}/Everlook"
 version="${1:-}"
 outdir="${2:-$root/dist}"
@@ -49,11 +50,11 @@ if [[ "${declared}" != "${found}" ]]; then
 fi
 
 # The MIT license has to travel with every copy of the code.
-if [[ ! -f "${root}/LICENSE" ]]; then
+if [[ ! -f "${license}" ]]; then
   echo "Missing LICENSE; the archive must carry it" >&2
   exit 1
 fi
-cp "${root}/LICENSE" "${stage}/Everlook/LICENSE"
+cp "${license}" "${stage}/Everlook/LICENSE"
 
 # Module TOCs carry no version in the repository. Each release stamps the
 # core's version into them so the addon list shows one version for the set.

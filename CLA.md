@@ -8,4 +8,4 @@ If the law does not allow that assignment, you grant him an exclusive, perpetual
 
 You confirm that the contribution is your original work, or that you have the right to assign it, and that you have any employer or third-party permission you need.
 
-the Everlook addon remains under the MIT License in `LICENSE` unless Christoffer Hallas says otherwise.
+The Everlook addon remains under the MIT License in `LICENSE` unless Christoffer Hallas says otherwise.

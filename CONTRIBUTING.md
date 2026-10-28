@@ -12,4 +12,4 @@ A pull request that touches mail, trade, repair, selling, buying, accepting or t
 
 A report is answered with one of four things: a question when something needed to reproduce it is missing, a confirmation, a fix in `main`, or a closing note that gives the reason. A fix names the person who reported it in a `Reported-by: <name>` line in the commit body, and the release notes thank everyone named that way. Fixes go to `main` as soon as they are ready, so a contributor does not rewrite what is already done there. Check recent commits before starting work on a report.
 
-the Everlook addon is licensed under the [MIT License](LICENSE).
+The Everlook addon is licensed under the [MIT License](LICENSE).

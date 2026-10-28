@@ -40,6 +40,6 @@ The bundled fonts keep their own licenses. See `Everlook_Fonts/assets/`.
 
 ## License
 
-MIT. See [LICENSE](LICENSE). Copyright (c) 2026 Christoffer Hallas.
+MIT. See [LICENSE](../LICENSE). Copyright (c) 2026 Christoffer Hallas.
 
-If you send a pull request or other contribution, you agree to the [CLA](CLA.md).
+If you send a pull request or other contribution, you agree to the [CLA](../CLA.md).

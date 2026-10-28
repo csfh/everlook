@@ -29,7 +29,7 @@ class AddonScriptsTest(unittest.TestCase):
         self.destination = self.addons / "Everlook"
         (self.core / "Everlook.toc").write_text("## Interface: 16001\n## Title: Everlook\n## Version: 0.1.0\n")
         (self.core / "world.lua").write_text("local _, Everlook = ...\n")
-        (self.addon / "LICENSE").write_text("MIT License\n")
+        (self.addon.parent / "LICENSE").write_text("MIT License\n")
         self.module = self.addon / "Everlook_SellJunk"
         self.module.mkdir()
         (self.module / "Everlook_SellJunk.toc").write_text(
@@ -94,7 +94,7 @@ class AddonScriptsTest(unittest.TestCase):
             self.assertNotIn("LICENSE", archive.getnames())
 
     def test_pack_refuses_to_run_without_a_license(self):
-        (self.addon / "LICENSE").unlink()
+        (self.addon.parent / "LICENSE").unlink()
         result = subprocess.run(
             ["bash", str(self.addon / "scripts" / "pack.sh"), "0.1.0", str(self.base / "unlicensed")],
             capture_output=True, text=True,
