@@ -1930,7 +1930,7 @@ return function(root, check)
 		and page_of_variable.Everlook_QoL_nameplates_enabled == "Nameplates" and page_of_variable.Everlook_QoL_swing_timers_enabled == "Combat"
 		and page_of_variable.Everlook_QoL_camera_enabled == "Screen and camera"
 		and page_of_variable.Everlook_QoL_quest_automation_enabled == "Quests" and page_of_variable.Everlook_QoL_smart_island_enabled == "Smart island"
-		and page_of_variable.Everlook_QoL_mail_enabled == "Loot and mail")
+		and page_of_variable.Everlook_QoL_take_mail_enabled == "Loot and mail")
 	local module_count = #addon2.module.modules
 	local last = addon2.module.modules[module_count]
 	local function has_header(name)

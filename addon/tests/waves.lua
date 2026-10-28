@@ -366,7 +366,7 @@ return function(root, check)
 			mails[index].taken = true
 		end
 	end
-	addon.module.set("mail", "enabled", true)
+	addon.module.set("take_mail", "enabled", true)
 	fire("MAIL_SHOW")
 	play.tickers[#play.tickers].callback()
 	check("one tick takes the money and leaves the attached item", taken[1] == 5 and #taken == 1)

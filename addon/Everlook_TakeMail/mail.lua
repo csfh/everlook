@@ -1,7 +1,7 @@
 local addon_name = ...
 local Everlook = Everlook
 local module = Everlook.module
-local id = "mail"
+local id = "take_mail"
 local ticker
 local open = false
 
