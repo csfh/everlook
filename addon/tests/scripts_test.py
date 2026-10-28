@@ -37,7 +37,6 @@ class AddonScriptsTest(unittest.TestCase):
         (self.module / "sell_junk.lua").write_text("local addon_name = ...\n")
         for name in ("sync.sh", "pack.sh"):
             shutil.copyfile(ADDON / "scripts" / name, self.addon / "scripts" / name)
-        (self.addon / "scripts" / "folders.txt").write_text("Everlook\nEverlook_SellJunk\n")
         script = self.addon / "scripts" / "sync.sh"
         script.write_text(re.sub(r'^addons=.*$', f'addons="{self.addons}"', script.read_text(), flags=re.MULTILINE))
 
@@ -103,27 +102,6 @@ class AddonScriptsTest(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Missing LICENSE", result.stderr)
 
-    def run_pack(self, output):
-        return subprocess.run(
-            ["bash", str(self.addon / "scripts" / "pack.sh"), "0.1.0", str(output)],
-            capture_output=True, text=True,
-            env={**os.environ, "UV_CACHE_DIR": str(self.base / "uv-cache"), "UV_PYTHON": sys.executable},
-        )
-
-    def test_pack_stops_on_a_folder_that_is_not_in_the_declared_list(self):
-        extra = self.addon / "Everlook_Extra"
-        extra.mkdir()
-        (extra / "Everlook_Extra.toc").write_text("## Interface: 16001\n## Title: Extra\n")
-        result = self.run_pack(self.base / "extra")
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("on disk but not listed: Everlook_Extra", result.stderr)
-
-    def test_pack_stops_on_a_listed_folder_that_is_gone(self):
-        shutil.rmtree(self.module)
-        result = self.run_pack(self.base / "gone")
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("listed but missing on disk: Everlook_SellJunk", result.stderr)
-
     def test_release_ships_every_folder_with_the_core_version(self):
         with self.pack(self.base / "release", version="2.3.4") as archive:
             names = archive.getnames()
@@ -172,9 +150,8 @@ class AddonScriptsTest(unittest.TestCase):
 class ReleaseArchiveTest(unittest.TestCase):
     """The packed release of the real addon, unpacked, with the suite run against the unpacked folders."""
 
-    def test_the_unpacked_release_has_the_declared_folders_and_passes_the_suite(self):
-        declared = [line.strip() for line in (ADDON / "scripts" / "folders.txt").read_text().splitlines()
-                    if line.strip() and not line.lstrip().startswith("#")]
+    def test_the_unpacked_release_has_every_addon_folder_and_passes_the_suite(self):
+        declared = [path.name for path in ADDON.iterdir() if path.is_dir() and re.fullmatch(r"Everlook(_[A-Za-z0-9]+)?", path.name)]
         with tempfile.TemporaryDirectory(prefix="everlook-release-") as temporary:
             base = Path(temporary)
             environment = {**os.environ, "UV_CACHE_DIR": str(base / "uv-cache"), "UV_PYTHON": sys.executable}
