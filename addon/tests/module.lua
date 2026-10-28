@@ -1,7 +1,8 @@
 -- The module registry on its own: registration from other addons, settings
--- page order, and extensions that add to a module another addon registered.
+-- page order, and extensions that add to a module another addon registered, then every shipped module
+-- loaded together.
 return function(root, check, lib)
-	local source = lib.source
+	local source, load_all = lib.source, lib.load_all
 	local function load_registry()
 		local namespace = {}
 		local loaded, waiting, frames = {}, {}, {}
@@ -288,4 +289,28 @@ return function(root, check, lib)
 	end
 
 
+	do
+		-- Every module the addon ships, loaded together: how many, that each starts off, and that every
+		-- slider's default and presets sit on its steps.
+		local addon, env, event = load_all()
+		check("Everlook has thirty-two independent modules", #addon.module.modules == 32)
+		for _, module in ipairs(addon.module.modules) do
+			check(module.id .. " starts disabled", not addon.module.enabled(module.id))
+		end
+		for _, module in ipairs(addon.module.modules) do
+			for key, option in pairs(module.options) do
+				if option.min then
+					local name = module.id .. "." .. key
+					local steps = (option.max - option.min) / (option.step or 1)
+					check(name .. " has a whole number of steps from its minimum to its maximum", math.abs(steps - math.floor(steps + 0.5)) < 1e-9)
+					addon.module.set(module.id, key, option.default)
+					check(name .. " has a default on one of its steps", addon.module.get(module.id, key) == option.default)
+					for _, preset in pairs(option.presets or {}) do
+						addon.module.set(module.id, key, preset)
+						check(name .. " has presets on its steps", addon.module.get(module.id, key) == preset)
+					end
+				end
+			end
+		end
+	end
 end
