@@ -34,7 +34,7 @@ return function(root, check)
 	for index, channel in ipairs({ red, green, blue }) do back[index] = channel * body_alpha + ground[index] * (1 - body_alpha) end
 	local background = luminance(back[1], back[2], back[3])
 	local worst, worst_name = math.huge, nil
-	for name, color in pairs(Everlook.island_const.COLORS) do
+	for name, color in pairs(Everlook.island_constants.COLORS) do
 		local value = ratio(luminance(color[1], color[2], color[3]), background)
 		if value < worst then worst, worst_name = value, name end
 	end

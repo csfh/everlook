@@ -54,7 +54,7 @@ local SECTION_CHANGES = { title = true, order = true, blocks = true, expires = t
 -- whether the pointer is still over the Island, and checks again until it is not.
 local CLOSE_DELAY = 0.1
 
-Everlook.island_const = {
+Everlook.island_constants = {
 	ACTION = ACTION,
 	HOLD = HOLD,
 	LIST_MAX = LIST_MAX,

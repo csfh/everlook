@@ -1,6 +1,6 @@
 local addon_name = ...
 local Everlook = Everlook
-local K = Everlook.island_const
+local K = Everlook.island_constants
 local module = Everlook.module
 local id = "island"
 
@@ -50,7 +50,7 @@ local vitals = Everlook.island_vitals
 local actions = Everlook.island_actions
 local compact_api = Everlook.island_capsule
 local island_surface = Everlook.island_surface
-local shell = { quest_offset = 0, quest_height = 0, stats = Everlook.island_stats, scroll_api = Everlook.island_scroll, width = K.CLOSED_W, height = K.CLOSED_H, from_w = K.CLOSED_W, to_w = K.CLOSED_W, from_h = K.CLOSED_H, to_h = K.CLOSED_H }
+local shell = { quest_offset = 0, quest_height = 0, stats = Everlook.island_quests.stats, scroll_api = Everlook.island_scroll, width = K.CLOSED_W, height = K.CLOSED_H, from_w = K.CLOSED_W, to_w = K.CLOSED_W, from_h = K.CLOSED_H, to_h = K.CLOSED_H }
 local resting_slots = {}
 -- Background statuses: they hold the capsule when nothing with more to say does, and are never history, a toast or timed.
 shell.backgrounds = {}

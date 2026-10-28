@@ -5,10 +5,10 @@ local Everlook = Everlook
 local quests = {}
 Everlook.island_quests = quests
 
--- Plain call counters for development: /dump Everlook.island_stats shows how
+-- Plain call counters for development: /dump Everlook.island_quests.stats shows how
 -- often the Island repainted, scanned the quest log, polled feeds and aimed.
 local stats = { paint = 0, quest_scan = 0, feed_tick = 0, aim = 0 }
-Everlook.island_stats = stats
+quests.stats = stats
 local records, order, baseline = {}, {}, {}
 local selected, suggested, pinned, recent, recent_at, scanned
 local suggested_ready

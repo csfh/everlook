@@ -543,7 +543,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon, _, event, state, _, tickers = island_world()
-		local stats = addon.island_stats
+		local stats = addon.island_quests.stats
 		addon.module.set("island", "enabled", true)
 		local paints = stats.paint
 		for _ = 1, 10 do state.time = state.time + 1; tickers[1].callback() end

@@ -133,7 +133,7 @@ for _, e in ipairs(harness.errors()) do print("script error:", e) end
 -- Hover code that never ran in the client runs now that the buttons have the mouse. It repaints when the pointer
 -- crosses into a control; holding still must not keep repainting, and moving along the list must not close the island.
 do
-	local stats = Everlook.island_stats
+	local stats = Everlook.island_quests.stats
 	local function open_state() return Everlook.island.view().mode == "open" end
 	harness.move(5, 5)
 	harness.advance(0.5)
