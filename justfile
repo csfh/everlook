@@ -17,7 +17,6 @@ test-addon:
 # Each script's test, beside it in scripts/
 test-scripts:
     python3 -m unittest discover --quiet --start-directory scripts --pattern '*_test.py'
-    bash scripts/push_release_commit_test.sh
 
 # Every harness scenario, run against addon/
 [working-directory('harness')]

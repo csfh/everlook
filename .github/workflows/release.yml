@@ -57,7 +57,10 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add addon/Everlook/Everlook.toc
           git commit -m "chore: release addon ${{ steps.bump.outputs.version }}"
-          bash scripts/push_release_commit.sh
+          # If main moved since the checkout, this push is rejected and nothing is tagged. The archive was packed
+          # from the checkout, so a rebase would tag commits it does not hold. The next run counts from the last
+          # tag and releases both pushes.
+          git push origin HEAD:main
 
       - name: Tag and publish GitHub release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.bump.outputs.release != 'false'
