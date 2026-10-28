@@ -6,5 +6,5 @@
 ## Group: Everlook
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
 
-nameplate_kinds.lua
-nameplate_view.lua
+nameplates_kinds.lua
+nameplates.lua
