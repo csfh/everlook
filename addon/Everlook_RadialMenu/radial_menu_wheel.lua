@@ -1,6 +1,6 @@
 local Everlook = Everlook
 local wheel = {}
-Everlook.wheel = wheel
+Everlook.radial_menu_wheel = wheel
 
 -- A ring of labels around the cursor. Moving the cursor toward a label chooses it. The wheel only draws and
 -- measures. What the labels do is up to the caller. It draws its own ring because the game's

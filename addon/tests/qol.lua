@@ -193,7 +193,7 @@ return function(root, check)
 			frames[#frames + 1] = frame
 			return frame
 		end
-		for _, file in ipairs({ "world", "module", "tooltips", "blizzard_settings", "quest_text_size", "flight_time", "friend_conveniences", "useful_tooltips", "auto_loot", "quest_automation", "auto_repair", "sell_junk", "open_containers", "fonts", "hide_clutter", "auto_responses", "chat_layout", "coordinates", "quest_levels", "reward_marks", "cinematic_skip", "camera", "swing_timers", "unit_frame_names", "nameplates_kinds", "nameplates", "nameplate_titles", "quest_nameplates", "tracker_text_size", "mail", "tooltip_cursor", "compact_chat", "radial_wheel", "radial_menu", "island_capsule", "island_row", "island_grid", "island_section", "island_blocks", "island_reaction", "island_summary", "island_quests", "island_actions", "island_vitals", "island_history", "island_surface", "island_scroll", "island_notice", "island_inbox", "island_toasts", "island_constants", "smart_island", "island_feed_kit", "island_share", "island_quest_notices", "island_loot", "island_hearth", "island_reputation", "island_professions", "island_mail", "island_invites", "island_buffs", "island_recap", "island_experience", "island_react", "island_warnings", "action_shortcuts", "bags_layout", "bags_item_level", "bags_junk", "bags_categories", "bags_pins", "bags_assign", "bags_alts", "bags_recent", "bags_folds", "bags_headers", "bags_chips", "bags_search", "bags_marker", "bags", "action_bar_slots_layouts", "action_bar_slots" }) do
+		for _, file in ipairs({ "world", "module", "tooltips", "blizzard_settings", "quest_text_size", "flight_time", "friend_conveniences", "useful_tooltips", "auto_loot", "quest_automation", "auto_repair", "sell_junk", "open_containers", "fonts", "hide_clutter", "auto_responses", "chat_layout", "coordinates", "quest_levels", "reward_marks", "cinematic_skip", "camera", "swing_timers", "unit_frame_names", "nameplates_kinds", "nameplates", "nameplate_titles", "quest_nameplates", "tracker_text_size", "mail", "tooltip_cursor", "compact_chat", "radial_menu_wheel", "radial_menu", "island_capsule", "island_row", "island_grid", "island_section", "island_blocks", "island_reaction", "island_summary", "island_quests", "island_actions", "island_vitals", "island_history", "island_surface", "island_scroll", "island_notice", "island_inbox", "island_toasts", "island_constants", "smart_island", "island_feed_kit", "island_share", "island_quest_notices", "island_loot", "island_hearth", "island_reputation", "island_professions", "island_mail", "island_invites", "island_buffs", "island_recap", "island_experience", "island_react", "island_warnings", "action_shortcuts", "bags_layout", "bags_item_level", "bags_junk", "bags_categories", "bags_pins", "bags_assign", "bags_alts", "bags_recent", "bags_folds", "bags_headers", "bags_chips", "bags_search", "bags_marker", "bags", "action_bar_slots_layouts", "action_bar_slots" }) do
 			if not left_out[file] then
 				local chunk = assert(loadfile(source(file)))
 				setfenv(chunk, env)
@@ -2028,7 +2028,7 @@ return function(root, check)
 	-- Radial wheel: geometry and drawing.
 	do
 		local radial_addon = load_qol()
-		local wheel = radial_addon.wheel
+		local wheel = radial_addon.radial_menu_wheel
 		check("the first wedge is straight up", wheel.sector(4, 0, 100) == 1)
 		check("wedges run clockwise from the top", wheel.sector(4, 100, 0) == 2 and wheel.sector(4, 0, -100) == 3 and wheel.sector(4, -100, 0) == 4)
 		check("a cursor close to the centre chooses nothing", wheel.sector(4, 5, 5) == nil)
@@ -2074,7 +2074,7 @@ return function(root, check)
 		radial_env.UIParent = { GetWidth = function() return 1920 end, GetHeight = function() return 1080 end, GetEffectiveScale = function() return 1 end }
 		local cursor = { x = 0, y = 0 }
 		radial_env.GetCursorPosition = function() return cursor.x, cursor.y end
-		return radial_addon.wheel, radial_env, made, cursor
+		return radial_addon.radial_menu_wheel, radial_env, made, cursor
 	end
 	do
 		local wheel, env_w, made, cursor = drawn_wheel()
@@ -2174,9 +2174,9 @@ return function(root, check)
 				end
 			end
 		else
-			radial_addon.wheel.open = function(texts, x, y) seen.opened = { texts = texts, x = x, y = y } end
-			radial_addon.wheel.selected = function() return seen.index end
-			radial_addon.wheel.close = function() seen.opened = nil; seen.closed = seen.closed + 1 end
+			radial_addon.radial_menu_wheel.open = function(texts, x, y) seen.opened = { texts = texts, x = x, y = y } end
+			radial_addon.radial_menu_wheel.selected = function() return seen.index end
+			radial_addon.radial_menu_wheel.close = function() seen.opened = nil; seen.closed = seen.closed + 1 end
 		end
 		radial_addon.module.set("radial_menu", "enabled", true)
 		local function press() button.scripts.PreClick(button, "LeftButton", true); button.scripts.PostClick(button, "LeftButton", true) end

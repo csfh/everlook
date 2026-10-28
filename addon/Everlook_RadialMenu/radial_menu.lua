@@ -206,15 +206,15 @@ local function open()
 	local x, y = GetCursorPosition()
 	local scale = UIParent:GetEffectiveScale()
 	target, offered, active = who, definitions, true
-	Everlook.wheel.open(texts, x / scale, y / scale)
+	Everlook.radial_menu_wheel.open(texts, x / scale, y / scale)
 end
 
 -- The key coming up closes the wheel and, if a wedge was chosen, sets what the button does when its own click
 -- handler runs next. That handler fires after this script, so the action goes on in time.
 local function release(button)
 	if not active then return end
-	local index = Everlook.wheel.selected()
-	Everlook.wheel.close()
+	local index = Everlook.radial_menu_wheel.selected()
+	Everlook.radial_menu_wheel.close()
 	local wedge, who = offered[index or 0], target
 	active, target, offered = false, nil, nil
 	if not wedge or not module.enabled(id) or in_combat() then return end
