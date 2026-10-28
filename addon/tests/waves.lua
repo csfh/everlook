@@ -89,7 +89,7 @@ return function(root, check)
 	end
 
 	local addon, play, fire = load({
-		"world", "module", "tooltips", "useful_tooltips", "chat_layout", "coordinates", "quest_levels", "cinematic_skip", "camera", "ground_effects", "mail",
+		"world", "module", "tooltips", "useful_tooltips", "chat_layout", "coordinates", "quest_levels", "cinematic_skip", "camera", "ground_effects", "take_mail",
 	})
 	play.TooltipDataProcessor = {
 		AddTooltipPostCall = function(kind, callback)

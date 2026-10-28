@@ -6,4 +6,4 @@
 ## Group: Everlook
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
 
-mail.lua
+take_mail.lua
