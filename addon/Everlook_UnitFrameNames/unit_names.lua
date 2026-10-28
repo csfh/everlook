@@ -1,7 +1,7 @@
 local addon_name = ...
 local Everlook = Everlook
 local module = Everlook.module
-local id = "unit_names"
+local id = "unit_frame_names"
 local states = {}
 
 -- PlayerName and the target's Name are GameFontNormalSmall, 10 points in a
