@@ -84,7 +84,7 @@ return function(check, lib)
 	addon.module.set("island", "enabled", false)
 	local subpage_names = {}
 	for index = 1, #subpages do subpage_names[index] = subpages[index].name end
-	check("each subject gets its own subpage on the left", table.concat(subpage_names, ",") == "Quests,Vendors,Loot and mail,Social,Chat,Tooltips,Map,Action bars,Bags,Nameplates,Text and names,Combat,Screen and camera,Island,Radial menu")
+	check("each subject gets its own subpage on the left", table.concat(subpage_names, ",") == "Quests,Vendors,Loot and mail,Social,Chat,Tooltips,Map,Action bars,Bags,Nameplates,Text and names,Combat,Screen and camera,Loading,Island,Radial menu")
 	check("performance is the canvas subpage and hosts the scheduler's frame", #canvas_pages == 1 and canvas_pages[1].name == "Performance" and canvas_pages[1].frame == addon.sched.frame)
 	local count, expected = 0, 0
 	for _ in pairs(registered) do count = count + 1 end

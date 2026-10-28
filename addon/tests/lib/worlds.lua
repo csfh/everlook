@@ -1,7 +1,7 @@
 -- The worlds the suites load the addon into: every module file on stand-ins for the game, and the
 -- island and quest states on top of it. A suite gets these through the lib table run.lua hands it.
 return function(root)
-	local source = dofile(root .. "/tests/lib/source.lua")(root)
+	local source, load_order = dofile(root .. "/tests/lib/source.lua")(root)
 	local lib = { root = root, source = source, layout = dofile(root .. "/tests/lib/layout.lua") }
 	function lib.read_source(name)
 		local handle = assert(io.open((source(name)), "r"))
@@ -10,6 +10,9 @@ return function(root)
 		return text
 	end
 
+	-- Every Lua file of every addon on one set of stand-ins, in the order the game loads them, but for any in
+	-- left_out and minimap.lua: the minimap button hangs on the game's Minimap, outside the island the other
+	-- suites lay out and point at, and tests/minimap.lua covers it on stand-ins of its own.
 	local function load_all(left_out)
 		left_out = left_out or {}
 		local addon = { say = function() end }
@@ -203,8 +206,8 @@ return function(root)
 			frames[#frames + 1] = frame
 			return frame
 		end
-		for _, file in ipairs({ "world", "module", "tooltips", "blizzard_settings", "quest_text_size", "flight_time", "friend_conveniences", "useful_tooltips", "auto_loot", "quest_automation", "auto_repair", "sell_junk", "open_containers", "fonts", "hide_clutter", "auto_responses", "chat_layout", "minimap_coordinates", "quest_levels", "reward_marks", "cinematic_skip", "camera_distance", "swing_timers", "unit_frame_names", "nameplates_kinds", "nameplates", "nameplate_titles", "quest_nameplates", "tracker_text_size", "take_mail", "tooltip_cursor", "compact_chat", "radial_menu_wheel", "radial_menu", "island_capsule", "island_row", "island_grid", "island_section", "island_blocks", "island_reaction", "island_summary", "island_quests", "island_actions", "island_vitals", "island_history", "island_surface", "island_scroll", "island_notice", "island_inbox", "island_toasts", "island_constants", "island", "island_feed_kit", "island_share", "island_quest_notices", "island_loot", "island_hearth", "island_reputation", "island_professions", "island_mail", "island_invites", "island_buffs", "island_recap", "island_experience", "island_reactions", "island_warnings", "action_shortcuts", "bags_layout", "bags_item_level", "bags_junk", "bags_categories", "bags_pins", "bags_assign", "bags_alts", "bags_recent", "bags_folds", "bags_headers", "bags_chips", "bags_search", "bags_marker", "bags", "action_bar_slots_layouts", "action_bar_slots" }) do
-			if not left_out[file] then
+		for _, file in ipairs(load_order) do
+			if file ~= "minimap" and not left_out[file] then
 				local chunk = assert(loadfile(source(file)))
 				setfenv(chunk, env)
 				chunk("Everlook", addon)

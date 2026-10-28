@@ -293,7 +293,14 @@ return function(check, lib)
 		-- Every module the addon ships, loaded together: how many, that each starts off, and that every
 		-- slider's default and presets sit on its steps.
 		local addon, env, event = load_all()
-		check("Everlook has thirty-two independent modules", #addon.module.modules == 32)
+		-- Each Everlook_<Name> folder registers one module, but an Island extension, which extends the Island's.
+		local folders = 0
+		local listing = assert(io.popen('ls "' .. lib.root .. '"'))
+		for folder in listing:lines() do
+			if folder:match("^Everlook_") and not folder:match("^Everlook_Island.") then folders = folders + 1 end
+		end
+		listing:close()
+		check("every module folder registers one module, and an Island extension none", #addon.module.modules == folders)
 		for _, module in ipairs(addon.module.modules) do
 			check(module.id .. " starts disabled", not addon.module.enabled(module.id))
 		end
