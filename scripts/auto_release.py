@@ -167,22 +167,6 @@ def latest_tag(root: Path, prefix: str, ref: str) -> str | None:
         return None
 
 
-def release_base(root: Path, tag_prefix: str | None, version_file: str, ref: str) -> str | None:
-    """Where counting starts: the last release tag.
-
-    Without one, the last "chore: release" commit on the version file marks the
-    same point, so work after it is still counted when a push fails to release it.
-    """
-    tag = latest_tag(root, tag_prefix, ref) if tag_prefix else None
-    if tag is not None:
-        return tag
-    for line in git(root, "log", "--format=%H%x1f%s", ref, "--", version_file).splitlines():
-        sha, _, subject = line.partition("\x1f")
-        if RELEASE_SUBJECT.match(subject):
-            return sha
-    return None
-
-
 def plan_release(
     root: Path,
     before: str,
@@ -192,16 +176,16 @@ def plan_release(
 ) -> tuple[str | None, bool]:
     """Return (bump level, whether to release).
 
-    Commits are counted from the last release (see release_base), so
-    a push whose tests failed or whose run was cancelled still counts in the
-    next one. With no release at all, only this push counts. A level of None
+    Commits are counted from the last release tag, so a push whose checks
+    failed, whose run was cancelled or whose release commit was rejected still
+    counts in the next one. With no tag, only this push counts. A level of None
     with release True means the push already set the version by hand, so the
     release ships it as it is.
     """
     if before not in ("", ZERO_SHA) and not commit_known(root, before):
         # A force push replaced the history, so the runner never fetched the old tip.
         before = ZERO_SHA
-    base = release_base(root, tag_prefix, version_file, after)
+    base = latest_tag(root, tag_prefix, after) if tag_prefix else None
     if base is None and before in ("", ZERO_SHA):
         return "patch", True
     commits = commits_touching(root, base or before, after)
@@ -236,12 +220,11 @@ def version_field_changed(diff: str) -> bool:
     return old != new and (old is not None or new is not None)
 
 
-def write_output(version: str, bumped: bool, release: bool, level: str | None) -> None:
+def write_output(version: str, bumped: bool, release: bool) -> None:
     lines = (
         f"version={version}\n"
         f"bumped={'true' if bumped else 'false'}\n"
         f"release={'true' if release else 'false'}\n"
-        f"level={level or ''}\n"
     )
     sys.stdout.write(lines)
     output = os.environ.get("GITHUB_OUTPUT")
@@ -257,11 +240,11 @@ def current_addon_version(root: Path) -> str:
     return match.group(2)
 
 
-def maybe_bump(root: Path, before: str, after: str) -> tuple[str, bool, bool, str | None]:
+def maybe_bump(root: Path, before: str, after: str) -> tuple[str, bool, bool]:
     level, release = plan_release(root, before, after, VERSION_FILE, TAG_PREFIX)
     if level is not None:
-        return bump_addon(root, level), True, True, level
-    return current_addon_version(root), False, release, None
+        return bump_addon(root, level), True, True
+    return current_addon_version(root), False, release
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -270,17 +253,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1] / "addon")
     parser.add_argument("--before", default=ZERO_SHA)
     parser.add_argument("--after", default="HEAD")
-    parser.add_argument("--since", default="")
     args = parser.parse_args(argv)
     root = args.root.resolve()
     if args.command == "release-notes":
-        since = args.since
-        if latest_tag(root, TAG_PREFIX, "HEAD") is None:
-            since = release_base(root, TAG_PREFIX, VERSION_FILE, "HEAD") or since
-        sys.stdout.write(release_notes(root, since))
+        # Run before the new tag exists, so the last tag is the previous release.
+        sys.stdout.write(release_notes(root, latest_tag(root, TAG_PREFIX, "HEAD") or ""))
         return 0
-    version, bumped, release, level = maybe_bump(root, args.before, args.after)
-    write_output(version, bumped, release, level)
+    write_output(*maybe_bump(root, args.before, args.after))
     return 0
 
 

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import contextlib
+import io
 import subprocess
 import tempfile
 import unittest
@@ -152,8 +154,7 @@ class Planning(unittest.TestCase):
 
     def test_bumps_the_version_file(self) -> None:
         after = self.commit("src.txt", "two\n", "feat: change")
-        version, bumped, release, level = auto_release.maybe_bump(self.repo, self.before, after)
-        self.assertEqual((version, bumped, release, level), ("0.5.0", True, True, "minor"))
+        self.assertEqual(auto_release.maybe_bump(self.repo, self.before, after), ("0.5.0", True, True))
         self.assertIn("0.5.0", (self.repo / VERSION_FILE).read_text())
 
 
@@ -204,6 +205,17 @@ class Notes(unittest.TestCase):
     def test_housekeeping_only_is_a_maintenance_release(self) -> None:
         self.commit("chore: tidy")
         self.assertEqual(auto_release.release_notes(self.repo, TAG + "0.1.0"), "Maintenance release.\n")
+
+    def test_the_command_covers_every_commit_since_the_last_tag(self) -> None:
+        self.commit("feat: show a chip")
+        self.commit("fix: stop the crash")
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            auto_release.main(["release-notes", "--root", str(self.repo)])
+        notes = out.getvalue()
+        self.assertIn("show a chip", notes)
+        self.assertIn("stop the crash", notes)
+        self.assertNotIn("start", notes)
 
 
 if __name__ == "__main__":
