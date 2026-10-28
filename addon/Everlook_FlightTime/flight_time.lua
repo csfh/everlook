@@ -62,7 +62,7 @@ local function update_island(now, elapsed, known)
 end
 
 local function flights()
-	local settings = EverlookDB.qol[id]
+	local settings = EverlookSaved.modules[id]
 	settings.routes = settings.routes or {}
 	return settings.routes
 end
@@ -73,15 +73,15 @@ local RESUME_WITHIN = 3 * 60 * 60
 
 local function remember_route()
 	if not route or not route.started then return end
-	EverlookDB.qol[id].current = { key = route.key, origin = route.origin, destination = route.destination, started = route.started }
+	EverlookSaved.modules[id].current = { key = route.key, origin = route.origin, destination = route.destination, started = route.started }
 end
 
 local function forget_route()
-	if EverlookDB and EverlookDB.qol and EverlookDB.qol[id] then EverlookDB.qol[id].current = nil end
+	if EverlookSaved and EverlookSaved.modules and EverlookSaved.modules[id] then EverlookSaved.modules[id].current = nil end
 end
 
 local function resume_route()
-	local saved = EverlookDB and EverlookDB.qol and EverlookDB.qol[id] and EverlookDB.qol[id].current
+	local saved = EverlookSaved and EverlookSaved.modules and EverlookSaved.modules[id] and EverlookSaved.modules[id].current
 	if route or type(saved) ~= "table" then return end
 	local now = GetTime and GetTime()
 	local flying = UnitOnTaxi and UnitOnTaxi("player")

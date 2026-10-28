@@ -42,11 +42,11 @@ end
 
 -- The saved table, kept with the rest of the Bags settings. Its key is not an option's name.
 function assign.data()
-	EverlookDB = EverlookDB or {}
-	EverlookDB.qol = EverlookDB.qol or {}
-	EverlookDB.qol.bags = EverlookDB.qol.bags or {}
-	EverlookDB.qol.bags.assigned = EverlookDB.qol.bags.assigned or {}
-	return EverlookDB.qol.bags.assigned
+	EverlookSaved = EverlookSaved or {}
+	EverlookSaved.modules = EverlookSaved.modules or {}
+	EverlookSaved.modules.bags = EverlookSaved.modules.bags or {}
+	EverlookSaved.modules.bags.assigned = EverlookSaved.modules.bags.assigned or {}
+	return EverlookSaved.modules.bags.assigned
 end
 
 Everlook.bags_assign = assign

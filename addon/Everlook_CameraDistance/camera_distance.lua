@@ -10,17 +10,17 @@ local function apply(enabled)
 	if type(GetCVar) ~= "function" or type(SetCVar) ~= "function" then
 		return
 	end
-	EverlookDB = EverlookDB or {}
+	EverlookSaved = EverlookSaved or {}
 	if not enabled then
-		if EverlookDB.camera_distance_before ~= nil then
-			SetCVar(cvar, EverlookDB.camera_distance_before)
-			EverlookDB.camera_distance_before = nil
+		if EverlookSaved.camera_distance_before ~= nil then
+			SetCVar(cvar, EverlookSaved.camera_distance_before)
+			EverlookSaved.camera_distance_before = nil
 		end
 		return
 	end
-	if EverlookDB.camera_distance_before == nil then
+	if EverlookSaved.camera_distance_before == nil then
 		local current = GetCVar(cvar)
-		if type(current) == "string" and not (issecretvalue and issecretvalue(current)) then EverlookDB.camera_distance_before = current end
+		if type(current) == "string" and not (issecretvalue and issecretvalue(current)) then EverlookSaved.camera_distance_before = current end
 	end
 	SetCVar(cvar, tostring(module.get(id, "distance")))
 end

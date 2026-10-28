@@ -64,7 +64,7 @@ local function report_for(experiment)
 	harness.move(x, y)
 	island_mouse(experiment)
 	harness.advance(3.1)
-	local kept = EverlookDB.island_mouse[experiment == "" and "plain" or experiment]
+	local kept = EverlookSaved.island_mouse[experiment == "" and "plain" or experiment]
 	local gets, level
 	for _, line in ipairs(kept.lines) do
 		local first, found_level = line:match("^GETS THE MOUSE 1: (.-) L(%d+)")

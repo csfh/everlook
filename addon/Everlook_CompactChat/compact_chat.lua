@@ -104,26 +104,26 @@ local function set_timestamps(hidden)
 	if type(GetCVar) ~= "function" or type(SetCVar) ~= "function" then
 		return
 	end
-	EverlookDB = EverlookDB or {}
+	EverlookSaved = EverlookSaved or {}
 	if hidden then
 		-- Hidden again while a choice is saved: anything but the "none" this set was picked by the
 		-- player since, and becomes the choice to put back.
 		local current = GetCVar(cvar)
 		local readable = type(current) == "string" and not (issecretvalue and issecretvalue(current))
-		if EverlookDB.compact_chat_before == nil or (readable and current ~= "none") then
+		if EverlookSaved.compact_chat_before == nil or (readable and current ~= "none") then
 			if not readable then
 				return
 			end
-			EverlookDB.compact_chat_before = current
+			EverlookSaved.compact_chat_before = current
 		end
 		SetCVar(cvar, "none")
-	elseif EverlookDB.compact_chat_before ~= nil then
+	elseif EverlookSaved.compact_chat_before ~= nil then
 		-- Only the "none" this set is put back. A format the player picked since then is theirs.
 		local current = GetCVar(cvar)
 		if type(current) == "string" and not (issecretvalue and issecretvalue(current)) and current == "none" then
-			SetCVar(cvar, EverlookDB.compact_chat_before)
+			SetCVar(cvar, EverlookSaved.compact_chat_before)
 		end
-		EverlookDB.compact_chat_before = nil
+		EverlookSaved.compact_chat_before = nil
 	end
 end
 

@@ -9,7 +9,7 @@ local function growth()
 	return collectgarbage("count") - before
 end
 
-EverlookDB = { qol = { optimize = { enabled = true } } }
+EverlookSaved = { modules = { optimize = { enabled = true } } }
 harness.load_addon("Everlook")
 harness.load_addon("Everlook_Optimize")
 harness.check("the module holds the collector while loading", Everlook.optimize.held())

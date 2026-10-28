@@ -3,8 +3,8 @@ local addon_name, Everlook = ...
 -- Where the time goes when the game loads or reloads. The core loads first
 -- among the Everlook addons, so this file starts the clock, notes when each
 -- addon finishes loading, how long each module spends starting, and when the
--- loading screen ends. Every load overwrites `EverlookDB.load_trace`, and a short
--- summary of each load is kept in `EverlookDB.load_trace_history`, so a change
+-- loading screen ends. Every load overwrites `EverlookSaved.load_trace`, and a short
+-- summary of each load is kept in `EverlookSaved.load_trace_history`, so a change
 -- can be judged by comparing a few loads before and after it.
 --
 -- The clock is `debugprofilestop`, which keeps running through a loading
@@ -128,11 +128,11 @@ local function remember()
 		return
 	end
 	logged = true
-	EverlookDB = EverlookDB or {}
-	local history = EverlookDB.load_trace_history
+	EverlookSaved = EverlookSaved or {}
+	local history = EverlookSaved.load_trace_history
 	if type(history) ~= "table" then
 		history = {}
-		EverlookDB.load_trace_history = history
+		EverlookSaved.load_trace_history = history
 	end
 	history[#history + 1] = summary(reload)
 	while #history > MAX_HISTORY do
@@ -168,6 +168,6 @@ end
 
 -- The saved variables exist once this addon has loaded.
 EventUtil.ContinueOnAddOnLoaded(addon_name, function()
-	EverlookDB = EverlookDB or {}
-	EverlookDB.load_trace = ledger
+	EverlookSaved = EverlookSaved or {}
+	EverlookSaved.load_trace = ledger
 end)

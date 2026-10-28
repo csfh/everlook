@@ -377,15 +377,15 @@ return function(root, check, island_world, quest_world, secret_stat)
 			{ id = "go", label = "Go", type = "callback", on_click = function() end } } })
 		first_state.time = first_state.time + 120
 		first_env.GetServerTime = function() return 1000120 end
-		local saved = first_env.EverlookDB
+		local saved = first_env.EverlookSaved
 		first_event("PLAYER_LOGOUT")
 		check("history saves per character", saved.island_history["Player-1-00000001"] ~= nil)
 
 		local second, second_env = island_world()
 		with_character(second_env)
 		second_env.GetServerTime = function() return 1000300 end
-		second_env.EverlookDB = second_env.EverlookDB or {}
-		second_env.EverlookDB.island_history = saved.island_history
+		second_env.EverlookSaved = second_env.EverlookSaved or {}
+		second_env.EverlookSaved.island_history = saved.island_history
 		second.module.set("island", "enabled", true)
 		local notices = second.island.view().notices
 		local texts = {}

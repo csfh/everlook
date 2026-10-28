@@ -8,7 +8,7 @@ return function(root, check)
 		env._G = env
 		-- world.lua shares the namespace as the global Everlook.
 		env.Everlook = addon
-		env.EverlookDB = {}
+		env.EverlookSaved = {}
 		env.IsShiftKeyDown = function() return false end
 		env.CreateColor = function(red, green, blue, alpha) return { r = red, g = green, b = blue, a = alpha } end
 		env.InCombatLockdown = function() return false end
@@ -209,7 +209,7 @@ return function(root, check)
 		return addon, env, event, hooks, tickers, frames
 	end
 	local addon, env, event = load_qol()
-	check("QoL has thirty-two independent modules", #addon.module.modules == 32)
+	check("Everlook has thirty-two independent modules", #addon.module.modules == 32)
 	for _, module in ipairs(addon.module.modules) do
 		check(module.id .. " starts disabled", not addon.module.enabled(module.id))
 	end
@@ -558,7 +558,7 @@ return function(root, check)
 	check("junk sale skips locked and non-junk items", #sold == 2 and sold[1] == 1 and sold[2] == 2)
 	check("junk sale reports confirmed stack proceeds", report and report:find("30 copper", 1, true) and tickers[1].cancelled)
 	check("junk selling has no command and no protection list",
-		env2.SLASH_EVERLOOKJUNK1 == nil and addon2.sell_junk == nil and env2.EverlookDB.qol.sell_junk.protected == nil)
+		env2.SLASH_EVERLOOKJUNK1 == nil and addon2.sell_junk == nil and env2.EverlookSaved.modules.sell_junk.protected == nil)
 	bags[1] = { itemID = 5, quality = 0, stackCount = 1 }
 	event2("MERCHANT_SHOW")
 	event2("MERCHANT_CLOSED")
@@ -1071,7 +1071,7 @@ return function(root, check)
 	-- The player picks a format in Options, Social while the module has timestamps hidden.
 	chat_env.timestamps = "%I:%M "
 	chat.module.set("compact_chat", "enabled", false)
-	check("a format the player picked meanwhile is kept, not overwritten", chat_env.timestamps == "%I:%M " and chat_env.EverlookDB.compact_chat_before == nil)
+	check("a format the player picked meanwhile is kept, not overwritten", chat_env.timestamps == "%I:%M " and chat_env.EverlookSaved.compact_chat_before == nil)
 	chat.module.set("compact_chat", "enabled", true)
 	-- Picked again, then the chat windows change and the module hides timestamps once more before it lets go.
 	chat_env.timestamps = "%H:%M:%S "
@@ -1084,8 +1084,8 @@ return function(root, check)
 		chat_env.timestamps = "%H:%M "
 		chat.module.set("compact_chat", "enabled", true)
 		local reloaded, reloaded_env = load_qol()
-		reloaded_env.EverlookDB.qol = chat_env.EverlookDB.qol
-		reloaded_env.EverlookDB.compact_chat_before = chat_env.EverlookDB.compact_chat_before
+		reloaded_env.EverlookSaved.modules = chat_env.EverlookSaved.modules
+		reloaded_env.EverlookSaved.compact_chat_before = chat_env.EverlookSaved.compact_chat_before
 		reloaded_env.GetCVar = chat_env.GetCVar
 		reloaded_env.SetCVar = chat_env.SetCVar
 		reloaded.module.set("compact_chat", "enabled", false)
@@ -1126,7 +1126,7 @@ return function(root, check)
 		end
 	end
 	update(); time = 1; flying = true; update(); time = 61; flying = false; update()
-	local route = env2.EverlookDB.qol.flight_time.routes["::Origin>Destination"]
+	local route = env2.EverlookSaved.modules.flight_time.routes["::Origin>Destination"]
 	check("flight duration learns while display starts hidden", route and route.seconds == 60 and route.samples == 1)
 	check("landing stops the flight poller", ground_poller.scripts.OnUpdate == nil)
 	do
@@ -1135,9 +1135,9 @@ return function(root, check)
 		hooks.TakeTaxiNode(2)
 		flying = true
 		update()
-		check("a flight in the air is kept in the saved variables", env2.EverlookDB.qol.flight_time.current and env2.EverlookDB.qol.flight_time.current.started == 100)
+		check("a flight in the air is kept in the saved variables", env2.EverlookSaved.modules.flight_time.current and env2.EverlookSaved.modules.flight_time.current.started == 100)
 		local resumed, resumed_env, _, resumed_hooks, _, resumed_frames = load_qol()
-		resumed_env.EverlookDB.qol = env2.EverlookDB.qol
+		resumed_env.EverlookSaved.modules = env2.EverlookSaved.modules
 		resumed_env.GetTime = env2.GetTime
 		resumed_env.UnitOnTaxi = env2.UnitOnTaxi
 		resumed_env.TakeTaxiNode = function() end
@@ -1151,9 +1151,9 @@ return function(root, check)
 		for _, frame in ipairs(resumed_frames) do
 			if frame.shown and frame.scripts.OnUpdate then frame.scripts.OnUpdate(frame, 0.25) end
 		end
-		local after = env2.EverlookDB.qol.flight_time.routes["::Origin>Destination"]
+		local after = env2.EverlookSaved.modules.flight_time.routes["::Origin>Destination"]
 		check("after a reload in the air the flight is timed from when it started", after and after.samples == 2 and after.seconds == 90)
-		check("landing clears the saved flight", env2.EverlookDB.qol.flight_time.current == nil)
+		check("landing clears the saved flight", env2.EverlookSaved.modules.flight_time.current == nil)
 		flying = false
 	end
 
@@ -1423,13 +1423,13 @@ return function(root, check)
 		local sets = {}
 		env2.GetCVar = function(name) return values[name] end
 		env2.SetCVar = function(name, value) sets[#sets + 1] = name .. "=" .. value; values[name] = value end
-		env2.EverlookDB = env2.EverlookDB or {}
+		env2.EverlookSaved = env2.EverlookSaved or {}
 		addon2.module.set("quest_text_size", "enabled", true)
 		check("the at once option is off by default and the variable is left alone", #sets == 0 and values.instantQuestText == "0")
 		addon2.module.set("quest_text_size", "instant_text", true)
-		check("turned on, it sets the variable and keeps the player's value", values.instantQuestText == "1" and env2.EverlookDB.quest_text_size_before == "0")
+		check("turned on, it sets the variable and keeps the player's value", values.instantQuestText == "1" and env2.EverlookSaved.quest_text_size_before == "0")
 		addon2.module.set("quest_text_size", "enabled", false)
-		check("turning the module off puts the player's value back and forgets it", values.instantQuestText == "0" and env2.EverlookDB.quest_text_size_before == nil)
+		check("turning the module off puts the player's value back and forgets it", values.instantQuestText == "0" and env2.EverlookSaved.quest_text_size_before == nil)
 		addon2.module.set("quest_text_size", "enabled", true)
 		values.instantQuestText = "1"
 		addon2.module.set("quest_text_size", "instant_text", false)
@@ -1437,7 +1437,7 @@ return function(root, check)
 		values.instantQuestText = nil
 		local before = #sets
 		addon2.module.set("quest_text_size", "instant_text", true)
-		check("a client with no such variable is left alone", #sets == before and env2.EverlookDB.quest_text_size_before == nil)
+		check("a client with no such variable is left alone", #sets == before and env2.EverlookSaved.quest_text_size_before == nil)
 		addon2.module.set("quest_text_size", "instant_text", false)
 		addon2.module.set("quest_text_size", "enabled", false)
 		env2.GetCVar, env2.SetCVar = nil, nil
@@ -1924,13 +1924,13 @@ return function(root, check)
 	end
 	check("the subpages include each module option exactly once", count == expected)
 	check("an option sits on its subject's page",
-		page_of_variable.Everlook_QoL_flight_time_enabled == "Map" and page_of_variable.Everlook_QoL_useful_tooltips_enabled == "Tooltips"
-		and page_of_variable.Everlook_QoL_sell_junk_enabled == "Vendors" and page_of_variable.Everlook_QoL_fonts_size_offset == "Text and names"
-		and page_of_variable.Everlook_QoL_bags_enabled == "Bags" and page_of_variable.Everlook_QoL_action_bar_slots_enabled == "Action bars"
-		and page_of_variable.Everlook_QoL_nameplates_enabled == "Nameplates" and page_of_variable.Everlook_QoL_swing_timers_enabled == "Combat"
-		and page_of_variable.Everlook_QoL_camera_distance_enabled == "Screen and camera"
-		and page_of_variable.Everlook_QoL_quest_automation_enabled == "Quests" and page_of_variable.Everlook_QoL_island_enabled == "Island"
-		and page_of_variable.Everlook_QoL_take_mail_enabled == "Loot and mail")
+		page_of_variable.Everlook_flight_time_enabled == "Map" and page_of_variable.Everlook_useful_tooltips_enabled == "Tooltips"
+		and page_of_variable.Everlook_sell_junk_enabled == "Vendors" and page_of_variable.Everlook_fonts_size_offset == "Text and names"
+		and page_of_variable.Everlook_bags_enabled == "Bags" and page_of_variable.Everlook_action_bar_slots_enabled == "Action bars"
+		and page_of_variable.Everlook_nameplates_enabled == "Nameplates" and page_of_variable.Everlook_swing_timers_enabled == "Combat"
+		and page_of_variable.Everlook_camera_distance_enabled == "Screen and camera"
+		and page_of_variable.Everlook_quest_automation_enabled == "Quests" and page_of_variable.Everlook_island_enabled == "Island"
+		and page_of_variable.Everlook_take_mail_enabled == "Loot and mail")
 	local module_count = #addon2.module.modules
 	local last = addon2.module.modules[module_count]
 	local function has_header(name)
@@ -1949,32 +1949,32 @@ return function(root, check)
 		and (has_header("Activity") or 0) > (has_header("Session recap") or 0))
 	count = 0
 	for _, module in ipairs(addon2.module.modules) do
-		if page_of_variable["Everlook_QoL_" .. module.id .. "_enabled"] then count = count + 1 end
+		if page_of_variable["Everlook_" .. module.id .. "_enabled"] then count = count + 1 end
 	end
 	check("every module appears on exactly one page", count == module_count)
 	check("module options are grouped under their enable toggle", #children == expected - module_count)
 	local sample = children[1]
-	registered.Everlook_QoL_quest_text_size_enabled.set(false)
+	registered.Everlook_quest_text_size_enabled.set(false)
 	check("disabled module options cannot be changed in the UI", not sample.predicate())
-	registered.Everlook_QoL_quest_text_size_enabled.set(true)
+	registered.Everlook_quest_text_size_enabled.set(true)
 	check("enabling a module makes its options available", sample.predicate())
-	check("subpage toggles retain saved preferences", registered.Everlook_QoL_quest_text_size_enabled.get())
-	registered.Everlook_QoL_fonts_size_offset.set(100)
+	check("subpage toggles retain saved preferences", registered.Everlook_quest_text_size_enabled.get())
+	registered.Everlook_fonts_size_offset.set(100)
 	check("settings clamp font size to supported range", addon2.module.get("fonts", "size_offset") == 8)
-	check("a slider that counts things shows its number", sliders.Everlook_QoL_island_toast_count.format(3) == "3")
-	check("every text size is in points", sliders.Everlook_QoL_fonts_size_offset.format(3) == "3 pt" and sliders.Everlook_QoL_unit_frame_names_extra.format(4) == "4 pt"
-		and sliders.Everlook_QoL_quest_text_size_text_size.format(16) == "16 pt" and sliders.Everlook_QoL_tracker_text_size_text_size.format(16) == "16 pt")
-	check("the Island's position is in pixels", sliders.Everlook_QoL_island_position_x.format(-103) == "-103 px" and sliders.Everlook_QoL_island_position_top.format(12) == "12 px")
-	check("a slider with a unit shows it after the number", sliders.Everlook_QoL_island_size.format(105) == "105%" and sliders.Everlook_QoL_chat_layout_fade_seconds.format(120) == "120 s")
-	check("a label shows the step the value will be stored on", sliders.Everlook_QoL_island_size.format(97) == "95%" and sliders.Everlook_QoL_island_size.format(98) == "100%")
-	local scale = sliders.Everlook_QoL_swing_timers_scale
+	check("a slider that counts things shows its number", sliders.Everlook_island_toast_count.format(3) == "3")
+	check("every text size is in points", sliders.Everlook_fonts_size_offset.format(3) == "3 pt" and sliders.Everlook_unit_frame_names_extra.format(4) == "4 pt"
+		and sliders.Everlook_quest_text_size_text_size.format(16) == "16 pt" and sliders.Everlook_tracker_text_size_text_size.format(16) == "16 pt")
+	check("the Island's position is in pixels", sliders.Everlook_island_position_x.format(-103) == "-103 px" and sliders.Everlook_island_position_top.format(12) == "12 px")
+	check("a slider with a unit shows it after the number", sliders.Everlook_island_size.format(105) == "105%" and sliders.Everlook_chat_layout_fade_seconds.format(120) == "120 s")
+	check("a label shows the step the value will be stored on", sliders.Everlook_island_size.format(97) == "95%" and sliders.Everlook_island_size.format(98) == "100%")
+	local scale = sliders.Everlook_swing_timers_scale
 	check("a percentage label shows the step too", scale.format(83) == "80%" and scale.format(87) == "90%")
 	check("a fraction shown as a percentage runs in whole percents", scale.minimum == 50 and scale.maximum == 100 and scale.step == 10 and scale.format(80) == "80%")
-	check("a percentage slider starts from the stored fraction", registered.Everlook_QoL_swing_timers_scale.default == 50 and registered.Everlook_QoL_swing_timers_scale.get() == 50)
-	registered.Everlook_QoL_swing_timers_scale.set(80)
-	check("a percentage slider stores the fraction", addon2.module.get("swing_timers", "scale") == 0.8 and registered.Everlook_QoL_swing_timers_scale.get() == 80)
-	registered.Everlook_QoL_island_quest_distance_weight.set(150)
-	check("a quarter step shows as a whole percentage", addon2.module.get("island", "quest_distance_weight") == 1.5 and registered.Everlook_QoL_island_quest_distance_weight.get() == 150)
+	check("a percentage slider starts from the stored fraction", registered.Everlook_swing_timers_scale.default == 50 and registered.Everlook_swing_timers_scale.get() == 50)
+	registered.Everlook_swing_timers_scale.set(80)
+	check("a percentage slider stores the fraction", addon2.module.get("swing_timers", "scale") == 0.8 and registered.Everlook_swing_timers_scale.get() == 80)
+	registered.Everlook_island_quest_distance_weight.set(150)
+	check("a quarter step shows as a whole percentage", addon2.module.get("island", "quest_distance_weight") == 1.5 and registered.Everlook_island_quest_distance_weight.get() == 150)
 	addon2.settings.toggle()
 	check("the toggle opens the Everlook page", opened == 42)
 	local hidden_panels = 0
@@ -3264,9 +3264,9 @@ return function(root, check)
 		env.InCombatLockdown = function() return false end
 		event("PLAYER_REGEN_ENABLED")
 		check("combat ends without replaying routine arrivals", #addon.island.view().queue == 0)
-		env.EverlookDB.qol.island.size = 0 / 0
-		env.EverlookDB.qol.island.position_x = math.huge
-		env.EverlookDB.qol.island.position_top = -1000
+		env.EverlookSaved.modules.island.size = 0 / 0
+		env.EverlookSaved.modules.island.position_x = math.huge
+		env.EverlookSaved.modules.island.position_top = -1000
 		event("UI_SCALE_CHANGED")
 		check("corrupt numeric preferences use finite bounded values", root_frame.scale == 1 and root_frame.point[4] == 0 and root_frame.point[5] == -8)
 	end
@@ -5712,7 +5712,7 @@ return function(root, check)
 			local report = addon.island_experience.report()
 			check("the first plain reading stores a baseline and adds 0",
 				report.ready and report.hour.total == 0 and report.day.total == 0
-				and env.EverlookDB.island_experience["Player-1-ABC"].baseline.xp == 0
+				and env.EverlookSaved.island_experience["Player-1-ABC"].baseline.xp == 0
 				and joined(report):find("Hour  0", 1, true) and not joined(report):find("XP incomplete", 1, true))
 			state.xp = 250
 			addon.island_experience.on_event("PLAYER_XP_UPDATE")
@@ -5720,7 +5720,7 @@ return function(root, check)
 			check("a same-level gain lands in the hour and the day",
 				report.hour.total == 250 and report.day.total == 250 and report.hour.other == 250
 				and report.hour.quest == 0 and report.hour.kill == 0
-				and env.EverlookDB.island_experience["Player-1-ABC"].buckets["1000800"].total == 250)
+				and env.EverlookSaved.island_experience["Player-1-ABC"].buckets["1000800"].total == 250)
 
 			addon, env, state = open_world(function(state)
 				state.xp, state.xp_max = 900, 1000
@@ -5856,7 +5856,7 @@ return function(root, check)
 			addon.island_experience.on_event("PLAYER_XP_UPDATE")
 			report = addon.island_experience.report()
 			check("a gain older than 25 hours is dropped on the next commit",
-				report.day.total == 1 and env.EverlookDB.island_experience["Player-1-ABC"].buckets["1000800"] == nil)
+				report.day.total == 1 and env.EverlookSaved.island_experience["Player-1-ABC"].buckets["1000800"] == nil)
 
 			addon, env, state = open_world()
 			addon.island_experience.on_event("PLAYER_XP_UPDATE")
@@ -5897,12 +5897,12 @@ return function(root, check)
 			addon.island_experience.on_event("PLAYER_XP_UPDATE")
 			check("a second character keeps a separate total",
 				addon.island_experience.report().hour.total == 50
-				and env.EverlookDB.island_experience["Player-2-DEF"].buckets["1000800"].total == 50)
+				and env.EverlookSaved.island_experience["Player-2-DEF"].buckets["1000800"].total == 50)
 			state.guid, state.xp = "Player-1-ABC", 100
 			addon.island_experience.on_event("PLAYER_ENTERING_WORLD")
 			check("returning to the first character restores that ledger",
 				addon.island_experience.report().hour.total == 100
-				and env.EverlookDB.island_experience["Player-1-ABC"].buckets["1000800"].total == 100)
+				and env.EverlookSaved.island_experience["Player-1-ABC"].buckets["1000800"].total == 100)
 
 			addon, env, state = open_world(function(state, env)
 				local hidden_guid = secret_stat()
@@ -5913,7 +5913,7 @@ return function(root, check)
 			state.xp = 10
 			addon.island_experience.on_event("PLAYER_XP_UPDATE")
 			check("a secret character id keeps the hour in memory and writes nothing",
-				addon.island_experience.report().hour.total == 10 and env.EverlookDB.island_experience == nil)
+				addon.island_experience.report().hour.total == 10 and env.EverlookSaved.island_experience == nil)
 
 			addon, env, state = open_world()
 			addon.island_experience.on_event("PLAYER_XP_UPDATE")
@@ -5922,7 +5922,7 @@ return function(root, check)
 			addon.module.set("island", "enabled", false)
 			check("disabling Island leaves the saved ledger in place",
 				addon.island_experience.report() == nil
-				and env.EverlookDB.island_experience["Player-1-ABC"].buckets["1000800"].total == 80)
+				and env.EverlookSaved.island_experience["Player-1-ABC"].buckets["1000800"].total == 80)
 
 			addon, _, state = open_world()
 			state.xp_max = 2000

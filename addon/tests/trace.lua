@@ -61,7 +61,7 @@ return function(root, check)
 		trace.stamp("core_files")
 		check("a label keeps its first time", #trace.ledger.marks == 2 and trace.ledger.marks[1][2] == 5)
 		game.loaded.Everlook()
-		check("the saved variables hold this load's ledger", env.EverlookDB.load_trace == trace.ledger)
+		check("the saved variables hold this load's ledger", env.EverlookSaved.load_trace == trace.ledger)
 
 		local function work(a, b)
 			game.now = game.now + 2.5
@@ -85,7 +85,7 @@ return function(root, check)
 		game.fire("PLAYER_ENTERING_WORLD", false, true)
 		game.now = 50
 		game.fire("LOADING_SCREEN_DISABLED")
-		local history = env.EverlookDB.load_trace_history
+		local history = env.EverlookSaved.load_trace_history
 		check("the end of the loading screen adds one line to the history", #history == 1)
 		local line = history[1]
 		check("it says how long each step took", line.reload == true and line.saved == 4 and line.login > 0 and line.enter > line.login and line.done > line.enter)
@@ -93,19 +93,19 @@ return function(root, check)
 		check("it says when a module held the collector", line.gc == "loading_done")
 		game.fire("LOADING_SCREEN_DISABLED")
 		game.fire("PLAYER_ENTERING_WORLD", false, false)
-		check("a later zone change is not another load", #env.EverlookDB.load_trace_history == 1 and line.reload == true)
+		check("a later zone change is not another load", #env.EverlookSaved.load_trace_history == 1 and line.reload == true)
 	end
 
 	do
 		local trace, game, env = load()
-		env.EverlookDB = { load_trace_history = {} }
+		env.EverlookSaved = { load_trace_history = {} }
 		for index = 1, 12 do
-			env.EverlookDB.load_trace_history[index] = { at = index }
+			env.EverlookSaved.load_trace_history[index] = { at = index }
 		end
 		game.now = 1
 		game.fire("PLAYER_LOGIN")
 		game.fire("LOADING_SCREEN_DISABLED")
-		local history = env.EverlookDB.load_trace_history
+		local history = env.EverlookSaved.load_trace_history
 		check("the history keeps the last eight loads", #history == 8 and history[1].at == 6)
 	end
 
@@ -118,6 +118,6 @@ return function(root, check)
 		end, 21)
 		trace.stamp("anything")
 		game.fire("LOADING_SCREEN_DISABLED")
-		check("with no clock nothing is recorded and the work still happens", result == 42 and trace.ledger.marks[1] == nil and next(trace.ledger.spans) == nil and rawget(env, "EverlookDB") == nil)
+		check("with no clock nothing is recorded and the work still happens", result == 42 and trace.ledger.marks[1] == nil and next(trace.ledger.spans) == nil and rawget(env, "EverlookSaved") == nil)
 	end
 end

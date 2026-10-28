@@ -15,7 +15,7 @@ local id = "action_bar_slots"
 -- character layout exists for the one that made it. So what to switch back to is kept per
 -- character.
 local function records(key)
-	local data = EverlookDB and EverlookDB.qol and EverlookDB.qol[id]
+	local data = EverlookSaved and EverlookSaved.modules and EverlookSaved.modules[id]
 	if not data then return nil end
 	if type(data[key]) ~= "table" then data[key] = {} end
 	local guid = Everlook.player_guid()

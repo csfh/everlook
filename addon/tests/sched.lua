@@ -471,7 +471,7 @@ return function(root, check)
 			spans = { ["module:fonts"] = { ms = 6.1, runs = 2 }, ["module:island"] = { ms = 4, runs = 1 }, settings = { ms = 5.2, runs = 1 }, fonts_pass = { ms = 5.5, runs = 3 } },
 			counts = { fonts_passes = 3, fonts_frames = 4100, settings_kb = 310 },
 		} }
-		env.EverlookDB = { load_trace_history = { { done = 1300, reload = false }, { done = 980, reload = true } } }
+		env.EverlookSaved = { load_trace_history = { { done = 1300, reload = false }, { done = 980, reload = true } } }
 		worker(sched, game, "defer", 100000, 0.25)
 		sched.tick()
 		page.scripts.OnShow(page)

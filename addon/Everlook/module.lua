@@ -1,7 +1,7 @@
 local _, Everlook = ...
 
 -- Module addons register here. The registry keeps their settings in
--- EverlookDB.qol, sends them their events, and places them on a settings page.
+-- EverlookSaved.modules, sends them their events, and places them on a settings page.
 Everlook.module = { modules = {} }
 local registry = Everlook.module
 local by_id, listeners = {}, {}
@@ -42,10 +42,10 @@ local page_labels = {}
 for _, page in ipairs(PAGES) do page_labels[page.id] = page.label end
 
 local function saved(id)
-	EverlookDB = EverlookDB or {}
-	EverlookDB.qol = EverlookDB.qol or {}
-	EverlookDB.qol[id] = EverlookDB.qol[id] or {}
-	return EverlookDB.qol[id]
+	EverlookSaved = EverlookSaved or {}
+	EverlookSaved.modules = EverlookSaved.modules or {}
+	EverlookSaved.modules[id] = EverlookSaved.modules[id] or {}
+	return EverlookSaved.modules[id]
 end
 
 -- An option with choices holds one of their values. A saved value that is no
@@ -101,7 +101,7 @@ end
 
 function registry.get(id, key)
 	local module = known(id)
-	local value = EverlookDB and EverlookDB.qol and EverlookDB.qol[id] and EverlookDB.qol[id][key]
+	local value = EverlookSaved and EverlookSaved.modules and EverlookSaved.modules[id] and EverlookSaved.modules[id][key]
 	local option = module.options[key]
 	if option and not (issecretvalue and issecretvalue(value)) and type(value) == type(option.default) and allowed(option, value) then
 		if type(value) == "number" then

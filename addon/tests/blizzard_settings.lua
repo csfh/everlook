@@ -7,7 +7,7 @@ return function(root, check)
 		options = options or {}
 		local env = setmetatable({}, { __index = _G })
 		env._G = env
-		env.EverlookDB = options.db or {}
+		env.EverlookSaved = options.db or {}
 		env.UnitGUID = function() return options.guid or "Player-1" end
 		local frames = {}
 		env.CreateFrame = function()
@@ -73,17 +73,17 @@ return function(root, check)
 		local count = #state.calls
 		state.bars[1] = false
 		check("release leaves a setting the player has changed since", settings.release("action_bar_2") == true and state.bars[1] == false and #state.calls == count)
-		check("and forgets it", env.EverlookDB.qol.blizzard_settings.changed["Player-1"].action_bar_2 == nil)
+		check("and forgets it", env.EverlookSaved.modules.blizzard_settings.changed["Player-1"].action_bar_2 == nil)
 	end
 
 	do
 		local db = {}
 		local settings, state = world({ db = db, time = 110, guid = "Player-A" })
 		settings.ensure("action_bar_2", true)
-		check("what it changed is remembered for that character only", db.qol.blizzard_settings.changed["Player-A"].action_bar_2 ~= nil and db.qol.blizzard_settings.changed["Player-B"] == nil)
+		check("what it changed is remembered for that character only", db.modules.blizzard_settings.changed["Player-A"].action_bar_2 ~= nil and db.modules.blizzard_settings.changed["Player-B"] == nil)
 		local other = world({ db = db, time = 110, guid = "Player-B", bars = { true, false, true, false, false, false, false } })
 		check("another character has no change to put back", other.release("action_bar_2") == true)
-		check("and the first character's record is still there", db.qol.blizzard_settings.changed["Player-A"].action_bar_2 ~= nil)
+		check("and the first character's record is still there", db.modules.blizzard_settings.changed["Player-A"].action_bar_2 ~= nil)
 		check("the first character's setting is untouched by the other", state.bars[1] == true)
 	end
 

@@ -75,11 +75,11 @@ end
 
 -- The saved tables, kept with the rest of the Bags settings. The key is not an option's name.
 function alts.data()
-	EverlookDB = EverlookDB or {}
-	EverlookDB.qol = EverlookDB.qol or {}
-	EverlookDB.qol.bags = EverlookDB.qol.bags or {}
-	local root = EverlookDB.qol.bags.remembered or {}
-	EverlookDB.qol.bags.remembered = root
+	EverlookSaved = EverlookSaved or {}
+	EverlookSaved.modules = EverlookSaved.modules or {}
+	EverlookSaved.modules.bags = EverlookSaved.modules.bags or {}
+	local root = EverlookSaved.modules.bags.remembered or {}
+	EverlookSaved.modules.bags.remembered = root
 	root.characters = root.characters or {}
 	return root
 end

@@ -28,11 +28,11 @@ end
 
 -- The saved table, kept with the rest of the Bags settings. Its key is not the option's name.
 function folds.data()
-	EverlookDB = EverlookDB or {}
-	EverlookDB.qol = EverlookDB.qol or {}
-	EverlookDB.qol.bags = EverlookDB.qol.bags or {}
-	EverlookDB.qol.bags.folded = EverlookDB.qol.bags.folded or {}
-	return EverlookDB.qol.bags.folded
+	EverlookSaved = EverlookSaved or {}
+	EverlookSaved.modules = EverlookSaved.modules or {}
+	EverlookSaved.modules.bags = EverlookSaved.modules.bags or {}
+	EverlookSaved.modules.bags.folded = EverlookSaved.modules.bags.folded or {}
+	return EverlookSaved.modules.bags.folded
 end
 
 Everlook.bags_folds = folds

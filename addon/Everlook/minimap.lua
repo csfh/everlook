@@ -6,7 +6,7 @@ local DEFAULT_ANGLE = 160
 local button
 
 local function minimap_settings()
-	local minimap = EverlookDB and EverlookDB.minimap
+	local minimap = EverlookSaved and EverlookSaved.minimap
 	if type(minimap) == "table" then
 		return minimap
 	end
@@ -43,8 +43,8 @@ local function drag_on_update(self)
 	local cx, cy = GetCursorPosition()
 	local scale = Minimap:GetEffectiveScale()
 	cx, cy = cx / scale, cy / scale
-	EverlookDB.minimap = minimap_settings() or {}
-	EverlookDB.minimap.angle = math.deg(math.atan2(cy - my, cx - mx))
+	EverlookSaved.minimap = minimap_settings() or {}
+	EverlookSaved.minimap.angle = math.deg(math.atan2(cy - my, cx - mx))
 	place()
 end
 
@@ -104,16 +104,16 @@ local function create_button()
 end
 
 -- The client hands the saved variables to Lua when ADDON_LOADED fires for this addon, after its files have run,
--- so this is the first place EverlookDB can be read, and it is still nil on a new install. The client writes it to
+-- so this is the first place EverlookSaved can be read, and it is still nil on a new install. The client writes it to
 -- WTF/Account/<account>/SavedVariables/Everlook.lua on /reload, logout, disconnect or quit.
 EventUtil.ContinueOnAddOnLoaded(addon_name, function()
-	EverlookDB = EverlookDB or {}
+	EverlookSaved = EverlookSaved or {}
 
-	local minimap = EverlookDB.minimap
+	local minimap = EverlookSaved.minimap
 	if type(minimap) == "table" then
 		minimap.icon = nil
 	else
-		EverlookDB.minimap = nil
+		EverlookSaved.minimap = nil
 	end
 
 	create_button()

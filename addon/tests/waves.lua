@@ -276,8 +276,8 @@ return function(root, check)
 	-- A reload in the middle: a new session with the same saved variables, and the game still holding the number set here.
 	do
 		local reloaded, reloaded_env = load({ "world", "module", "camera_distance" })
-		reloaded_env.EverlookDB.qol = play.EverlookDB.qol
-		reloaded_env.EverlookDB.camera_distance_before = play.EverlookDB.camera_distance_before
+		reloaded_env.EverlookSaved.modules = play.EverlookSaved.modules
+		reloaded_env.EverlookSaved.camera_distance_before = play.EverlookSaved.camera_distance_before
 		reloaded_env.GetCVar = play.GetCVar
 		reloaded_env.SetCVar = play.SetCVar
 		reloaded.module.set("camera_distance", "enabled", false)
@@ -305,8 +305,8 @@ return function(root, check)
 	-- A reload in the middle: a new session with the same saved variables and the game's settings as they were left.
 	do
 		local reloaded, reloaded_env = load({ "world", "module", "ground_effects" })
-		reloaded_env.EverlookDB.qol = play.EverlookDB.qol
-		reloaded_env.EverlookDB.ground_effects_before = play.EverlookDB.ground_effects_before
+		reloaded_env.EverlookSaved.modules = play.EverlookSaved.modules
+		reloaded_env.EverlookSaved.ground_effects_before = play.EverlookSaved.ground_effects_before
 		reloaded_env.GetCVar = play.GetCVar
 		reloaded_env.SetCVar = play.SetCVar
 		reloaded.module.set("ground_effects", "enabled", false)

@@ -3,7 +3,7 @@
 ## Notes: Quality-of-life tweaks for World of Warcraft, and the settings page for its module addons.
 ## Author: Christoffer Hallas
 ## Version: 1.1.0
-## SavedVariables: EverlookDB
+## SavedVariables: EverlookSaved
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
 
 world.lua

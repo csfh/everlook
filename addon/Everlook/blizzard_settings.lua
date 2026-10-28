@@ -6,7 +6,7 @@ local _, Everlook = ...
 -- It makes the calls the game's own settings page makes, and reads and writes nothing until a
 -- few seconds after the character has entered the world, because the game says its values are
 -- wrong until the server has sent them, and a loading screen can be long.
--- What it changed is kept per character in EverlookDB.qol.blizzard_settings.changed, and only
+-- What it changed is kept per character in EverlookSaved.modules.blizzard_settings.changed, and only
 -- that is put back, and only while the setting still has the value this gave it.
 local settings = {}
 local SETTLE = 5
@@ -20,11 +20,11 @@ local function toggle_of(key)
 end
 
 local function changed(guid)
-	if type(EverlookDB) ~= "table" then return nil end
-	EverlookDB.qol = EverlookDB.qol or {}
-	local qol = EverlookDB.qol
-	qol.blizzard_settings = qol.blizzard_settings or {}
-	local store = qol.blizzard_settings
+	if type(EverlookSaved) ~= "table" then return nil end
+	EverlookSaved.modules = EverlookSaved.modules or {}
+	local modules = EverlookSaved.modules
+	modules.blizzard_settings = modules.blizzard_settings or {}
+	local store = modules.blizzard_settings
 	store.changed = store.changed or {}
 	store.changed[guid] = store.changed[guid] or {}
 	return store.changed[guid]

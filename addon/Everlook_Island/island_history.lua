@@ -33,9 +33,9 @@ end
 function history.save(notices, now)
 	local key = Everlook.player_guid()
 	if not key then return end
-	EverlookDB = EverlookDB or {}
-	local store = type(EverlookDB.island_history) == "table" and EverlookDB.island_history or {}
-	EverlookDB.island_history = store
+	EverlookSaved = EverlookSaved or {}
+	local store = type(EverlookSaved.island_history) == "table" and EverlookSaved.island_history or {}
+	EverlookSaved.island_history = store
 	local saved_at = server_now()
 	for other, bucket in pairs(store) do
 		if type(bucket) ~= "table" or type(bucket.saved_at) ~= "number" or saved_at - bucket.saved_at > KEEP_SECONDS then
@@ -56,7 +56,7 @@ end
 -- Returns rows with an age in seconds, oldest first. Anything malformed or older than a day is dropped.
 function history.load()
 	local key = Everlook.player_guid()
-	local store = EverlookDB and EverlookDB.island_history
+	local store = EverlookSaved and EverlookSaved.island_history
 	local bucket = key and type(store) == "table" and store[key]
 	if type(bucket) ~= "table" or type(bucket.rows) ~= "table" or type(bucket.saved_at) ~= "number" then return {} end
 	local away = math.max(0, server_now() - bucket.saved_at)

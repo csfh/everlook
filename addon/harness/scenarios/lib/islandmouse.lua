@@ -95,9 +95,9 @@ function island_mouse(argument)
 			depth = depth + 1
 		end
 		if experiment then experiment.restore() end
-		EverlookDB = EverlookDB or {}
-		EverlookDB.island_mouse = type(EverlookDB.island_mouse) == "table" and EverlookDB.island_mouse or {}
-		EverlookDB.island_mouse[label] = { when = date and date("%Y-%m-%d %H:%M:%S") or "?", lines = lines }
+		EverlookSaved = EverlookSaved or {}
+		EverlookSaved.island_mouse = type(EverlookSaved.island_mouse) == "table" and EverlookSaved.island_mouse or {}
+		EverlookSaved.island_mouse[label] = { when = date and date("%Y-%m-%d %H:%M:%S") or "?", lines = lines }
 		print("Everlook island: report of " .. #lines .. " lines saved; type /reload to write it to disk")
 		for index = 1, math.min(#lines, 6) do print("Everlook island: " .. lines[index]) end
 	end

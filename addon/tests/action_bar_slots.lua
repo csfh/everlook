@@ -37,7 +37,7 @@ return function(root, check)
 	local function load_module(extra)
 		local env = setmetatable({}, { __index = _G })
 		env._G = env
-		env.EverlookDB = {}
+		env.EverlookSaved = {}
 		env.UnitGUID = function() return "Player-1" end
 		env.IsShiftKeyDown = function() return false end
 		env.IsLoggedIn = function() return true end
@@ -185,7 +185,7 @@ return function(root, check)
 				state.bars = { ... }
 			end
 		end
-		extra.EverlookDB = options.db
+		extra.EverlookSaved = options.db
 		extra.UnitGUID = options.guid and function() return options.guid end or nil
 		for key, value in pairs(options.extra or {}) do extra[key] = value end
 		addon, env, loaded, fire = load_module(extra)
@@ -216,7 +216,7 @@ return function(root, check)
 		addon.module.set("action_bar_slots", "enabled", true)
 		check("enabling saves a new Everlook layout and makes it the active one", state.calls[1] == "save" and state.calls[2] == "added:5:true:false" and state.active == 5)
 		check("the saved layout hides empty slots on the bars above the main bar", layout_named(state, "Everlook Slots") and always_of(layout_named(state, "Everlook Slots"), 2) == 0)
-		local remembered = env.EverlookDB.qol.action_bar_slots.switched["Player-1"]
+		local remembered = env.EverlookSaved.modules.action_bar_slots.switched["Player-1"]
 		check("the layout in use before is remembered by name and type", remembered and remembered.name == "Mine" and remembered.type == ACCOUNT)
 		local count = #state.calls
 		addon.module.set("action_bar_slots", "enabled", true)
@@ -252,11 +252,11 @@ return function(root, check)
 		check("another character logging in with it on switches too", second_state.active == 5 and second_state.calls[1] == "save")
 		second.module.set("action_bar_slots", "enabled", false)
 		check("turning it off there switches that character back", second_state.active == 4)
-		check("and keeps the first character's way back", db.qol.action_bar_slots.switched["Player-A"] ~= nil and db.qol.action_bar_slots.switched["Player-B"] == nil)
+		check("and keeps the first character's way back", db.modules.action_bar_slots.switched["Player-A"] ~= nil and db.modules.action_bar_slots.switched["Player-B"] == nil)
 		local _, _, again = world({ db = db, guid = "Player-A", saved = first_state.saved, active = first_state.active })
 		check("the first character switches back when it logs in with it off", again.active == 4 and again.calls[1] == "active:4")
-		check("and its way back is cleared", db.qol.action_bar_slots.switched["Player-A"] == nil)
-		local _, _, unknown = world({ db = { qol = { action_bar_slots = { enabled = true } } }, extra = { UnitGUID = function() return nil end } })
+		check("and its way back is cleared", db.modules.action_bar_slots.switched["Player-A"] == nil)
+		local _, _, unknown = world({ db = { modules = { action_bar_slots = { enabled = true } } }, extra = { UnitGUID = function() return nil end } })
 		check("a character it cannot name is left alone", #unknown.calls == 0)
 	end
 
@@ -312,7 +312,7 @@ return function(root, check)
 
 	do
 		-- Logging in with the module already on sets everything up, with nothing to switch off and on.
-		local db = { qol = { action_bar_slots = { enabled = true } } }
+		local db = { modules = { action_bar_slots = { enabled = true } } }
 		local _, _, state = world({ db = db, bars = { false, false, false, false, false, false, false } })
 		check("the layout is made and switched to as the module starts", state.calls[1] == "save" and state.active == 5)
 		check("the bars wait for the game to settle", state.bars[1] == false and #state.timers == 1)
@@ -333,20 +333,20 @@ return function(root, check)
 
 	do
 		-- Starting up puts the player on the slots layout, once. A layout they pick later stays.
-		local db = { qol = { action_bar_slots = { enabled = true, switched = { ["Player-1"] = { name = "Mine", type = ACCOUNT } } } } }
+		local db = { modules = { action_bar_slots = { enabled = true, switched = { ["Player-1"] = { name = "Mine", type = ACCOUNT } } } } }
 		local addon, _, state, fire = world({ db = db, saved = { layout("Mine", ACCOUNT, 1), layout("Everlook Slots", CHARACTER, 0) }, active = 4 })
 		check("starting up on another layout switches to the slots layout", state.active == 5 and state.calls[1] == "active:5")
-		check("and keeps the way back", db.qol.action_bar_slots.switched["Player-1"].name == "Mine")
+		check("and keeps the way back", db.modules.action_bar_slots.switched["Player-1"].name == "Mine")
 		state.active = 4
 		local count = #state.calls
 		fire("EDIT_MODE_LAYOUTS_UPDATED")
 		fire("PLAYER_ENTERING_WORLD")
 		check("a layout the player picks afterwards is left alone", #state.calls == count and state.active == 4)
 
-		db = { qol = { action_bar_slots = { enabled = true, switched = { ["Player-1"] = { name = "Mine", type = ACCOUNT } } } } }
+		db = { modules = { action_bar_slots = { enabled = true, switched = { ["Player-1"] = { name = "Mine", type = ACCOUNT } } } } }
 		_, _, state = world({ db = db, saved = { layout("Mine", ACCOUNT, 1), layout("Everlook Slots", CHARACTER, 0) }, active = 5 })
 		check("starting up on the slots layout already changes nothing", #state.calls == 0)
-		check("and keeps the way back to the layout before it", db.qol.action_bar_slots.switched["Player-1"].name == "Mine")
+		check("and keeps the way back to the layout before it", db.modules.action_bar_slots.switched["Player-1"].name == "Mine")
 	end
 
 	do
@@ -424,7 +424,7 @@ return function(root, check)
 		check("turning it off in Edit Mode switches nothing yet", #state.calls == count and state.active == 5)
 		leave_edit_mode(state)
 		check("closing Edit Mode switches back to the layout that was in use", state.calls[#state.calls] == "active:4" and state.active == 4)
-		check("and drops the way back", env.EverlookDB.qol.action_bar_slots.switched["Player-1"] == nil)
+		check("and drops the way back", env.EverlookSaved.modules.action_bar_slots.switched["Player-1"] == nil)
 		check("and stops watching for Edit Mode to close", state.callbacks["EditMode.Exit"] == nil)
 		count = #state.calls
 		state.edit_mode = true
@@ -451,18 +451,18 @@ return function(root, check)
 		count = #state.calls
 		leave_edit_mode(state)
 		check("a layout picked in Edit Mode stays when it closes", #state.calls == count and state.active == 3)
-		check("and the way back is dropped", env.EverlookDB.qol.action_bar_slots.switched["Player-1"] == nil)
+		check("and the way back is dropped", env.EverlookSaved.modules.action_bar_slots.switched["Player-1"] == nil)
 		check("and it stops watching", state.callbacks["EditMode.Exit"] == nil)
 
 		-- Logging in with it off before the game has handed out its layouts.
-		local db = { qol = { action_bar_slots = { switched = { ["Player-1"] = { name = "Mine", type = ACCOUNT } } } } }
+		local db = { modules = { action_bar_slots = { switched = { ["Player-1"] = { name = "Mine", type = ACCOUNT } } } } }
 		local later
 		_, _, later, fire = world({ db = db, saved = { layout("Mine", ACCOUNT, 1), layout("Everlook Slots", CHARACTER, 0) }, active = 5, ready = false })
 		check("logging in with it off before the layouts arrive switches nothing yet", #later.calls == 0)
 		later.ready = true
 		fire("EDIT_MODE_LAYOUTS_UPDATED")
 		check("it switches back when the layouts arrive", later.calls[1] == "active:4" and later.active == 4)
-		check("and drops the way back then", db.qol.action_bar_slots.switched["Player-1"] == nil)
+		check("and drops the way back then", db.modules.action_bar_slots.switched["Player-1"] == nil)
 	end
 
 	do
@@ -473,6 +473,6 @@ return function(root, check)
 		fire("PLAYER_ENTERING_WORLD")
 		fire("EDIT_MODE_LAYOUTS_UPDATED")
 		check("events after it is done change nothing", #state.calls == count)
-		check("its record does not share a name with an option", env.EverlookDB.qol.action_bar_slots.switched["Player-1"] ~= nil)
+		check("its record does not share a name with an option", env.EverlookSaved.modules.action_bar_slots.switched["Player-1"] ~= nil)
 	end
 end

@@ -32,11 +32,11 @@ end
 
 -- The saved table, kept with the rest of the Bags settings.
 function junk.data()
-	EverlookDB = EverlookDB or {}
-	EverlookDB.qol = EverlookDB.qol or {}
-	EverlookDB.qol.bags = EverlookDB.qol.bags or {}
-	EverlookDB.qol.bags.junk = EverlookDB.qol.bags.junk or {}
-	return EverlookDB.qol.bags.junk
+	EverlookSaved = EverlookSaved or {}
+	EverlookSaved.modules = EverlookSaved.modules or {}
+	EverlookSaved.modules.bags = EverlookSaved.modules.bags or {}
+	EverlookSaved.modules.bags.junk = EverlookSaved.modules.bags.junk or {}
+	return EverlookSaved.modules.bags.junk
 end
 
 Everlook.bags_junk = junk

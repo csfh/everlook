@@ -104,10 +104,10 @@ local function persist(current)
 		prune(current.buckets, now)
 		current.pruned_at = now
 	end
-	EverlookDB = EverlookDB or {}
-	if type(EverlookDB.island_experience) ~= "table" then EverlookDB.island_experience = {} end
+	EverlookSaved = EverlookSaved or {}
+	if type(EverlookSaved.island_experience) ~= "table" then EverlookSaved.island_experience = {} end
 	local baseline = current.baseline
-	EverlookDB.island_experience[current.key] = {
+	EverlookSaved.island_experience[current.key] = {
 		baseline = baseline and { level = baseline.level, xp = baseline.xp, xp_max = baseline.xp_max } or nil,
 		buckets = current.buckets,
 	}
@@ -118,7 +118,7 @@ local function load_character(key)
 		key = key, buckets = {}, pending_quest = 0, pending_kill = 0, blind = false, latest = nil,
 	}
 	if not key then return current end
-	local saved = EverlookDB and type(EverlookDB.island_experience) == "table" and EverlookDB.island_experience[key] or nil
+	local saved = EverlookSaved and type(EverlookSaved.island_experience) == "table" and EverlookSaved.island_experience[key] or nil
 	if type(saved) ~= "table" then return current end
 	if type(saved.buckets) == "table" then
 		for key_name, row in pairs(saved.buckets) do

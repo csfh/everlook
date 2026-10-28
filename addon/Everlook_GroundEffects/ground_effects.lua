@@ -14,9 +14,9 @@ local order = { "density", "distance", "fade" }
 -- What each setting was before this was turned on. The game keeps a setting between sessions, so what was there
 -- first has to be kept between sessions too, or turning this off after a reload would put back our own numbers.
 local function before()
-	EverlookDB = EverlookDB or {}
-	EverlookDB.ground_effects_before = EverlookDB.ground_effects_before or {}
-	return EverlookDB.ground_effects_before
+	EverlookSaved = EverlookSaved or {}
+	EverlookSaved.ground_effects_before = EverlookSaved.ground_effects_before or {}
+	return EverlookSaved.ground_effects_before
 end
 
 local function read(name)

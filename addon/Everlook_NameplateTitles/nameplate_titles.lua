@@ -80,12 +80,12 @@ end
 -- after combat or another change, takes such a choice as the one to put back.
 local function switch_names(enabled)
 	if type(InCombatLockdown) ~= "function" or InCombatLockdown() or not GetCVar or not SetCVar then return end
-	EverlookDB = EverlookDB or {}
+	EverlookSaved = EverlookSaved or {}
 	if enabled and module.get(id, "use_nameplates") then
-		local saved = EverlookDB.nameplate_titles_before
+		local saved = EverlookSaved.nameplate_titles_before
 		if type(saved) ~= "table" then
 			saved = {}
-			EverlookDB.nameplate_titles_before = saved
+			EverlookSaved.nameplate_titles_before = saved
 		end
 		for _, group in ipairs(GROUPS) do
 			if saved[group[1]] == nil or not holds_ours(group) then
@@ -93,8 +93,8 @@ local function switch_names(enabled)
 			end
 			for _, name in ipairs(group) do SetCVar(name, WANTED[name]) end
 		end
-	elseif type(EverlookDB.nameplate_titles_before) == "table" then
-		local saved = EverlookDB.nameplate_titles_before
+	elseif type(EverlookSaved.nameplate_titles_before) == "table" then
+		local saved = EverlookSaved.nameplate_titles_before
 		for _, group in ipairs(GROUPS) do
 			if holds_ours(group) then
 				for _, name in ipairs(group) do
@@ -102,7 +102,7 @@ local function switch_names(enabled)
 				end
 			end
 		end
-		EverlookDB.nameplate_titles_before = nil
+		EverlookSaved.nameplate_titles_before = nil
 	end
 end
 

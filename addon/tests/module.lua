@@ -8,7 +8,7 @@ return function(root, check)
 		local env = setmetatable({}, { __index = _G })
 		env._G = env
 		env.frames = frames
-		env.EverlookDB = {}
+		env.EverlookSaved = {}
 		env.EventUtil = {
 			ContinueOnAddOnLoaded = function(name, callback)
 				if loaded[name] then return callback() end
@@ -57,11 +57,11 @@ return function(root, check)
 			options = { amount = { name = "Amount", default = 3, min = 1, max = 5 } },
 			apply = function(enabled) applied[#applied + 1] = enabled end,
 		})
-		check("a module waits for its own addon before its first apply", #applied == 0 and env.EverlookDB.qol == nil)
-		env.EverlookDB.qol = { late = { amount = "three", enabled = true } }
+		check("a module waits for its own addon before its first apply", #applied == 0 and env.EverlookSaved.modules == nil)
+		env.EverlookSaved.modules = { late = { amount = "three", enabled = true } }
 		finish("Everlook_late")
 		check("a module registered after Everlook still gets its defaults and one apply",
-			#applied == 1 and applied[1] == true and registry.get("late", "amount") == 3 and env.EverlookDB.qol.late.amount == nil)
+			#applied == 1 and applied[1] == true and registry.get("late", "amount") == 3 and env.EverlookSaved.modules.late.amount == nil)
 	end
 
 	do
@@ -76,21 +76,21 @@ return function(root, check)
 		})
 		finish("Everlook_sliders")
 		registry.set("sliders", "whole", 13.47)
-		check("a slider value snaps to its nearest step", registry.get("sliders", "whole") == 13 and env.EverlookDB.qol.sliders.whole == 13)
+		check("a slider value snaps to its nearest step", registry.get("sliders", "whole") == 13 and env.EverlookSaved.modules.sliders.whole == 13)
 		registry.set("sliders", "coarse", 97)
 		check("a step wider than one snaps to its multiple", registry.get("sliders", "coarse") == 95)
 		registry.set("sliders", "coarse", 98)
 		check("a value halfway past a step rounds up", registry.get("sliders", "coarse") == 100)
 		registry.set("sliders", "fraction", 0.1 + 0.2)
-		check("a fractional step stores exactly the number it names", env.EverlookDB.qol.sliders.fraction == 0.3)
+		check("a fractional step stores exactly the number it names", env.EverlookSaved.modules.sliders.fraction == 0.3)
 		registry.set("sliders", "quarter", 0.4)
 		check("a quarter step snaps from the minimum", registry.get("sliders", "quarter") == 0.5)
 		registry.set("sliders", "coarse", 500)
 		check("a value above the maximum is held at it", registry.get("sliders", "coarse") == 150)
 		registry.set("sliders", "coarse", 1)
 		check("a value below the minimum is held at it", registry.get("sliders", "coarse") == 80)
-		env.EverlookDB.qol.sliders.fraction = 0.1 + 0.2
-		env.EverlookDB.qol.sliders.whole = 13.4
+		env.EverlookSaved.modules.sliders.fraction = 0.1 + 0.2
+		env.EverlookSaved.modules.sliders.whole = 13.4
 		check("a saved value off its step reads back on it", registry.get("sliders", "fraction") == 0.3 and registry.get("sliders", "whole") == 13)
 	end
 
@@ -148,9 +148,9 @@ return function(root, check)
 		finish("Everlook_loot")
 		finish("Everlook_mail")
 		check("an extension's option is saved under the host",
-			registry.get("host", "feed_loot") == false and registry.get("host", "feed_mail") == true and env.EverlookDB.qol.host.feed_mail == nil)
+			registry.get("host", "feed_loot") == false and registry.get("host", "feed_mail") == true and env.EverlookSaved.modules.host.feed_mail == nil)
 		registry.set("host", "feed_loot", true)
-		check("an extension option is set through the host", env.EverlookDB.qol.host.feed_loot == true and registry.get("host", "feed_loot") == true)
+		check("an extension option is set through the host", env.EverlookSaved.modules.host.feed_loot == true and registry.get("host", "feed_loot") == true)
 		check("an option name is taken once per host", not pcall(registry.extend, "host", {
 			id = "clash", addon = "Everlook_clash", order = 30, options = { size = { name = "Size", default = 1 } },
 		}))
@@ -232,7 +232,7 @@ return function(root, check)
 		-- The host's addon finishes loading before an extension's addon calls extend, as the
 		-- island's does before its feeds, and the player had the host on last session.
 		local registry, env, finish, fire = load_registry()
-		env.EverlookDB.qol = { host = { enabled = true } }
+		env.EverlookSaved.modules = { host = { enabled = true } }
 		local heard = {}
 		plain(registry, "host", "island", 10)
 		finish("Everlook_host")
@@ -257,7 +257,7 @@ return function(root, check)
 
 	do
 		local registry, env, finish = load_registry()
-		env.EverlookDB.qol = { tidy = { enabled = true, amount = 3, size = 2, mode = "gone" } }
+		env.EverlookSaved.modules = { tidy = { enabled = true, amount = 3, size = 2, mode = "gone" } }
 		plain(registry, "tidy", "map", 10, {
 			options = {
 				amount = { name = "Amount", default = 3, min = 1, max = 5 },
@@ -266,7 +266,7 @@ return function(root, check)
 			},
 		})
 		finish("Everlook_tidy")
-		local stored = env.EverlookDB.qol.tidy
+		local stored = env.EverlookSaved.modules.tidy
 		check("a value equal to its default is not kept", stored.amount == nil)
 		check("a value the player changed is kept", stored.enabled == true and stored.size == 2)
 		check("a value no longer on the list is dropped", stored.mode == nil and registry.get("tidy", "mode") == "a")
@@ -278,10 +278,10 @@ return function(root, check)
 		local registry, env, finish = load_registry()
 		plain(registry, "moved", "map", 10, { options = { limit = { name = "Limit", default = 5, min = 1, max = 9 } } })
 		finish("Everlook_moved")
-		check("an untouched option reads the default and stores nothing", registry.get("moved", "limit") == 5 and env.EverlookDB.qol.moved.limit == nil)
-		local db = env.EverlookDB
+		check("an untouched option reads the default and stores nothing", registry.get("moved", "limit") == 5 and env.EverlookSaved.modules.moved.limit == nil)
+		local db = env.EverlookSaved
 		local later, later_env, later_finish = load_registry()
-		later_env.EverlookDB = db
+		later_env.EverlookSaved = db
 		plain(later, "moved", "map", 10, { options = { limit = { name = "Limit", default = 7, min = 1, max = 9 } } })
 		later_finish("Everlook_moved")
 		check("a default that changes in code reaches a player who never set it", later.get("moved", "limit") == 7)

@@ -32,7 +32,7 @@ end
 
 local function setting(page, module, key)
 	local option = module.options[key]
-	local variable = "Everlook_QoL_" .. module.id .. "_" .. key
+	local variable = "Everlook_" .. module.id .. "_" .. key
 	local proxy = Settings.RegisterProxySetting(page, variable, type(option.default), option.name, shown(option, option.default),
 		function() return shown(option, registry.get(module.id, key)) end,
 		function(value) registry.set(module.id, key, option.percent and value / 100 or value) end)

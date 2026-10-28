@@ -343,7 +343,7 @@ class LayoutTest(unittest.TestCase):
                 self.assertEqual(fields.get("Group"), "Everlook")
                 self.assertTrue(fields.get("Notes"))
                 self.assertNotIn("Version", fields, "pack.sh stamps the version")
-                self.assertNotIn("SavedVariables", fields, "settings live in EverlookDB")
+                self.assertNotIn("SavedVariables", fields, "settings live in EverlookSaved")
 
 
 class IslandLayoutHtmlTest(unittest.TestCase):

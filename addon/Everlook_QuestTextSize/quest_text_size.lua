@@ -28,17 +28,17 @@ end
 -- reload the game already holds what this set, and putting that back would never undo it.
 local function update_instant(enabled)
 	if type(GetCVar) ~= "function" or type(SetCVar) ~= "function" then return end
-	EverlookDB = EverlookDB or {}
+	EverlookSaved = EverlookSaved or {}
 	if not (enabled and module.get(id, "instant_text")) then
-		if EverlookDB.quest_text_size_before ~= nil then
-			SetCVar(INSTANT, EverlookDB.quest_text_size_before)
-			EverlookDB.quest_text_size_before = nil
+		if EverlookSaved.quest_text_size_before ~= nil then
+			SetCVar(INSTANT, EverlookSaved.quest_text_size_before)
+			EverlookSaved.quest_text_size_before = nil
 		end
 		return
 	end
 	local current = GetCVar(INSTANT)
 	if type(current) ~= "string" or (issecretvalue and issecretvalue(current)) then return end
-	if EverlookDB.quest_text_size_before == nil then EverlookDB.quest_text_size_before = current end
+	if EverlookSaved.quest_text_size_before == nil then EverlookSaved.quest_text_size_before = current end
 	SetCVar(INSTANT, "1")
 end
 

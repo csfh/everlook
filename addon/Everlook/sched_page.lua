@@ -136,7 +136,7 @@ local function startup()
 		line("Lua memory, KB", whole(memory.core_files) .. " at the start, " .. whole(memory.loading_done) .. " at the end" .. (held and (", collector held until " .. tostring(held)) or ""))
 	end
 	line("Loading screen ended", marks.loading_done and (whole(marks.loading_done) .. " ms after Everlook began") or "not yet")
-	local history = EverlookDB and EverlookDB.load_trace_history
+	local history = EverlookSaved and EverlookSaved.load_trace_history
 	if type(history) == "table" and #history > 0 then
 		local done = {}
 		for index = math.max(1, #history - 5), #history do

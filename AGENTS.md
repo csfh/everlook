@@ -4,7 +4,7 @@ Everlook is a collection of World of Warcraft quality-of-life addons and a stati
 
 | Path | What it is |
 | --- | --- |
-| `addon/` | Lua 5.1 addons. No Ace, LibStub, or embeds. `Everlook` is the core. Each `Everlook_<Name>` is a module addon that depends on it and starts disabled. TOC order is wiring. Settings live in `EverlookDB.qol`. `addon/AGENTS.md` has the rules modules follow. |
+| `addon/` | Lua 5.1 addons. No Ace, LibStub, or embeds. `Everlook` is the core. Each `Everlook_<Name>` is a module addon that depends on it and starts disabled. TOC order is wiring. Settings live in `EverlookSaved.modules`. `addon/AGENTS.md` has the rules modules follow. |
 | `addon/harness/` | Rust host (`mlua`, Lua 5.1) that runs the addon files with the game's frame, mouse and clock rules. Scenarios are `addon/harness/scenarios`, run against the addon folders one level up. It never ships. |
 | `www/` | Vite static site for Cloudflare Pages. It reads the module list from the addon TOCs at build time. Build output is `www/dist`. |
 

@@ -8,7 +8,7 @@ return function(root, check)
 	local function load_bags(extra)
 		local env = setmetatable({}, { __index = _G })
 		env._G = env
-		env.EverlookDB = {}
+		env.EverlookSaved = {}
 		env.IsShiftKeyDown = function() return false end
 		env.IsLoggedIn = function() return true end
 		local loaded = {}
@@ -399,8 +399,8 @@ return function(root, check)
 		check("a secret id pins nothing", guarded.toggle({}, secret) == nil and not guarded.is_pinned({ [secret] = true }, secret))
 		local saved = pins.data()
 		check("the pin table lives with the Bags settings and survives being asked for again",
-			saved == env.EverlookDB.qol.bags.pinned and pins.data() == saved)
-		check("pins and junk marks are kept apart", env.EverlookDB.qol.bags.junk == nil or env.EverlookDB.qol.bags.junk ~= saved)
+			saved == env.EverlookSaved.modules.bags.pinned and pins.data() == saved)
+		check("pins and junk marks are kept apart", env.EverlookSaved.modules.bags.junk == nil or env.EverlookSaved.modules.bags.junk ~= saved)
 	end
 
 	-- The custom section store: which custom section an item was put in.
@@ -425,7 +425,7 @@ return function(root, check)
 		data[1111] = 7
 		check("a saved section that does not exist is in none", assign.of(data, 1111) == nil)
 		local saved = assign.data()
-		check("the table lives with the Bags settings and survives being asked for again", saved == env.EverlookDB.qol.bags.assigned and assign.data() == saved)
+		check("the table lives with the Bags settings and survives being asked for again", saved == env.EverlookSaved.modules.bags.assigned and assign.data() == saved)
 	end
 
 	-- What the module remembers about each character's bags and bank.
@@ -473,7 +473,7 @@ return function(root, check)
 		check("a secret item gives nothing", #guarded.others(root, "Me-Realm", secret) == 0)
 		check("a character is keyed by name and realm", alts.key("Mage", "Realm") == "Mage-Realm" and alts.key(nil, "Realm") == nil and alts.key("Mage", "") == nil)
 		local saved = alts.data()
-		check("the remembered items live with the Bags settings, apart from the option", saved == env.EverlookDB.qol.bags.remembered and type(saved.characters) == "table" and alts.data() == saved)
+		check("the remembered items live with the Bags settings, apart from the option", saved == env.EverlookSaved.modules.bags.remembered and type(saved.characters) == "table" and alts.data() == saved)
 	end
 
 	-- The recent list: what arrived in the bags this session, from the item totals now and before.
@@ -527,7 +527,7 @@ return function(root, check)
 		local guarded = load_bags({ issecretvalue = function(value) return value == secret end }).bags_folds
 		check("a secret key folds nothing", guarded.toggle({}, secret) == nil)
 		local saved = folds.data()
-		check("the fold table lives with the Bags settings and survives being asked for again", saved == env.EverlookDB.qol.bags.folded and folds.data() == saved)
+		check("the fold table lives with the Bags settings and survives being asked for again", saved == env.EverlookSaved.modules.bags.folded and folds.data() == saved)
 	end
 
 	-- Registration.
@@ -1059,7 +1059,7 @@ return function(root, check)
 		-- Folding does not hide the section shown alone.
 		info[3] = { itemID = 1003, hyperlink = "link3", quality = 1, class = 0, level = 1, stackCount = 1 }
 		addon.module.set("bags", "fold", true)
-		env.EverlookDB.qol.bags.folded = { prep = true }
+		env.EverlookSaved.modules.bags.folded = { prep = true }
 		frame:UpdateItems()
 		rows = rows_of(list)
 		rows[3].scripts.OnClick(rows[3])
@@ -1188,48 +1188,48 @@ return function(root, check)
 		check("with no custom section in use no slot listens", frame.buttons[3].hooks == nil)
 		addon.module.set("bags", "custom1", "keep")
 		check("naming a custom section makes every slot listen", frame.buttons[3].hooks and frame.buttons[3].hooks.OnMouseUp ~= nil)
-		check("a middle-click without Ctrl assigns nothing", (function() middle_click(frame.buttons[3]) return next(env.EverlookDB.qol.bags.assigned or {}) == nil end)())
+		check("a middle-click without Ctrl assigns nothing", (function() middle_click(frame.buttons[3]) return next(env.EverlookSaved.modules.bags.assigned or {}) == nil end)())
 		ctrl = true
 		middle_click(frame.buttons[3])
-		check("Ctrl and a middle-click puts the item in the first custom section in use, saved by item id", env.EverlookDB.qol.bags.assigned[1003] == 1)
+		check("Ctrl and a middle-click puts the item in the first custom section in use, saved by item id", env.EverlookSaved.modules.bags.assigned[1003] == 1)
 		check("the item moves to its own section above the types", at(frame.buttons[3], -378, 142) and at(frame.buttons[1], -378, 71) and at(frame.buttons[4], -378, 0))
 		check("the section is named by the choice", header_named(env, frame, "Keep").shown and header_named(env, frame, "Keep").texts[2].content == "1")
 		middle_click(frame.buttons[3])
-		check("with one section in use the next click takes the item out again", next(env.EverlookDB.qol.bags.assigned) == nil and at(frame.buttons[3], -378, 71))
+		check("with one section in use the next click takes the item out again", next(env.EverlookSaved.modules.bags.assigned) == nil and at(frame.buttons[3], -378, 71))
 
 		addon.module.set("bags", "custom3", "sell")
 		middle_click(frame.buttons[3])
 		middle_click(frame.buttons[3])
-		check("the next click goes to the next section in use, skipping the one that is off", env.EverlookDB.qol.bags.assigned[1003] == 3 and header_named(env, frame, "Sell").shown and not header_named(env, frame, "Keep").shown)
+		check("the next click goes to the next section in use, skipping the one that is off", env.EverlookSaved.modules.bags.assigned[1003] == 3 and header_named(env, frame, "Sell").shown and not header_named(env, frame, "Keep").shown)
 		middle_click(frame.buttons[3])
-		check("after the last it is in none again", next(env.EverlookDB.qol.bags.assigned) == nil)
+		check("after the last it is in none again", next(env.EverlookSaved.modules.bags.assigned) == nil)
 
 		middle_click(frame.buttons[3])
 		addon.module.set("bags", "custom1", "off")
-		check("a section turned off hands its items back to their types and keeps the assignment", at(frame.buttons[3], -378, 142) == false and env.EverlookDB.qol.bags.assigned[1003] == 1 and at(frame.buttons[3], -378, 71))
+		check("a section turned off hands its items back to their types and keeps the assignment", at(frame.buttons[3], -378, 142) == false and env.EverlookSaved.modules.bags.assigned[1003] == 1 and at(frame.buttons[3], -378, 71))
 		addon.module.set("bags", "custom1", "keep")
 		check("turning it back on brings them back", at(frame.buttons[3], -378, 142))
 
 		addon.module.set("bags", "pins", true)
 		ctrl = false
 		middle_click(frame.buttons[1])
-		check("a plain middle-click still pins", env.EverlookDB.qol.bags.pinned[1001] == true)
+		check("a plain middle-click still pins", env.EverlookSaved.modules.bags.pinned[1001] == true)
 		ctrl = true
 		middle_click(frame.buttons[2])
-		check("with Ctrl it assigns, not pins", env.EverlookDB.qol.bags.assigned[1002] == 1 and env.EverlookDB.qol.bags.pinned[1002] == nil)
+		check("with Ctrl it assigns, not pins", env.EverlookSaved.modules.bags.assigned[1002] == 1 and env.EverlookSaved.modules.bags.pinned[1002] == nil)
 		check("a pinned item stays pinned over a custom section", (function()
 			middle_click(frame.buttons[1])
-			return env.EverlookDB.qol.bags.assigned[1001] == 1 and header_named(env, frame, "Pinned").shown
+			return env.EverlookSaved.modules.bags.assigned[1001] == 1 and header_named(env, frame, "Pinned").shown
 		end)())
 
 		addon.module.set("bags", "custom1", "off")
 		addon.module.set("bags", "custom3", "off")
 		middle_click(frame.buttons[2])
-		check("with every section off Ctrl and a middle-click does nothing", env.EverlookDB.qol.bags.assigned[1002] == 1)
+		check("with every section off Ctrl and a middle-click does nothing", env.EverlookSaved.modules.bags.assigned[1002] == 1)
 		addon.module.set("bags", "custom1", "keep")
 		addon.module.set("bags", "group", false)
 		middle_click(frame.buttons[3])
-		check("with grouping off Ctrl and a middle-click does nothing", env.EverlookDB.qol.bags.assigned[1003] == 1 and not header_named(env, frame, "Keep").shown)
+		check("with grouping off Ctrl and a middle-click does nothing", env.EverlookSaved.modules.bags.assigned[1003] == 1 and not header_named(env, frame, "Keep").shown)
 	end
 	do
 		-- No way to tell if Ctrl is down: nothing is assigned.
@@ -1237,7 +1237,7 @@ return function(root, check)
 		local addon, env, frame = group_setup(3, entries, { IsControlKeyDown = false })
 		addon.module.set("bags", "group", true)
 		addon.module.set("bags", "custom1", "keep")
-		check("without a way to read Ctrl a middle-click assigns nothing", pcall(frame.buttons[1].hooks.OnMouseUp, frame.buttons[1], "MiddleButton") and next(env.EverlookDB.qol.bags.assigned or {}) == nil)
+		check("without a way to read Ctrl a middle-click assigns nothing", pcall(frame.buttons[1].hooks.OnMouseUp, frame.buttons[1], "MiddleButton") and next(env.EverlookSaved.modules.bags.assigned or {}) == nil)
 	end
 	do
 		-- Remembering the items on each character, and telling where else an item is.
@@ -1275,17 +1275,17 @@ return function(root, check)
 		end
 		addon.module.set("bags", "enabled", true)
 		fire("BAG_UPDATE_DELAYED")
-		check("with remembering off nothing is stored", env.EverlookDB.qol.bags.remembered == nil)
+		check("with remembering off nothing is stored", env.EverlookSaved.modules.bags.remembered == nil)
 		addon.module.set("bags", "remember", true)
-		local mine = env.EverlookDB.qol.bags.remembered.characters["Me-Realm"]
+		local mine = env.EverlookSaved.modules.bags.remembered.characters["Me-Realm"]
 		check("turning it on remembers the bags at once, under the name and realm", mine and mine.name == "Me" and mine.realm == "Realm" and mine.class == "MAGE" and mine.time == 1000
 			and addon.bags_alts.count(mine.bags, 2589) == 20)
 		check("the bank is not remembered while it is closed", mine.bank == nil)
 		bank_visible = true
 		fire("BANKFRAME_OPENED")
-		mine = env.EverlookDB.qol.bags.remembered.characters["Me-Realm"]
+		mine = env.EverlookSaved.modules.bags.remembered.characters["Me-Realm"]
 		check("opening the bank remembers it, and the warband bank apart", addon.bags_alts.count(mine.bank, 2589) == 40
-			and addon.bags_alts.count(env.EverlookDB.qol.bags.remembered.warband.bank, 4306) == 15)
+			and addon.bags_alts.count(env.EverlookSaved.modules.bags.remembered.warband.bank, 4306) == 15)
 		contents["0:1"] = { itemID = 2589, stackCount = 25, quality = 1 }
 		fire("BAG_UPDATE_DELAYED")
 		check("the bags are looked at again when they change", addon.bags_alts.count(mine.bags, 2589) == 25)
@@ -1293,10 +1293,10 @@ return function(root, check)
 		bank_visible = false
 		fire("BAG_UPDATE_DELAYED")
 		check("a closed bank is not looked at, so what was remembered stays",
-			addon.bags_alts.count(env.EverlookDB.qol.bags.remembered.characters["Me-Realm"].bank, 2589) == 40)
+			addon.bags_alts.count(env.EverlookSaved.modules.bags.remembered.characters["Me-Realm"].bank, 2589) == 40)
 
 		-- Others are seeded; the tooltip says where else an item is.
-		local root = env.EverlookDB.qol.bags.remembered
+		local root = env.EverlookSaved.modules.bags.remembered
 		root.characters["Mage-Realm"] = { name = "Mage", realm = "Realm", bags = { [0] = { [1] = { 2589, 7, 1 } } }, bank = { [6] = { [1] = { 2589, 3, 1 } } } }
 		check("the game is asked to add to item tooltips once the module is on", type(posted) == "function")
 		local shown = tooltip()
@@ -1330,7 +1330,7 @@ return function(root, check)
 		contents["0:1"] = { itemID = 2589, stackCount = 99, quality = 1 }
 		fire("BAG_UPDATE_DELAYED")
 		check("with remembering off the bags are not looked at, and what was kept stays",
-			addon.bags_alts.count(env.EverlookDB.qol.bags.remembered.characters["Me-Realm"].bags, 2589) == 25)
+			addon.bags_alts.count(env.EverlookSaved.modules.bags.remembered.characters["Me-Realm"].bags, 2589) == 25)
 	end
 	do
 		-- Folding: a click on a header folds its section down to the header.
@@ -1370,7 +1370,7 @@ return function(root, check)
 			prep.texts[1].points[1][1] == "LEFT" and prep.texts[1].points[1][3] == "LEFT" and prep.texts[1].points[1][4] == 2 + 14 + 4)
 		frame.buttons[3].alpha = 0.6
 		prep.scripts.OnClick(prep)
-		check("a click folds the section and the choice is saved", env.EverlookDB.qol.bags.folded.prep == true)
+		check("a click folds the section and the choice is saved", env.EverlookSaved.modules.bags.folded.prep == true)
 		check("the folded slot is parked at the grid corner, clear and not clickable",
 			at(frame.buttons[3], 0, 0) and frame.buttons[3].alpha == 0 and frame.buttons[3].mouse == false)
 		check("the sections below and above close up, the folded header between them",
@@ -1382,14 +1382,14 @@ return function(root, check)
 		check("the folded header sits at the bottom of its place", prep.points[1][5] == 4 + 142)
 		prep.scripts.OnClick(prep)
 		check("a second click opens it and the slot is back, solid and clickable",
-			at(frame.buttons[3], -378, 142) and frame.buttons[3].alpha == 0.6 and frame.buttons[3].mouse == true and next(env.EverlookDB.qol.bags.folded) == nil)
+			at(frame.buttons[3], -378, 142) and frame.buttons[3].alpha == 0.6 and frame.buttons[3].mouse == true and next(env.EverlookSaved.modules.bags.folded) == nil)
 
 		prep.scripts.OnClick(prep)
 		addon.module.set("bags", "fold", false)
 		check("turning folding off opens every section, keeps the fold and stops the header taking clicks",
-			at(frame.buttons[3], -378, 142) and frame.buttons[3].alpha == 0.6 and env.EverlookDB.qol.bags.folded.prep == true and prep.mouse == false)
+			at(frame.buttons[3], -378, 142) and frame.buttons[3].alpha == 0.6 and env.EverlookSaved.modules.bags.folded.prep == true and prep.mouse == false)
 		prep.scripts.OnClick(prep)
-		check("a click that still arrives with folding off does nothing", env.EverlookDB.qol.bags.folded.prep == true)
+		check("a click that still arrives with folding off does nothing", env.EverlookSaved.modules.bags.folded.prep == true)
 		check("with folding off the title goes back to the header's edge and the arrow is hidden", prep.texts[1].points[1][4] == 2 and (function()
 			for _, texture in ipairs(prep.textures) do if texture.atlas == "campaign_headericon_open" and texture.shown then return false end end
 			return true
@@ -1421,31 +1421,31 @@ return function(root, check)
 
 		frame.buttons[3].mouse_over = true
 		frame.buttons[3].hooks.OnMouseUp(frame.buttons[3], "LeftButton")
-		check("a left click pins nothing", next(env.EverlookDB.qol.bags or {}) == nil or next(env.EverlookDB.qol.bags.pinned or {}) == nil)
+		check("a left click pins nothing", next(env.EverlookSaved.modules.bags or {}) == nil or next(env.EverlookSaved.modules.bags.pinned or {}) == nil)
 		middle_click(frame.buttons[3])
-		check("a middle-click pins the item and it is saved by item id", env.EverlookDB.qol.bags.pinned[1003] == true)
+		check("a middle-click pins the item and it is saved by item id", env.EverlookSaved.modules.bags.pinned[1003] == true)
 		check("the pinned item moves to the top section at once, though the pointer is on it",
 			at(frame.buttons[3], -378, 142) and at(frame.buttons[1], -378, 71) and at(frame.buttons[2], -336, 71) and at(frame.buttons[4], -378, 0))
 		check("the pinned section has a header and a count", header_named(env, frame, "Pinned").shown and header_named(env, frame, "Pinned").texts[2].content == "1")
 		check("the section the item left loses its header", not header_named(env, frame, "Adventure Prep").shown)
 		frame.buttons[3].mouse_over = false
 		middle_click(frame.buttons[3])
-		check("a second middle-click unpins it and it goes back to its type", at(frame.buttons[3], -378, 71) and at(frame.buttons[1], -378, 142) and next(env.EverlookDB.qol.bags.pinned) == nil)
+		check("a second middle-click unpins it and it goes back to its type", at(frame.buttons[3], -378, 71) and at(frame.buttons[1], -378, 142) and next(env.EverlookSaved.modules.bags.pinned) == nil)
 
 		middle_click(frame.buttons[3])
 		addon.module.set("bags", "pins", false)
-		check("turning pins off puts the item back under its type and keeps the pin", at(frame.buttons[3], -378, 71) and env.EverlookDB.qol.bags.pinned[1003] == true)
+		check("turning pins off puts the item back under its type and keeps the pin", at(frame.buttons[3], -378, 71) and env.EverlookSaved.modules.bags.pinned[1003] == true)
 		middle_click(frame.buttons[3])
-		check("with pins off a middle-click does nothing", env.EverlookDB.qol.bags.pinned[1003] == true and at(frame.buttons[3], -378, 71))
+		check("with pins off a middle-click does nothing", env.EverlookSaved.modules.bags.pinned[1003] == true and at(frame.buttons[3], -378, 71))
 		addon.module.set("bags", "pins", true)
 		check("turning pins back on brings the pin back", at(frame.buttons[3], -378, 142))
 		addon.module.set("bags", "group", false)
 		middle_click(frame.buttons[3])
-		check("with grouping off a middle-click does nothing", env.EverlookDB.qol.bags.pinned[1003] == true and at(frame.buttons[3], -84, 0))
+		check("with grouping off a middle-click does nothing", env.EverlookSaved.modules.bags.pinned[1003] == true and at(frame.buttons[3], -84, 0))
 		addon.module.set("bags", "group", true)
 		addon.module.set("bags", "enabled", false)
 		middle_click(frame.buttons[2])
-		check("with Bags off a middle-click does nothing", env.EverlookDB.qol.bags.pinned[1002] == nil)
+		check("with Bags off a middle-click does nothing", env.EverlookSaved.modules.bags.pinned[1002] == nil)
 	end
 	do
 		-- Recent items: what arrived in the bags this session.
@@ -1464,7 +1464,7 @@ return function(root, check)
 		bags_changed()
 		check("a new item goes to the recent section at the top", at(frame.buttons[4], -378, 213) and at(frame.buttons[1], -378, 142) and at(frame.buttons[3], -378, 71) and at(frame.buttons[5], -378, 0))
 		check("the recent section has a header and a count", header_named(env, frame, "Recent").shown and header_named(env, frame, "Recent").texts[2].content == "1")
-		check("the list is not saved", type(env.EverlookDB.qol.bags.recent) ~= "table")
+		check("the list is not saved", type(env.EverlookSaved.modules.bags.recent) ~= "table")
 
 		info[5] = { itemID = 1005, hyperlink = "link5", quality = 0, class = 15, level = 1, stackCount = 1 }
 		bags_changed()
@@ -1725,7 +1725,7 @@ return function(root, check)
 		local addon, env = load_bags()
 		local data = addon.bags_junk.data()
 		check("the junk table lives with the Bags settings and survives being asked for again",
-			data == env.EverlookDB.qol.bags.junk and addon.bags_junk.data() == data)
+			data == env.EverlookSaved.modules.bags.junk and addon.bags_junk.data() == data)
 	end
 
 	-- Registration of the marker option.
@@ -1796,7 +1796,7 @@ return function(root, check)
 
 		local empty = buttons_with(env.created, frame.buttons[4])[1]
 		empty.scripts.OnClick(empty)
-		check("clicking an empty slot marks nothing", next(env.EverlookDB.qol.bags.junk) == nil)
+		check("clicking an empty slot marks nothing", next(env.EverlookSaved.modules.bags.junk) == nil)
 
 		first.scripts.OnClick(first)
 		first.scripts.OnEnter(first)
@@ -1830,14 +1830,14 @@ return function(root, check)
 
 		addon.module.set("bags", "junk_marker", false)
 		check("turning the marker off hides the coin button, the coins and any overlay", coin.shown == false and junk_coin(frame.buttons[2]) == nil)
-		check("turning the marker off keeps what was marked", env.EverlookDB.qol.bags.junk[1001] == true)
+		check("turning the marker off keeps what was marked", env.EverlookSaved.modules.bags.junk[1001] == true)
 		check("with the marker off nothing counts as junk", addon.bags.is_junk(1001) == false)
 		addon.module.set("bags", "junk_marker", true)
 		check("turning it back on brings the button, the coins and the marks back", coin.shown == true and junk_coin(frame.buttons[2]) ~= nil and addon.bags.is_junk(1001) == true)
 
 		addon.module.set("bags", "enabled", false)
 		check("turning the module off hides the button and the coins", coin.shown == false and junk_coin(frame.buttons[2]) == nil)
-		check("with the module off nothing counts as junk, though the marks are kept", addon.bags.is_junk(1001) == false and env.EverlookDB.qol.bags.junk[1001] == true)
+		check("with the module off nothing counts as junk, though the marks are kept", addon.bags.is_junk(1001) == false and env.EverlookSaved.modules.bags.junk[1001] == true)
 	end
 	do
 		-- Mark mode must not outlive the option that turns it on.

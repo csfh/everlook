@@ -24,11 +24,11 @@ end
 
 -- The saved table, kept with the rest of the Bags settings. Its key is not the option's name, which would share it.
 function pins.data()
-	EverlookDB = EverlookDB or {}
-	EverlookDB.qol = EverlookDB.qol or {}
-	EverlookDB.qol.bags = EverlookDB.qol.bags or {}
-	EverlookDB.qol.bags.pinned = EverlookDB.qol.bags.pinned or {}
-	return EverlookDB.qol.bags.pinned
+	EverlookSaved = EverlookSaved or {}
+	EverlookSaved.modules = EverlookSaved.modules or {}
+	EverlookSaved.modules.bags = EverlookSaved.modules.bags or {}
+	EverlookSaved.modules.bags.pinned = EverlookSaved.modules.bags.pinned or {}
+	return EverlookSaved.modules.bags.pinned
 end
 
 Everlook.bags_pins = pins
