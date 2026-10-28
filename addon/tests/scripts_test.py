@@ -303,7 +303,8 @@ class LayoutTest(unittest.TestCase):
                         self.assertEqual(path.stem, module_id)
                     else:
                         self.assertTrue(path.stem == module_id or path.stem.startswith(module_id + "_"), path.stem)
-                    tables = set(re.findall(r"^\s*(?:function\s+)?Everlook\.([a-z_]+)\s*[=(]", path.read_text(), re.M))
+                    defined = re.findall(r"^\s*(?:function\s+Everlook\.([a-z_]+)\s*\(|Everlook\.([a-z_]+)\s*=(?!=))", path.read_text(), re.M)
+                    tables = {function or assigned for function, assigned in defined}
                     self.assertLessEqual(tables, {module_id, path.stem})
 
     NAMEPLATE_PROVIDERS = {"QuestNameplates", "NameplateTitles"}
