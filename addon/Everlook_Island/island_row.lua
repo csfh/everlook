@@ -99,14 +99,14 @@ function row.natural_width(spec, measure, ring_size, reserve)
 	return width + SPACE.edge + (reserve or 0)
 end
 
-local Row = {}
-Row.__index = Row
+local instance = {}
+instance.__index = instance
 
 -- host brings the island's own pieces: label(parent, justify, role), the rings
 -- table (make, chain, set, hide), ring_size and, optionally, the font role of the
 -- title (the capsule's is the large one; a list row's is the text size) and, for the capsule, center_alone.
 function row.new(parent, host)
-	local self = setmetatable({ parent = parent, host = host, labels = {}, label_count = 0 }, Row)
+	local self = setmetatable({ parent = parent, host = host, labels = {}, label_count = 0 }, instance)
 	self.icon = call(parent, "CreateTexture", nil, "OVERLAY")
 	call(self.icon, "SetSize", 16, 16)
 	call(self.icon, "SetPoint", "LEFT", parent, "LEFT", SPACE.lead, 0)
@@ -139,12 +139,12 @@ local function text_of(item)
 	return item
 end
 
-function Row:width_of(region)
+function instance:width_of(region)
 	return call(region, "GetStringWidth") or 0
 end
 
 -- The room the labels and badge take together, gaps included.
-function Row:trailing_width()
+function instance:trailing_width()
 	local total, parts = 0, 0
 	for index = 1, self.label_count do
 		total, parts = total + self:width_of(self.labels[index]), parts + 1
@@ -154,7 +154,7 @@ function Row:trailing_width()
 end
 
 -- The width of one label, or of the badge for "badge".
-function Row:part_width(which)
+function instance:part_width(which)
 	if which == "badge" then return self.has_badge and self:width_of(self.badge) or 0 end
 	return self.labels[which] and self:width_of(self.labels[which]) or 0
 end
@@ -179,11 +179,11 @@ local function ask(self)
 end
 
 -- Turns an arrow that asks for its angle. It moves no frame and lays nothing out, so it can run ten times a second.
-function Row:tick()
+function instance:tick()
 	if self.arrow_function and not self.arrow_failed then self:aim(ask(self)) end
 end
 
-function Row:aim(angle)
+function instance:aim(angle)
 	self.angle = angle
 	row.show_arrow(self.arrow, angle)
 	call(self.icon, (self.has_icon and angle == nil) and "Show" or "Hide")
@@ -192,7 +192,7 @@ end
 -- Puts every part from a spec and lays the row out. A part the spec leaves out is
 -- hidden. spec = { icon = mark, arrow = angle, title = text, ring = { fraction, tone },
 -- labels = { label, ... }, badge = text }. reserve is room kept free at the right edge.
-function Row:set(spec, reserve)
+function instance:set(spec, reserve)
 	spec = spec or {}
 	reserve = reserve or 0
 	self.has_icon = spec.icon ~= nil
@@ -251,7 +251,7 @@ end
 
 -- Sets the title to the wording that fits the room the other parts leave it. Where the row has no width yet, the
 -- first wording stays and the engine clips it as it always did.
-function Row:fit_title(reserve)
+function instance:fit_title(reserve)
 	local wordings = self.wordings
 	local width = call(self.parent, "GetWidth")
 	if not wordings or type(width) ~= "number" or width <= 0 then return end
@@ -268,13 +268,13 @@ function Row:fit_title(reserve)
 end
 
 -- Hides the title while a copy of it travels somewhere else, and shows it again.
-function Row:lend_title(lent)
+function instance:lend_title(lent)
 	call(self.title, "SetAlpha", lent and 0 or 1)
 end
 
 -- Anchors the parts to one another. A part that is hidden is skipped, so no part
 -- needs to know what its neighbours are.
-function Row:layout(reserve)
+function instance:layout(reserve)
 	local parent, rings = self.parent, self.host.rings
 	local right = SPACE.edge + (reserve or 0)
 	local previous

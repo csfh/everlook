@@ -24,8 +24,8 @@ end
 -- link(parent, name, title, callback), set_link_text(button, text), hover(frame, node),
 -- controls (the list that keeps a hover preview open), heading(label, text), rings,
 -- ring_size and space.
-local View = {}
-View.__index = View
+local view = {}
+view.__index = view
 
 -- A table's value columns are this wide, with the island's `near` gap between them.
 local COLUMN_WIDTH = 84
@@ -36,11 +36,11 @@ local BAR_ART = "Interface\\AddOns\\Everlook_Island\\assets\\island_white.tga"
 -- the control height unless told) and across (how many cells share a row, two unless told). A pane
 -- takes the defaults; the header and the metrics under it set their own.
 function blocks.new(parent, host, options)
-	return setmetatable({ parent = parent, host = host, options = options or {}, rows = {}, texts = {}, headings = {}, meters = {}, cells = {}, tables = {} }, View)
+	return setmetatable({ parent = parent, host = host, options = options or {}, rows = {}, texts = {}, headings = {}, meters = {}, cells = {}, tables = {} }, view)
 end
 
 -- The title of the first row drawn, for the one thing that has to know where it sits.
-function View:first_title()
+function view:first_title()
 	return self.rows[1] and self.rows[1].row.title or nil
 end
 
@@ -111,7 +111,7 @@ local function cell_slot(self, index)
 end
 
 -- Turns every arrow that asks for its angle. Cheap: it moves no frame and lays nothing out.
-function View:tick()
+function view:tick()
 	for index = 1, self.used_rows or 0 do self.rows[index].row:tick() end
 end
 
@@ -159,7 +159,7 @@ end
 -- Lays `sections` out one after another from `top`, `width` wide, inside the pane's frame.
 -- With `title_in_band` the first section's title is left out, because the pane's heading band shows it.
 -- Returns where they end (`top` when there is nothing).
-function View:paint(sections, top, width, title_in_band)
+function view:paint(sections, top, width, title_in_band)
 	local host, space = self.host, self.host.space
 	local inset = space.edge
 	local inner = width - 2 * inset

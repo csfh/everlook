@@ -5,15 +5,15 @@ local DEFAULT_ANGLE = 160
 
 local button
 
-local function MinimapSettings()
+local function minimap_settings()
 	local minimap = EverlookDB and EverlookDB.minimap
 	if type(minimap) == "table" then
 		return minimap
 	end
 end
 
-local function Angle()
-	local minimap = MinimapSettings()
+local function saved_angle()
+	local minimap = minimap_settings()
 	local angle = minimap and minimap.angle
 	if type(angle) == "number" then
 		return angle
@@ -21,17 +21,17 @@ local function Angle()
 	return DEFAULT_ANGLE
 end
 
-local function Place()
+local function place()
 	if button:GetParent() ~= Minimap then
 		return
 	end
-	local angle = math.rad(Angle())
+	local angle = math.rad(saved_angle())
 	local radius = (math.max(Minimap:GetWidth(), Minimap:GetHeight()) / 2) + 5
 	button:ClearAllPoints()
 	button:SetPoint("CENTER", Minimap, "CENTER", math.cos(angle) * radius, math.sin(angle) * radius)
 end
 
-local function DragOnUpdate(self)
+local function drag_on_update(self)
 	if self:GetParent() ~= Minimap then
 		self:SetScript("OnUpdate", nil)
 		return
@@ -43,12 +43,12 @@ local function DragOnUpdate(self)
 	local cx, cy = GetCursorPosition()
 	local scale = Minimap:GetEffectiveScale()
 	cx, cy = cx / scale, cy / scale
-	EverlookDB.minimap = MinimapSettings() or {}
+	EverlookDB.minimap = minimap_settings() or {}
 	EverlookDB.minimap.angle = math.deg(math.atan2(cy - my, cx - mx))
-	Place()
+	place()
 end
 
-local function CreateButton()
+local function create_button()
 	button = CreateFrame("Button", "EverlookMinimapButton", Minimap)
 	button:SetSize(31, 31)
 	button:SetFrameStrata("MEDIUM")
@@ -92,14 +92,14 @@ local function CreateButton()
 	button:RegisterForDrag("LeftButton")
 	button:SetScript("OnDragStart", function(self)
 		GameTooltip:Hide()
-		self:SetScript("OnUpdate", DragOnUpdate)
+		self:SetScript("OnUpdate", drag_on_update)
 	end)
 	button:SetScript("OnDragStop", function(self)
 		self:SetScript("OnUpdate", nil)
-		Place()
+		place()
 	end)
 
-	Place()
+	place()
 	button:Show()
 end
 
@@ -116,8 +116,8 @@ EventUtil.ContinueOnAddOnLoaded(addon_name, function()
 		EverlookDB.minimap = nil
 	end
 
-	CreateButton()
-	EventUtil.ContinueOnPlayerLogin(Place)
+	create_button()
+	EventUtil.ContinueOnPlayerLogin(place)
 end)
 
 -- The last file of the core: what happens before the addon loads is the engine's.
