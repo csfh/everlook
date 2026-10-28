@@ -11,7 +11,7 @@ local snapshot = vitals.snapshot()
 local finite = Everlook.finite
 
 local function option(key)
-	return Everlook.module.get("smart_island", key)
+	return Everlook.module.get("island", key)
 end
 
 local function dismiss(handle)
@@ -87,7 +87,7 @@ end
 local function flush_money(batch)
 	if state.money_batch ~= batch then return end
 	state.money_batch = nil
-	if not Everlook.module.enabled("smart_island") or not option("source_money") or batch.delta == 0
+	if not Everlook.module.enabled("island") or not option("source_money") or batch.delta == 0
 		or math.abs(batch.delta) < option("money_min_silver") * 100 then return end
 	Everlook.island.notify({
 		source = "everlook.money", kind = "money",
@@ -164,7 +164,7 @@ local function follow(signal, _, a, b, c)
 	end
 end
 
-Everlook.module.extend("smart_island", {
+Everlook.module.extend("island", {
 	id = "warnings", addon = addon_name, order = 110,
 	options = {
 		source_bags = { name = "Warn about general bag space", default = true, description = "Warns when general bag space falls to the low free-slot threshold or runs out. Specialty and reagent bags stay out of the count, a bag the client cannot classify stays quiet, space already that low stays quiet until it rises more than two free slots above that threshold and falls again, and turning this off clears the notice.", presets = { Quiet = true, Standard = true, Informative = true } },

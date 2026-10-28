@@ -26,7 +26,7 @@ return function(root, check, island_world)
 
 	do
 		local addon, _, _, _, _, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		local resting
 		for _, frame in ipairs(frames) do if frame.name == "EverlookIslandResting" then resting = frame end end
 		local kinds = {}
@@ -40,7 +40,7 @@ return function(root, check, island_world)
 
 	do
 		local addon, env, _, _, _, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		env.Everlook.island.notify({ source = "Test", key = "right", text = "Right click me", duration = 4,
 			actions = { { id = "go", label = "Go", type = "callback", on_click = function() end } } })
 		layout.settle(frames)
@@ -58,8 +58,8 @@ return function(root, check, island_world)
 	do
 		-- A frame has no `shown` field. The pill's arrows turn only while their capsule is on screen.
 		local addon, env, _, _, _, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "reduced_motion", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "reduced_motion", true)
 		local calls = 0
 		env.Everlook.island.notify({ source = "A", key = "a", presentation = "status", text = "x", capsule = { arrow = function() calls = calls + 1; return 0 end } })
 		layout.settle(frames)

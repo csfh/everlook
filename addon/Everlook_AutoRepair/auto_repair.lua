@@ -12,7 +12,7 @@ local function amount(value)
 end
 
 local function island_enabled()
-	return Everlook.island and type(Everlook.island.notify) == "function" and module.enabled("smart_island") and module.get("smart_island", "source_repair")
+	return Everlook.island and type(Everlook.island.notify) == "function" and module.enabled("island") and module.get("island", "source_repair")
 end
 
 local function notice(payload)

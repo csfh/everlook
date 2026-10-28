@@ -153,7 +153,7 @@ local function settle()
 	if not map_pending(state.loot_handles) then state.loot, state.loot_handles = nil, nil end
 end
 
-Everlook.module.extend("smart_island", {
+Everlook.module.extend("island", {
 	id = "loot", addon = addon_name, order = 20,
 	options = {
 		feed_loot = { name = "Rare loot", default = false, description = "Tells you when you loot a rare item or better, including one that goes straight to your bags or comes from a bonus roll. The same item within two seconds adds to its count, later rare loot joins that notice while it is still up, an item below rare, someone else's loot, a crafted item, or text or a quality the client hides stays quiet, and turning this off clears the notice.", presets = { Quiet = false, Standard = true, Informative = true } },

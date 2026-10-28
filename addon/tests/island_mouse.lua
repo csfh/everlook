@@ -45,9 +45,9 @@ return function(root, check, island_world, quest_world)
 
 	local function open_world(how)
 		local addon, env, _, _, afters, _, frames = quest_world()
-		addon.module.set("smart_island", "quest_context", true)
-		addon.module.set("smart_island", "quest_plan", true)
-		addon.module.set("smart_island", "reduced_motion", how.reduced)
+		addon.module.set("island", "quest_context", true)
+		addon.module.set("island", "quest_plan", true)
+		addon.module.set("island", "reduced_motion", how.reduced)
 		-- A notice changes the capsule, and its ease is still playing when the island opens.
 		env.Everlook.island.notify({ source = "Test", key = "one", text = "A notice", detail = "with detail",
 			actions = { { id = "go", label = "Go", type = "callback", on_click = function() end },

@@ -5,8 +5,8 @@ return function(root, check, island_world)
 
 	local function world()
 		local addon, env, event, state, afters, tickers, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "reduced_motion", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "reduced_motion", true)
 		return addon, env, state, frames, afters
 	end
 
@@ -178,8 +178,8 @@ return function(root, check, island_world)
 		check("dismissing it clears the capsule", api.dismiss(handle) == true and addon.smart_island.view().background == nil)
 
 		api.notify(background())
-		addon.module.set("smart_island", "enabled", false)
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", false)
+		addon.module.set("island", "enabled", true)
 		check("turning the island off clears it", addon.smart_island.view().background == nil)
 	end
 end

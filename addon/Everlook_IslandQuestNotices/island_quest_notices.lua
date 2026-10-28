@@ -220,7 +220,7 @@ local function after_quests()
 	next_quest()
 end
 
-Everlook.module.extend("smart_island", {
+Everlook.module.extend("island", {
 	id = "quest_notices", addon = addon_name, order = 10,
 	options = {
 		source_quest_completion = { name = "Show completed quests", default = false, description = "Shows a notice when you turn in a quest, with the quest name from your log and any copper reward. If the log no longer has the quest, the notice uses its number. A hidden quest id stays quiet.", presets = { Quiet = false, Standard = true, Informative = true } },

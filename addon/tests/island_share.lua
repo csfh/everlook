@@ -38,7 +38,7 @@ return function(_, check, load_qol)
 	local function ready()
 		local addon, env, event = load_qol()
 		arm(env)
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		return addon, env, event
 	end
 
@@ -55,7 +55,7 @@ return function(_, check, load_qol)
 	end
 
 	local addon, env, event = ready()
-	check("sharing an alt-right-click starts on", addon.module.get("smart_island", "share_click") == true)
+	check("sharing an alt-right-click starts on", addon.module.get("island", "share_click") == true)
 
 	point_at_unit(env, "Hogger")
 	env.everlook_share_click()
@@ -145,13 +145,13 @@ return function(_, check, load_qol)
 	check("a keyboard focus stays quiet", #env.said == 0 and #env.sent == 0 and #addon.smart_island.view().notices == 0)
 
 	addon, env = ready()
-	addon.module.set("smart_island", "share_click", false)
+	addon.module.set("island", "share_click", false)
 	point_at_unit(env, "Hogger")
 	env.everlook_share_click()
 	check("turning sharing off stays quiet", #env.said == 0 and #env.sent == 0 and #addon.smart_island.view().notices == 0)
 
 	addon, env, event = ready()
-	addon.module.set("smart_island", "enabled", false)
+	addon.module.set("island", "enabled", false)
 	point_at_unit(env, "Hogger")
 	env.everlook_share_click()
 	event("CHAT_MSG_ADDON", "Everlook", "1\tunit\tHogger", "PARTY", "Kor-Realm")
@@ -219,7 +219,7 @@ return function(_, check, load_qol)
 	check("your own message and a malformed party message stay quiet", #addon.smart_island.view().notices == 0)
 
 	addon, env, event = ready()
-	addon.module.set("smart_island", "share_click", false)
+	addon.module.set("island", "share_click", false)
 	event("CHAT_MSG_ADDON", "Everlook", "1\tunit\tHogger", "PARTY", "Kor")
 	check("turning sharing off still shows a party notice", latest(addon) and latest(addon).text == "Kor: Hogger")
 end

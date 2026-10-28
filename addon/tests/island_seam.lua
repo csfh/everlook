@@ -20,7 +20,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 		end
 		local module
 		for _, candidate in ipairs(addon.module.modules) do
-			if candidate.id == "smart_island" then module = candidate end
+			if candidate.id == "island" then module = candidate end
 		end
 		local layout = { AddInitializer = function(_, row) buttons[row.name] = row end }
 		for _, section in ipairs(addon.module.sections(module) or {}) do
@@ -86,8 +86,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 
 	do
 		local addon, env, event = quest_world()
-		addon.module.set("smart_island", "source_quest_completion", true)
-		addon.module.set("smart_island", "feed_recap", true)
+		addon.module.set("island", "source_quest_completion", true)
+		addon.module.set("island", "feed_recap", true)
 		event("QUEST_TURNED_IN", 23, 10, 50)
 		local completed = 0
 		for _, notice in ipairs(addon.smart_island.view().notices) do
@@ -112,8 +112,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 
 	do
 		local addon, env, event, state, _, tickers = island_world()
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "feed_recap", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "feed_recap", true)
 		state.level = 14
 		tickers[1].callback()
 		check("a missed level marks experience incomplete", show_recap(addon, env) == true
@@ -133,8 +133,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 		local addon, env, _, state = island_world()
 		state.level, state.xp, state.xp_max = 90, 0, 0
 		env.GetMaxPlayerLevel = function() return 90 end
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "feed_recap", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "feed_recap", true)
 		check("the level cap is one question", addon.island_vitals.at_cap(90) == true and addon.island_vitals.at_cap(12) == false)
 		check("the level cap baseline stays quiet", #addon.smart_island.view().notices == 0)
 		check("an empty bar at the level cap counts no experience", show_recap(addon, env) == true
@@ -143,8 +143,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 		local addon2, env2, event2, state2 = island_world()
 		state2.level, state2.xp, state2.xp_max = 89, 500, 1000
 		env2.GetMaxPlayerLevel = function() return 90 end
-		addon2.module.set("smart_island", "enabled", true)
-		addon2.module.set("smart_island", "feed_recap", true)
+		addon2.module.set("island", "enabled", true)
+		addon2.module.set("island", "feed_recap", true)
 		state2.level, state2.xp, state2.xp_max = 90, 0, 0
 		event2("PLAYER_LEVEL_UP", 90)
 		check("reaching the level cap keeps the last bar", show_recap(addon2, env2) == true
@@ -152,8 +152,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 		local addon3, env3, _, state3 = island_world()
 		state3.level, state3.xp, state3.xp_max = 12, 0, 0
 		env3.GetMaxPlayerLevel = function() return 90 end
-		addon3.module.set("smart_island", "enabled", true)
-		addon3.module.set("smart_island", "feed_recap", true)
+		addon3.module.set("island", "enabled", true)
+		addon3.module.set("island", "feed_recap", true)
 		check("a zero bar below the level cap stays incomplete", show_recap(addon3, env3) == true
 			and notice_key(addon3, "session-recap").detail:find("XP incomplete", 1, true))
 	end
@@ -164,8 +164,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 			GetNumFactions = function() scans = scans + 1; return 0 end,
 			GetFactionDataByIndex = function() end,
 		}
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "feed_reputation", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "feed_reputation", true)
 		local baseline = scans
 		for _ = 1, 5 do event("QUEST_LOG_UPDATE") end
 		check("quest log bursts do not poll the reputation feed", scans == baseline)
@@ -183,8 +183,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 			GetNumQuestWatches = function() return 0 end,
 			GetInfo = function() end,
 		}
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "quest_context", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "quest_context", true)
 		state.time = state.time + 10
 		local baseline = scans
 		for _ = 1, 6 do event("QUEST_LOG_UPDATE") end
@@ -194,7 +194,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon, _, _, state, _, tickers, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		local island_frame
 		for _, candidate in ipairs(frames) do if candidate.name == "EverlookSmartIsland" then island_frame = candidate end end
 		local placements = 0
@@ -211,7 +211,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon, _, _, _, _, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		local function surface_alphas()
 			local alphas = {}
 			for _, frame in ipairs(frames) do
@@ -223,26 +223,26 @@ return function(root, check, island_world, quest_world, secret_stat)
 		end
 		local before = surface_alphas()
 		check("the island surface starts at 96 percent", #before > 0 and before[1] == 0.96)
-		addon.module.set("smart_island", "opacity", 82)
+		addon.module.set("island", "opacity", 82)
 		local after = surface_alphas()
 		check("the opacity option retints the surfaces already built", #after == #before and after[1] == 0.82)
 	end
 	do
 		local addon = island_world()
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "inbox_size", 20)
-		addon.module.set("smart_island", "toast_count", 1)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "inbox_size", 20)
+		addon.module.set("island", "toast_count", 1)
 		for index = 1, 15 do addon.island.notify({ source = "Test", key = "n" .. index, text = "Notice " .. index }) end
 		local view = addon.smart_island.view()
 		check("the inbox keeps as many notices as the option allows", #view.notices == 15)
 		check("the toast count option caps the stack", #view.toasts == 1)
-		addon.module.set("smart_island", "inbox_size", 10)
+		addon.module.set("island", "inbox_size", 10)
 		check("lowering the inbox size trims the oldest notices", #addon.smart_island.view().notices == 10)
 	end
 	do
 		local addon = island_world()
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "do_not_disturb", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "do_not_disturb", true)
 		addon.island.notify({ source = "Test", key = "quiet", text = "Routine", severity = "warning" })
 		addon.island.notify({ source = "Test", key = "info", text = "Info" })
 		local view = addon.smart_island.view()
@@ -260,8 +260,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 			end
 		end
 		local addon, env, _, state, afters = island_world()
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "do_not_disturb", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "do_not_disturb", true)
 		addon.island.notify({ source = "Test", key = "quiet", text = "Routine", duration = 4 })
 		run_out(afters, 4)
 		check("a notice do not disturb kept from toasting outlasts its duration", notice_key(addon, "quiet") ~= nil)
@@ -276,39 +276,39 @@ return function(root, check, island_world, quest_world, secret_stat)
 		check("once seen it goes when its time runs out", notice_key(addon, "quiet") == nil)
 
 		addon, env, _, _, afters = island_world()
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "toasts", false)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "toasts", false)
 		addon.island.notify({ source = "Test", key = "untoasted", text = "Routine", duration = 4 })
 		run_out(afters, 4)
 		check("with toasts off a notice outlasts its duration in the inbox", notice_key(addon, "untoasted") ~= nil)
 
 		addon, env, _, _, afters = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		env.InCombatLockdown = function() return true end
 		addon.island.notify({ source = "Test", key = "fight", text = "Routine", duration = 4 })
 		run_out(afters, 4)
 		check("a routine notice kept quiet in combat outlasts its duration", notice_key(addon, "fight") ~= nil)
 
 		addon = island_world()
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "do_not_disturb", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "do_not_disturb", true)
 		for index = 1, 12 do addon.island.notify({ source = "Test", key = "q" .. index, text = "Quiet " .. index }) end
 		check("the inbox size still caps notices that never toasted", #addon.smart_island.view().notices == 10)
 	end
 	do
 		local addon = island_world()
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "size", 120)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "size", 120)
 		check("an unknown preset changes nothing", addon.smart_island.apply_preset("Loud") == false)
 		check("the Informative preset turns the feeds on", addon.smart_island.apply_preset("Informative") == true
-			and addon.module.get("smart_island", "feed_loot") == true and addon.module.get("smart_island", "quest_context") == true)
+			and addon.module.get("island", "feed_loot") == true and addon.module.get("island", "quest_context") == true)
 		check("the Quiet preset turns them off and keeps the warnings", addon.smart_island.apply_preset("Quiet") == true
-			and addon.module.get("smart_island", "feed_loot") == false and addon.module.get("smart_island", "source_bags") == true)
-		check("presets leave placement and size alone", addon.module.get("smart_island", "size") == 120)
+			and addon.module.get("island", "feed_loot") == false and addon.module.get("island", "source_bags") == true)
+		check("presets leave placement and size alone", addon.module.get("island", "size") == 120)
 	end
 	do
 		local addon, env, _, state, _, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		local island_frame
 		for _, candidate in ipairs(frames) do if candidate.name == "EverlookSmartIsland" then island_frame = candidate end end
 		local shift, cursor = false, { 500, 500 }
@@ -318,13 +318,13 @@ return function(root, check, island_world, quest_world, secret_stat)
 		cursor = { 600, 400 }
 		island_frame.scripts.OnDragStop(island_frame)
 		check("a drag without Shift leaves the placement alone",
-			addon.module.get("smart_island", "position_x") == 0 and addon.module.get("smart_island", "position_top") == 12)
+			addon.module.get("island", "position_x") == 0 and addon.module.get("island", "position_top") == 12)
 		shift, cursor = true, { 500, 500 }
 		island_frame.scripts.OnDragStart(island_frame)
 		cursor = { 600, 400 }
 		island_frame.scripts.OnDragStop(island_frame)
 		check("Shift and drag writes the placement options",
-			addon.module.get("smart_island", "position_x") == 100 and addon.module.get("smart_island", "position_top") == 112)
+			addon.module.get("island", "position_x") == 100 and addon.module.get("island", "position_top") == 112)
 		island_frame.scripts.OnClick(island_frame)
 		check("the click that ends a drag does not pin the island", addon.smart_island.view().pinned == false)
 		state.time = state.time + 1
@@ -333,31 +333,31 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon, _, _, state, afters, tickers, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		local island_frame
 		for _, candidate in ipairs(frames) do if candidate.name == "EverlookSmartIsland" then island_frame = candidate end end
-		addon.module.set("smart_island", "hide_when_idle", true)
+		addon.module.set("island", "hide_when_idle", true)
 		check("the pill stays through the first quiet seconds", island_frame.alpha ~= 0)
 		state.time = state.time + 6
 		for _, after in ipairs(afters) do after.callback() end
 		check("an idle pill fades out", island_frame.alpha == 0)
 		addon.island.notify({ source = "Test", key = "back", text = "Hello" })
 		check("a notice brings the pill back", island_frame.alpha == 1)
-		addon.module.set("smart_island", "hide_when_idle", false)
+		addon.module.set("island", "hide_when_idle", false)
 		check("turning the option off keeps it visible", island_frame.alpha == 1)
 	end
 	do
 		-- Turned off and on again from the settings page while the pill had faded.
 		local addon, _, _, state, afters, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		local island_frame
 		for _, candidate in ipairs(frames) do if candidate.name == "EverlookSmartIsland" then island_frame = candidate end end
-		addon.module.set("smart_island", "hide_when_idle", true)
+		addon.module.set("island", "hide_when_idle", true)
 		state.time = state.time + 6
 		for _, after in ipairs(afters) do after.callback() end
 		check("a quiet pill has faded before it is turned off", island_frame.alpha == 0)
-		addon.module.set("smart_island", "enabled", false)
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", false)
+		addon.module.set("island", "enabled", true)
 		check("turned off and on again while quiet, the pill is back for its quiet seconds", island_frame.alpha == 1)
 		state.time = state.time + 6
 		for _, after in ipairs(afters) do after.callback() end
@@ -370,7 +370,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 		end
 		local first, first_env, first_event, first_state = island_world()
 		with_character(first_env)
-		first.module.set("smart_island", "enabled", true)
+		first.module.set("island", "enabled", true)
 		first.island.notify({ source = "Test", key = "kept", text = "Kept row", detail = "Some detail", money = 500 })
 		first.island.notify({ source = "Test", key = "live", text = "Bags are full", severity = "warning", persist = true })
 		first.island.notify({ source = "Test", key = "act", text = "Has action", actions = {
@@ -386,7 +386,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 		second_env.GetServerTime = function() return 1000300 end
 		second_env.EverlookDB = second_env.EverlookDB or {}
 		second_env.EverlookDB.island_history = saved.island_history
-		second.module.set("smart_island", "enabled", true)
+		second.module.set("island", "enabled", true)
 		local notices = second.smart_island.view().notices
 		local texts = {}
 		for _, notice in ipairs(notices) do texts[#texts + 1] = notice.text end
@@ -402,19 +402,19 @@ return function(root, check, island_world, quest_world, secret_stat)
 		env.UIParent = env.UIParent or {}
 		env.UIParent.GetTop = function() return 1080 end
 		env.UIWidgetTopCenterContainerFrame = { IsShown = function() return shown end, GetBottom = function() return 1000 end }
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		for _, candidate in ipairs(frames) do if candidate.name == "EverlookSmartIsland" then island_frame = candidate end end
 		check("the pill drops below a showing top widget", island_frame.point[5] == -88)
-		addon.module.set("smart_island", "avoid_top_widgets", false)
+		addon.module.set("island", "avoid_top_widgets", false)
 		check("the option puts it back at its own distance", island_frame.point[5] == -12)
-		addon.module.set("smart_island", "avoid_top_widgets", true)
+		addon.module.set("island", "avoid_top_widgets", true)
 		shown = false
-		addon.module.set("smart_island", "position_top", 16)
+		addon.module.set("island", "position_top", 16)
 		check("a hidden widget leaves the placement alone", island_frame.point[5] == -16)
 	end
 	do
 		local addon, env = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		check("dismiss with no toast does nothing", env.everlook_smart_island_dismiss() == nil and addon.smart_island.dismiss_top() == false)
 		addon.island.notify({ source = "Test", key = "older", text = "Older" })
 		addon.island.notify({ source = "Test", key = "newer", text = "Newer" })
@@ -442,8 +442,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 		local addon, env, event = island_world()
 		local waiting = false
 		env.HasNewMail = function() return waiting end
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "feed_mail", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "feed_mail", true)
 		waiting = true
 		event("UPDATE_PENDING_MAIL")
 		check("new mail starts with the plain detail", notice_key(addon, "mail:new").detail == "Unread mail is waiting")
@@ -463,10 +463,10 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon, _, event = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		event("PARTY_INVITE_REQUEST", "Thrall", false, false, false)
 		check("an invite stays quiet while the feed is off", notice_key(addon, "party-invite") == nil)
-		addon.module.set("smart_island", "feed_invites", true)
+		addon.module.set("island", "feed_invites", true)
 		event("PARTY_INVITE_REQUEST", "Thrall", false, false, false)
 		local notice = notice_key(addon, "party-invite")
 		check("an invite shows the name and points to the popup", notice and notice.text == "Thrall invited you to a group"
@@ -476,7 +476,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 		event("PARTY_INVITE_CANCEL")
 		check("a cancelled invite goes away", notice_key(addon, "party-invite") == nil)
 		addon.smart_island.apply_preset("Quiet")
-		check("the Quiet preset turns invites off", addon.module.get("smart_island", "feed_invites") == false)
+		check("the Quiet preset turns invites off", addon.module.get("island", "feed_invites") == false)
 	end
 	do
 		local addon, env, _, state, _, tickers = island_world()
@@ -487,8 +487,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 			{ spellId = 3, name = "Well Fed", duration = 900, expirationTime = 100 + 200 },
 		}
 		env.C_UnitAuras = { GetAuraDataByIndex = function(_, index) return auras[index] end }
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "feed_buffs", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "feed_buffs", true)
 		check("a buff already inside the window stays quiet", #addon.smart_island.view().notices == 0)
 		state.time = state.time + 150
 		tickers[1].callback()
@@ -515,7 +515,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 		local objectives = {}
 		for index = 1, 6 do objectives[index] = { text = "Objective " .. index, numFulfilled = 0, numRequired = 3, finished = false } end
 		state.quests[2].objectives = objectives
-		addon.module.set("smart_island", "quest_context", true)
+		addon.module.set("island", "quest_context", true)
 		env.everlook_smart_island_key("down")
 		local texts = {}
 		for _, frame in ipairs(frames) do
@@ -529,7 +529,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon, env, _, _, _, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		env.everlook_smart_island_key("down")
 		local marks = {}
 		for _, frame in ipairs(frames) do
@@ -544,7 +544,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	do
 		local addon, _, event, state, _, tickers = island_world()
 		local stats = addon.island_stats
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		local paints = stats.paint
 		for _ = 1, 10 do state.time = state.time + 1; tickers[1].callback() end
 		check("ten idle seconds repaint a closed pill zero times", stats.paint == paints)
@@ -571,8 +571,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 		local server = 1000000
 		env.GetServerTime = function() return server end
 		env.UnitGUID = function() return "Player-1-00000002" end
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "feed_experience", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "feed_experience", true)
 		local experience = addon.island_experience
 		event("PLAYER_ENTERING_WORLD")
 		local first = experience.report()
@@ -587,7 +587,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	do
 		local addon, env, _, state, _, _, frames = island_world()
 		env.C_Container.GetContainerNumSlots = function(bag) return bag <= 1 and 20 or 0 end
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		-- Their cells carry a ring that fills to the share.
 		env.everlook_smart_island_key("down")
 		local shares = {}
@@ -640,14 +640,14 @@ return function(root, check, island_world, quest_world, secret_stat)
 				centers[#centers + 1] = container.Center
 			end,
 		}
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		check("the island borrows the game's tooltip border when it exists", applied >= 3 and centers[1].color ~= nil)
-		addon.module.set("smart_island", "opacity", 84)
+		addon.module.set("island", "opacity", 84)
 		check("the opacity option tints the native fill", centers[1].color[4] == 0.84)
 	end
 	do
 		local addon, _, _, state, _, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		local function face() for _, f in ipairs(frames) do if f.name == "EverlookIslandFace" then return f end end end
 		-- The text on the pill that shows now: a region of a visible frame under the face.
 		local layout_tests = dofile(root .. "/tests/layout.lua")
@@ -666,25 +666,25 @@ return function(root, check, island_world, quest_world, secret_stat)
 		end
 		local function near(color, red, green, blue) return color and math.abs(color[1] - red / 255) < 0.01 and math.abs(color[2] - green / 255) < 0.01 and math.abs(color[3] - blue / 255) < 0.01 end
 		check("the closed pill is the level chip by default in these tests", face().width == 64 and shown("Level 12") == nil and shown("12") ~= nil)
-		addon.module.set("smart_island", "closed_xp", true)
+		addon.module.set("island", "closed_xp", true)
 		check("the experience percent widens the pill", face().width > 64 and shown("45%") ~= nil)
 		check("on the level chip too the percent is purple and the level white", near(shown("45%").color, 173, 118, 239) and near(shown("12").color, 245, 247, 250))
-		addon.module.set("smart_island", "closed_clock", true)
+		addon.module.set("island", "closed_clock", true)
 		check("the clock joins it", shown("14:05") ~= nil)
 		state.bags = { [0] = 1, [1] = 1 }
 		addon.smart_island.pull()
-		addon.module.set("smart_island", "low_slots", 5)
+		addon.module.set("island", "low_slots", 5)
 		check("low bags warn on the pill without a setting, in the warning color", shown("Bags 2") ~= nil and shown("Bags 2").color[1] > shown("Bags 2").color[3])
-		addon.module.set("smart_island", "closed_xp", false)
-		addon.module.set("smart_island", "closed_clock", false)
+		addon.module.set("island", "closed_xp", false)
+		addon.module.set("island", "closed_clock", false)
 		state.bags = { [0] = 6, [1] = 8 }
 		addon.smart_island.pull()
-		addon.module.set("smart_island", "low_slots", 1)
+		addon.module.set("island", "low_slots", 1)
 		check("with every extra off and nothing wrong it is the level chip again", face().width == 64)
 	end
 	do
 		local addon, env, _, _, _, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		env.everlook_smart_island_key("down")
 		local function label(text)
 			for _, frame in ipairs(frames) do
@@ -726,7 +726,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 			{ text = "Collect things", numFulfilled = 1, numRequired = 6, finished = false },
 			{ text = "Talk to someone", finished = false },
 		}
-		addon.module.set("smart_island", "quest_context", true)
+		addon.module.set("island", "quest_context", true)
 		env.everlook_smart_island_key("down")
 		-- A ring on each objective, in the pane: one filled to its count, and an empty one for the objective with none.
 		local function in_expanded(frame)
@@ -762,7 +762,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 			{ text = "0/1 Stoneanvil's Rifle", numFulfilled = 0, numRequired = 1, finished = false },
 			{ text = "Wolves slain", numFulfilled = 2, numRequired = 5, finished = false },
 		}
-		addon.module.set("smart_island", "quest_context", true)
+		addon.module.set("island", "quest_context", true)
 		env.everlook_smart_island_key("down")
 		local texts = {}
 		for _, frame in ipairs(frames) do
@@ -781,8 +781,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 			SetOwner = function() end, Show = function() end, Hide = function() end,
 			SetText = function(_, text) shown[#shown + 1] = text end,
 		}
-		addon.module.set("smart_island", "quest_context", true)
-		addon.module.set("smart_island", "hover_preview", false)
+		addon.module.set("island", "quest_context", true)
+		addon.module.set("island", "hover_preview", false)
 		local island_frame
 		for _, candidate in ipairs(frames) do if candidate.name == "EverlookSmartIsland" then island_frame = candidate end end
 		island_frame.scripts.OnEnter(island_frame)
@@ -798,8 +798,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 		env.GetServerTime = function() return server end
 		env.UnitGUID = function() return "Player-1-00000003" end
 		env.GetXPExhaustion = function() return 0 end
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "feed_experience", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "feed_experience", true)
 		local experience = addon.island_experience
 		event("PLAYER_ENTERING_WORLD")
 		state.xp = state.xp + 120
@@ -814,8 +814,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 	do
 		local addon, env, _, state, _, _, frames = quest_world()
 		table.insert(state.quests, 1, { isHeader = true, title = "Elwynn Forest" })
-		addon.module.set("smart_island", "quest_context", true)
-		addon.module.set("smart_island", "quest_plan", true)
+		addon.module.set("island", "quest_context", true)
+		addon.module.set("island", "quest_plan", true)
 		env.everlook_smart_island_key("down")
 		local texts = {}
 		for _, frame in ipairs(frames) do
@@ -840,7 +840,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon, _, _, _, _, _, frames = quest_world()
-		addon.module.set("smart_island", "quest_context", true)
+		addon.module.set("island", "quest_context", true)
 		local function label(text)
 			for _, frame in ipairs(frames) do
 				for _, region in ipairs(frame.regions or {}) do
@@ -851,14 +851,14 @@ return function(root, check, island_world, quest_world, secret_stat)
 		local level = label("12")
 		check("the quest capsule carries the level after its distance, in white", level ~= nil and math.abs(level.color[1] - 245 / 255) < 0.01 and label("45%") == nil)
 		local held_width = addon.smart_island.view().width
-		addon.module.set("smart_island", "closed_xp", true)
+		addon.module.set("island", "closed_xp", true)
 		local percent = label("45%")
 		check("and the experience percent in the bar's purple when the pill shows it", percent ~= nil and math.abs(percent.color[1] - 173 / 255) < 0.01)
 		check("the capsule holds its width when a part is added", addon.smart_island.view().width == held_width)
 	end
 	do
 		local addon, _, _, _, _, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		local function accents()
 			local found = {}
 			for _, frame in ipairs(frames) do
@@ -880,8 +880,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 		local addon, env, event, state, _, _, frames = island_world()
 		env.GetServerTime = function() return 3000000 end
 		env.UnitGUID = function() return "Player-1-00000004" end
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "feed_experience", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "feed_experience", true)
 		event("PLAYER_ENTERING_WORLD")
 		state.xp = state.xp + 90
 		event("PLAYER_XP_UPDATE")
@@ -910,7 +910,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon, env, _, _, _, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		local function has(text)
 			for _, frame in ipairs(frames) do
 				for _, region in ipairs(frame.regions or {}) do
@@ -926,8 +926,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon, _, _, _, _, _, frames = quest_world()
-		addon.module.set("smart_island", "quest_context", true)
-		addon.module.set("smart_island", "closed_xp", true)
+		addon.module.set("island", "quest_context", true)
+		addon.module.set("island", "closed_xp", true)
 		local function badge_point()
 			for _, frame in ipairs(frames) do
 				for _, region in ipairs(frame.regions or {}) do
@@ -956,7 +956,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon, env, _, state, afters, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		addon.island.notify({ source = "Test", key = "hovered", text = "Stay", duration = 4,
 			actions = { { id = "go", label = "Go", type = "callback", on_click = function() end } } })
 		local card
@@ -988,7 +988,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	do
 		local addon, env, event, state, _, _, frames = island_world()
 		env.C_Container.GetContainerNumSlots = function(bag) return bag <= 1 and 20 or 0 end
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		env.everlook_smart_island_key("down")
 		local function text_of(match)
 			for _, frame in ipairs(frames) do
@@ -1030,7 +1030,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	do
 		local addon, env, _, _, _, _, frames = island_world()
 		env.C_Container.GetContainerNumSlots = function(bag) return bag <= 1 and 20 or 0 end
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		env.everlook_smart_island_key("down")
 		local function rings()
 			local count = 0
@@ -1069,13 +1069,13 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon = island_world()
-		check("the edge bars are gone as options", not pcall(addon.module.set, "smart_island", "rim_top", "experience")
-			and not pcall(addon.module.set, "smart_island", "rim_bottom", "quest"))
+		check("the edge bars are gone as options", not pcall(addon.module.set, "island", "rim_top", "experience")
+			and not pcall(addon.module.set, "island", "rim_bottom", "quest"))
 		check("and so is their module", addon.island_rim == nil)
 	end
 	do
 		local addon, env, _, _, _, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		local function marks()
 			local found = 0
 			for _, frame in ipairs(frames) do
@@ -1091,7 +1091,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon, _, _, state, afters, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		local island_frame
 		for _, candidate in ipairs(frames) do if candidate.name == "EverlookSmartIsland" then island_frame = candidate end end
 		local over = true
@@ -1118,10 +1118,10 @@ return function(root, check, island_world, quest_world, secret_stat)
 		env.GetXPExhaustion = function() return 0 end
 		env.GetServerTime = function() return 4000000 end
 		env.UnitGUID = function() return "Player-1-00000005" end
-		addon.module.set("smart_island", "quest_context", true)
-		addon.module.set("smart_island", "quest_plan", true)
-		addon.module.set("smart_island", "feed_quest_ready", true)
-		addon.module.set("smart_island", "feed_experience", true)
+		addon.module.set("island", "quest_context", true)
+		addon.module.set("island", "quest_plan", true)
+		addon.module.set("island", "feed_quest_ready", true)
+		addon.module.set("island", "feed_experience", true)
 		for index = 1, 4 do
 			addon.island.notify({ source = "Test", key = "row" .. index, text = "Row " .. index, persist = index == 1,
 				actions = { { id = "act", label = "Act", type = "callback", on_click = function() end } } })
@@ -1147,7 +1147,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon, _, _, state, _, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		local island_frame
 		for _, candidate in ipairs(frames) do if candidate.name == "EverlookSmartIsland" then island_frame = candidate end end
 		island_frame.scripts.OnClick(island_frame)
@@ -1164,7 +1164,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon, _, _, _, _, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		local api = addon.island
 		local function button(label)
 			for _, frame in ipairs(frames) do
@@ -1215,8 +1215,8 @@ return function(root, check, island_world, quest_world, secret_stat)
 			local at = positions[quest_id]
 			return 37, at[1], at[2]
 		end
-		addon.module.set("smart_island", "quest_context", true)
-		addon.module.set("smart_island", "quest_plan", true)
+		addon.module.set("island", "quest_context", true)
+		addon.module.set("island", "quest_plan", true)
 		local quests = addon.island_quests
 		local view = quests.view()
 		check("with no pin the island shows the best guess", view.reason == "Suggested" and view.current.id == 23)
@@ -1237,15 +1237,15 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon, env, event, state, _, _, frames = quest_world()
-		addon.module.set("smart_island", "quest_context", true)
-		addon.module.set("smart_island", "quest_plan", true)
+		addon.module.set("island", "quest_context", true)
+		addon.module.set("island", "quest_plan", true)
 		local function suggestion() return notice_key(addon, "pin-suggest") end
 		local function button(label)
 			for _, frame in ipairs(frames) do
 				if frame.action_id and frame.label and frame.label.text == label and frame.shown ~= false then return frame end
 			end
 		end
-		check("pin suggestions start on", addon.module.get("smart_island", "feed_pin_suggest") == true)
+		check("pin suggestions start on", addon.module.get("island", "feed_pin_suggest") == true)
 		check("nothing is suggested before anything happens", suggestion() == nil)
 		table.insert(state.quests, { questID = 25, title = "A fresh errand", level = 12, distance = 5000,
 			objectives = { { text = "Fetch", numFulfilled = 0, numRequired = 3, finished = false } } })
@@ -1274,7 +1274,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	end
 	do
 		local addon, _, _, _, _, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		addon.island.notify({ source = "Test", key = "two", text = "Two choices", duration = 4, interaction = "buttons",
 			actions = { { id = "yes", label = "Yes", type = "callback", on_click = function() end },
 				{ id = "later", label = "Not now", type = "callback", on_click = function() end } } })
@@ -1290,7 +1290,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	-- Where the game can draw its gold tooltip border, the first button has it, scaled to fit.
 	do
 		local addon, env, _, _, _, _, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		env.NineSliceUtil = {
 			GetLayout = function() return {} end,
 			ApplyLayoutByName = function(frame)

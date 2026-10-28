@@ -32,7 +32,7 @@ local HOUR, DAY, KEEP = 3600, 86400, 25 * 3600
 local session
 
 local function enabled()
-	return Everlook.module and Everlook.module.enabled and Everlook.module.enabled("smart_island") == true
+	return Everlook.module and Everlook.module.enabled and Everlook.module.enabled("island") == true
 end
 
 local secret = Everlook.secret
@@ -524,7 +524,7 @@ local PUSH_EVERY = 30
 local push
 
 local function wanted()
-	return Everlook.module.enabled("smart_island") and Everlook.module.get("smart_island", "feed_experience") == true
+	return Everlook.module.enabled("island") and Everlook.module.get("island", "feed_experience") == true
 end
 
 local function plain(text)
@@ -559,7 +559,7 @@ push = function()
 end
 
 -- The experience events the island used to forward are this extension's own now.
-Everlook.module.extend("smart_island", {
+Everlook.module.extend("island", {
 	id = "experience", addon = addon_name, order = 100,
 	options = {
 		feed_experience = { name = "Experience detail", default = false, description = "On the open Island, lists experience from the last hour and the last day, and names how much came from quest turn-ins, kills, and everything else. The closed capsule stays a level chip, nothing is listed until the experience bar has been read once, the first look is not counted, rested experience is shown when the client gives a whole amount and no rested bonus says Not rested, an estimate of time to this level appears only after a minute of gains and stays off when the bar is full or you are at the level cap, a missing reading or a skipped level is marked incomplete, a reading the client hides or the first gain after a reload lists any part that is not a turn-in or a kill as Unsorted and marks that line incomplete, and turning this off hides the lines while Smart island keeps counting.", presets = { Quiet = false, Standard = false, Informative = true } },

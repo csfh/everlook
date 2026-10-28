@@ -93,7 +93,7 @@ local function poll()
 	professions()
 end
 
-Everlook.module.extend("smart_island", {
+Everlook.module.extend("island", {
 	id = "professions", addon = addon_name, order = 50,
 	options = {
 		feed_professions = { name = "Professions", default = false, description = "Tells you when a profession reaches a higher 25-point mark, naming that profession and the highest mark it crossed, or Profession and its skill line number when the name is hidden, or says New recipe when you learn one, and lines from the same two seconds share one notice. The skills you already have stay quiet, and so do a drop, a gain inside the same 25 points, a profession the first time it appears, a skill or a recipe the client hides, skill marks stay quiet when the client cannot list professions, a learned recipe says New recipe, a later mark or recipe joins that notice while it is still up, and turning this off clears the notice.", presets = { Quiet = false, Standard = false, Informative = true } },

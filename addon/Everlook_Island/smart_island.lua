@@ -2,7 +2,7 @@ local addon_name = ...
 local Everlook = Everlook
 local K = Everlook.island_const
 local module = Everlook.module
-local id = "smart_island"
+local id = "island"
 
 BINDING_HEADER_EVERLOOK_ISLAND = "Everlook Island"
 BINDING_NAME_EVERLOOK_SMART_ISLAND = "Open smart island"

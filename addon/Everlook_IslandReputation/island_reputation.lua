@@ -88,7 +88,7 @@ local function poll()
 	reputation()
 end
 
-Everlook.module.extend("smart_island", {
+Everlook.module.extend("island", {
 	id = "reputation", addon = addon_name, order = 40,
 	options = {
 		feed_reputation = { name = "Reputation", default = false, description = "Tells you when a faction moves to a higher standing than the one already recorded, and names that faction and the new standing, saying Standing increased when that standing has no name. Gains inside the same standing stay quiet, and so do a drop, the first reading, a heading that does not track its own standing, and a standing the client hides, a later rise joins that notice while it is still up, and turning this off clears it.", presets = { Quiet = false, Standard = false, Informative = true } },

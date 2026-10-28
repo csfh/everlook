@@ -5,8 +5,8 @@ return function(root, check, island_world, quest_world)
 
 	local function ready(world)
 		local addon, env, event, state, afters, tickers, frames = world()
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "reduced_motion", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "reduced_motion", true)
 		local top
 		for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then top = frame end end
 		return addon, env, event, state, tickers, frames, top
@@ -26,7 +26,7 @@ return function(root, check, island_world, quest_world)
 	-- The wide quest capsule.
 	do
 		local addon, _, _, _, _, frames, top = ready(quest_world)
-		addon.module.set("smart_island", "quest_context", true)
+		addon.module.set("island", "quest_context", true)
 		layout.settle(frames)
 		dump("wide", frames, top)
 		states.wide = { addon = addon, frames = frames, top = top }
@@ -35,8 +35,8 @@ return function(root, check, island_world, quest_world)
 	-- The compact quest capsule: no title, no ring.
 	do
 		local addon, _, _, _, _, frames, top = ready(quest_world)
-		addon.module.set("smart_island", "quest_context", true)
-		addon.module.set("smart_island", "quest_title", false)
+		addon.module.set("island", "quest_context", true)
+		addon.module.set("island", "quest_title", false)
 		layout.settle(frames)
 		dump("compact", frames, top)
 	end
@@ -44,7 +44,7 @@ return function(root, check, island_world, quest_world)
 	-- With an unread count.
 	do
 		local addon, env, _, _, _, frames, top = ready(quest_world)
-		addon.module.set("smart_island", "quest_context", true)
+		addon.module.set("island", "quest_context", true)
 		env.Everlook.island.notify({ source = "Test", key = "unread", text = "Something new", presentation = "inbox" })
 		layout.settle(frames)
 		dump("unread", frames, top)

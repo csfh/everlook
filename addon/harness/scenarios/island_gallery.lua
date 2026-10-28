@@ -7,11 +7,11 @@ harness.load_addon("Everlook_Island")
 game.login()
 -- The minimap button is not part of what is being looked at.
 if EverlookMinimapButton then EverlookMinimapButton:Hide() end
-Everlook.module.set("smart_island", "enabled", true)
+Everlook.module.set("island", "enabled", true)
 harness.advance(1)
 game.snapshot("Resting: the level", "closed")
 
-Everlook.module.set("smart_island", "quest_context", true)
+Everlook.module.set("island", "quest_context", true)
 harness.advance(1)
 game.snapshot("Resting: the quest", "closed")
 

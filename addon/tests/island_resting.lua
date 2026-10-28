@@ -5,8 +5,8 @@ return function(root, check, island_world)
 
 	local function world()
 		local addon, env, event, state, afters, tickers, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
-		addon.module.set("smart_island", "reduced_motion", true)
+		addon.module.set("island", "enabled", true)
+		addon.module.set("island", "reduced_motion", true)
 		return addon, env, state, frames
 	end
 
@@ -60,29 +60,29 @@ return function(root, check, island_world)
 		api.dismiss(background)
 		check("and the chip when that goes", shown("12") ~= nil)
 
-		addon.module.set("smart_island", "enabled", false)
+		addon.module.set("island", "enabled", false)
 		check("turning the island off clears the chip", addon.smart_island.view().resting == nil)
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		check("and turning it on brings it back", addon.smart_island.view().resting ~= nil and addon.smart_island.view().resting.count == 1)
 	end
 
 	do
 		local addon, env, state, frames = world()
 		local shown = finder(frames)
-		addon.module.set("smart_island", "closed_xp", true)
+		addon.module.set("island", "closed_xp", true)
 		check("the experience percent is a label on the chip", shown("45%") ~= nil)
 		check("with one resting status, however many times it changes", addon.smart_island.view().resting.count == 1)
-		addon.module.set("smart_island", "closed_clock", true)
+		addon.module.set("island", "closed_clock", true)
 		state.bags = { [0] = 0, [1] = 0 }
 		addon.smart_island.pull()
-		addon.module.set("smart_island", "low_slots", 5)
+		addon.module.set("island", "low_slots", 5)
 		check("gear and bags share one label, so the chip keeps within three", shown("Bags 0") ~= nil and addon.smart_island.view().resting.count == 1)
 		check("an empty bag is in the error color", math.abs(shown("Bags 0").color[2] - 128 / 255) < 0.01 and shown("Bags 0").color[1] > 0.99)
 	end
 
 	do
 		local addon, env, _, frames = world()
-		addon.module.set("smart_island", "reduced_motion", false)
+		addon.module.set("island", "reduced_motion", false)
 		layout.settle(frames)
 		-- Every region that says the level, with whether it is lent out and where it hangs.
 		local function level_regions()
@@ -124,8 +124,8 @@ return function(root, check, island_world)
 	-- other parts follow it. The copy starts on that title, and a resting status of someone else's does not slide.
 	do
 		local addon, env, _, frames = world()
-		addon.module.set("smart_island", "reduced_motion", false)
-		addon.module.set("smart_island", "closed_xp", true)
+		addon.module.set("island", "reduced_motion", false)
+		addon.module.set("island", "closed_xp", true)
 		layout.settle(frames)
 		local pill
 		for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then pill = frame end end
@@ -146,7 +146,7 @@ return function(root, check, island_world)
 
 	do
 		local addon, env, _, frames = world()
-		addon.module.set("smart_island", "reduced_motion", false)
+		addon.module.set("island", "reduced_motion", false)
 		local api = env.Everlook.island
 		api.notify({ source = "Other", key = "idle", text = "Standing by", presentation = "status", rank = "resting", capsule = { text = "Standing by" } })
 		layout.settle(frames)

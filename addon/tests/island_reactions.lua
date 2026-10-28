@@ -70,7 +70,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	-- How the island shows one.
 	local function world()
 		local addon, env, event, state, afters, tickers, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		return addon, env, state, frames
 	end
 
@@ -131,13 +131,13 @@ return function(root, check, island_world, quest_world, secret_stat)
 	do
 		local addon, env, state = world()
 		local api = env.Everlook.island
-		addon.module.set("smart_island", "do_not_disturb", true)
+		addon.module.set("island", "do_not_disturb", true)
 		check("do not disturb turns reactions off", select(2, api.react("kill")) == "do_not_disturb")
-		addon.module.set("smart_island", "do_not_disturb", false)
-		addon.module.set("smart_island", "reactions", false)
+		addon.module.set("island", "do_not_disturb", false)
+		addon.module.set("island", "reactions", false)
 		check("the setting turns reactions off", select(2, api.react("kill")) == "disabled")
-		addon.module.set("smart_island", "reactions", true)
-		addon.module.set("smart_island", "enabled", false)
+		addon.module.set("island", "reactions", true)
+		addon.module.set("island", "enabled", false)
 		check("a disabled island refuses a reaction", select(2, api.react("kill")) == "disabled")
 	end
 
@@ -163,7 +163,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 		local event
 		do
 			local fresh_addon, fresh_env, fresh_event, fresh_state, _, _, fresh_frames = island_world()
-			fresh_addon.module.set("smart_island", "enabled", true)
+			fresh_addon.module.set("island", "enabled", true)
 			addon, env, state, frames, event = fresh_addon, fresh_env, fresh_state, fresh_frames, fresh_event
 		end
 		local api = env.Everlook.island
@@ -192,14 +192,14 @@ return function(root, check, island_world, quest_world, secret_stat)
 			local layout = dofile(root .. "/tests/layout.lua")
 			local function dump(name, make_world, kind, open_it)
 				local addon, env, event, state, _, _, frames = make_world()
-				addon.module.set("smart_island", "enabled", true)
-				addon.module.set("smart_island", "reduced_motion", false)
+				addon.module.set("island", "enabled", true)
+				addon.module.set("island", "reduced_motion", false)
 				local top
 				for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then top = frame end end
 				if open_it then
-					addon.module.set("smart_island", "reduced_motion", true)
+					addon.module.set("island", "reduced_motion", true)
 					top.scripts.OnClick(top, "LeftButton")
-					addon.module.set("smart_island", "reduced_motion", false)
+					addon.module.set("island", "reduced_motion", false)
 				end
 				layout.settle(frames)
 				state.time = 800

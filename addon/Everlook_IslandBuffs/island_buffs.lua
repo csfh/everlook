@@ -61,7 +61,7 @@ local function poll()
 	buffs()
 end
 
-Everlook.module.extend("smart_island", {
+Everlook.module.extend("island", {
 	id = "buffs", addon = addon_name, order = 80,
 	options = {
 		feed_buffs = { name = "Buff expiry", default = false, description = "Warns when a long buff, such as food, a flask or a world buff, has under a minute left. Buffs shorter than five minutes are ignored. Buffs already that low when you turn this on stay quiet, and combat is skipped.", presets = { Quiet = false, Standard = false, Informative = true } },

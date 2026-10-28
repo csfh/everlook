@@ -76,8 +76,8 @@ local function confirm_sale()
 end
 
 local function report_island(proceeds)
-	if not Everlook.island or type(Everlook.island.notify) ~= "function" or not module.enabled("smart_island")
-		or not module.enabled(id) or not module.get("smart_island", "source_sell") then return end
+	if not Everlook.island or type(Everlook.island.notify) ~= "function" or not module.enabled("island")
+		or not module.enabled(id) or not module.get("island", "source_sell") then return end
 	next_result = next_result + 1
 	local ok, result = pcall(Everlook.island.notify, {
 		source = "everlook.sell_junk", key = "sale:" .. next_result, kind = "money", stack = "sale", severity = "success",

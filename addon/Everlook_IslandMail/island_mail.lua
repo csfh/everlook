@@ -79,7 +79,7 @@ local function poll()
 	mail()
 end
 
-Everlook.module.extend("smart_island", {
+Everlook.module.extend("island", {
 	id = "mail", addon = addon_name, order = 60,
 	options = {
 		feed_mail = { name = "New mail", default = false, description = "Tells you when new mail arrives, and keeps one notice while that mail is still waiting, unless you choose Remind in five minutes, which hides it and brings it back if the mail is still there. Mail already waiting when you turn this on stays quiet, and so does a mail flag the client hides or a client that cannot check mail, the notice goes away once the mail is gone, and turning this off clears it.", presets = { Quiet = false, Standard = true, Informative = true } },

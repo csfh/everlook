@@ -15,7 +15,7 @@ function kit.now()
 end
 
 function kit.option(key)
-	return Everlook.module.enabled("smart_island") and Everlook.module.get("smart_island", key) == true
+	return Everlook.module.enabled("island") and Everlook.module.get("island", key) == true
 end
 
 -- False when combat kept the notice, so the feed holds its handle and tries again.

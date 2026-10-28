@@ -248,7 +248,7 @@ end
 -- Extensions of the island, such as the warnings, read the same snapshot once
 -- it is fresh.
 local function tell_extensions(signal, a, b, c)
-	for _, extension in ipairs(Everlook.module.extensions("smart_island")) do
+	for _, extension in ipairs(Everlook.module.extensions("island")) do
 		if extension.follow then extension.follow(signal, snapshot, a, b, c) end
 	end
 end

@@ -63,7 +63,7 @@ local function hearth()
 	state.hearth.ready = ready
 end
 
-Everlook.module.extend("smart_island", {
+Everlook.module.extend("island", {
 	id = "hearth", addon = addon_name, order = 30,
 	options = {
 		feed_hearth = { name = "Hearthstone", default = false, description = "Tells you when your Hearthstone finishes its cooldown. A stone you do not have, one already ready the first time it is seen, the pause after a spell, or a cooldown the client hides or has switched off stays quiet, the notice goes away when that cooldown starts again, and turning this off clears it once combat allows.", presets = { Quiet = false, Standard = true, Informative = true } },

@@ -4,7 +4,7 @@ local Everlook = Everlook
 -- Tells the island when something happened that deserves a flash. The island
 -- draws the flash and never decides what a kill is, so the deciding is here.
 local function option(key)
-	return Everlook.module.get("smart_island", key) == true
+	return Everlook.module.get("island", key) == true
 end
 
 local function react(kind)
@@ -44,7 +44,7 @@ local function gave_experience(message)
 	return experience and type(experience.kill_xp) == "function" and experience.kill_xp(message) ~= nil
 end
 
-Everlook.module.extend("smart_island", {
+Everlook.module.extend("island", {
 	id = "reactions", addon = addon_name, order = 30,
 	options = {
 		react_level = { name = "Flash on level up", default = true, description = "Flashes the island in gold when you level up. It needs Show reactions, and it stays off while Do not disturb is on.", presets = { Quiet = false, Standard = true, Informative = true } },

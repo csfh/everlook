@@ -35,11 +35,11 @@ local function safe_id(value)
 end
 
 local function island_enabled()
-	return Everlook.module and Everlook.module.enabled and Everlook.module.enabled("smart_island") == true
+	return Everlook.module and Everlook.module.enabled and Everlook.module.enabled("island") == true
 end
 
 local function sharing()
-	return island_enabled() and Everlook.module.get("smart_island", OPTION) == true
+	return island_enabled() and Everlook.module.get("island", OPTION) == true
 end
 
 local function typing()
@@ -337,7 +337,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
 end)
 register_prefix()
 
-Everlook.module.extend("smart_island", {
+Everlook.module.extend("island", {
 	id = "share", addon = addon_name, order = 5,
 	options = {
 		share_click = { name = "Share an Alt-right-click", default = true, description = "Alt-right-click a unit, item, quest, spell, or world object to say its name and show it on the island. People in your party who have Smart island get that notice from you. A raid uses your party group. Nothing named, a secret name, and clicking yourself stay quiet. The key can be changed under Key Bindings. Turning this off stops sharing. Notices from other players stay." },

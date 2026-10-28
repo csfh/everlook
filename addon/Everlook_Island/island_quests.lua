@@ -133,18 +133,18 @@ local function next_candidate()
 end
 
 local function island_options()
-	local ready = Everlook.module.get("smart_island", "feed_quest_ready")
-	local next_quest = Everlook.module.get("smart_island", "feed_quest_next")
-	local completion = Everlook.module.get("smart_island", "source_quest_completion")
+	local ready = Everlook.module.get("island", "feed_quest_ready")
+	local next_quest = Everlook.module.get("island", "feed_quest_next")
+	local completion = Everlook.module.get("island", "source_quest_completion")
 	return {
-		enabled = Everlook.module.get("smart_island", "quest_context"),
+		enabled = Everlook.module.get("island", "quest_context"),
 		observe = ready or next_quest or completion,
-		planning = Everlook.module.get("smart_island", "quest_plan"),
+		planning = Everlook.module.get("island", "quest_plan"),
 		feed_planning = next_quest,
-		recent = Everlook.module.get("smart_island", "quest_recent"),
-		nearby = Everlook.module.get("smart_island", "quest_nearby"),
-		distance_weight = Everlook.module.get("smart_island", "quest_distance_weight"),
-		level_weight = Everlook.module.get("smart_island", "quest_level_weight"),
+		recent = Everlook.module.get("island", "quest_recent"),
+		nearby = Everlook.module.get("island", "quest_nearby"),
+		distance_weight = Everlook.module.get("island", "quest_distance_weight"),
+		level_weight = Everlook.module.get("island", "quest_level_weight"),
 	}
 end
 
@@ -473,7 +473,7 @@ end
 function quests.refresh(force)
 	scan(force)
 	if not force then stats.feed_tick = stats.feed_tick + 1 end
-	for _, extension in ipairs(Everlook.module.extensions("smart_island")) do
+	for _, extension in ipairs(Everlook.module.extensions("island")) do
 		if extension.refresh then extension.refresh(force) end
 	end
 	-- The island sets this to push the card and the plan again, whoever asked for the scan.
@@ -661,7 +661,7 @@ end
 local function capsule_notice(view)
 	local current = view.current
 	if not current then return nil end
-	local wide = Everlook.module.get("smart_island", "quest_title") == true
+	local wide = Everlook.module.get("island", "quest_title") == true
 	local fraction = wide and quests.progress(current)
 	local level, experience = ui.adapter.badge()
 	local labels = {}

@@ -13,7 +13,7 @@ local number = Everlook.finite
 
 local function island_feed()
 	return Everlook.island and type(Everlook.island.notify) == "function"
-		and module.enabled("smart_island") and module.get("smart_island", "source_flight")
+		and module.enabled("island") and module.get("island", "source_flight")
 end
 
 local function notify(payload)

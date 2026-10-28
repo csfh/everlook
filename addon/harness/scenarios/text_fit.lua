@@ -103,9 +103,9 @@ end
 if Everlook.module.set then
 	Everlook.module.set("fonts", "size_offset", 8)
 	harness.advance(2)
-	Everlook.module.set("smart_island", "enabled", false)
+	Everlook.module.set("island", "enabled", false)
 	harness.advance(1)
-	Everlook.module.set("smart_island", "enabled", true)
+	Everlook.module.set("island", "enabled", true)
 	harness.advance(2)
 	local again = harness.find("EverlookSmartIsland")
 	if again then

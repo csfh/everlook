@@ -465,10 +465,10 @@ return function(root, check)
 		check("the page is one plain frame", page.name == "EverlookPerformancePage" and sched.page() == page)
 		local before = #made
 		check("it builds nothing until it is shown", before == 1)
-		Everlook.module = { modules = { { id = "fonts", name = "Fonts" }, { id = "smart_island", name = "Smart island" } } }
+		Everlook.module = { modules = { { id = "fonts", name = "Fonts" }, { id = "island", name = "Smart island" } } }
 		Everlook.trace = { ledger = {
 			marks = { { "core_files", 10 }, { "addon:Everlook", 22.3 }, { "loading_done", 1234 } },
-			spans = { ["module:fonts"] = { ms = 6.1, runs = 2 }, ["module:smart_island"] = { ms = 4, runs = 1 }, settings = { ms = 5.2, runs = 1 }, fonts_pass = { ms = 5.5, runs = 3 } },
+			spans = { ["module:fonts"] = { ms = 6.1, runs = 2 }, ["module:island"] = { ms = 4, runs = 1 }, settings = { ms = 5.2, runs = 1 }, fonts_pass = { ms = 5.5, runs = 3 } },
 			counts = { fonts_passes = 3, fonts_frames = 4100, settings_kb = 310 },
 		} }
 		env.EverlookDB = { loadTraceHistory = { { done = 1300, reload = false }, { done = 980, reload = true } } }

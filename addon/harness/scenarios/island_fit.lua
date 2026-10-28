@@ -7,7 +7,7 @@ harness.load_addon("Everlook_Fonts")
 harness.load_addon("Everlook_Island")
 game.login()
 Everlook.module.set("fonts", "enabled", true)
-Everlook.module.set("smart_island", "enabled", true)
+Everlook.module.set("island", "enabled", true)
 harness.advance(1)
 if EverlookMinimapButton then EverlookMinimapButton:Hide() end
 local island = harness.find("EverlookSmartIsland")

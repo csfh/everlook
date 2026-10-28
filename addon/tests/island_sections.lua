@@ -6,12 +6,12 @@ return function(root, check, island_world, quest_world)
 	-- The island is off until it is turned on.
 	local function world()
 		local addon, env, event, state, afters, tickers, frames = island_world()
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		return addon, env, event, state, afters, tickers, frames
 	end
 
 	local function open(addon, frames)
-		addon.module.set("smart_island", "reduced_motion", true)
+		addon.module.set("island", "reduced_motion", true)
 		local island_frame
 		for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then island_frame = frame end end
 		island_frame.scripts.OnClick(island_frame, "LeftButton")
@@ -147,10 +147,10 @@ return function(root, check, island_world, quest_world)
 		api.dismiss(mine)
 		check("dismissing one leaves the other", added(addon, 2) == 1 and api.update(yours, { title = "Still" }) == yours)
 
-		addon.module.set("smart_island", "enabled", false)
+		addon.module.set("island", "enabled", false)
 		local blocked, reason = api.section(spec({ key = "off" }))
 		check("a disabled island refuses sections", blocked == nil and reason == "disabled")
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", true)
 		check("turning the island off cleared the sections that were there", added(addon, 2) == 0)
 	end
 
@@ -260,7 +260,7 @@ return function(root, check, island_world, quest_world)
 	-- Both panes, with a quest and sections in each.
 	do
 		local addon, env, _, _, _, _, frames = quest_world()
-		addon.module.set("smart_island", "quest_context", true)
+		addon.module.set("island", "quest_context", true)
 		local api = env.Everlook.island
 		api.notify({ source = "MyAddon", text = "Loot: Thunderfury", detail = "From Baron Geddon" })
 		api.section(spec({ region = "pane_a", key = "raid", title = "Raid", blocks = {
@@ -353,7 +353,7 @@ return function(root, check, island_world, quest_world)
 	do
 		local function with_history()
 			local addon, env, _, _, _, _, frames = quest_world()
-			addon.module.set("smart_island", "quest_context", true)
+			addon.module.set("island", "quest_context", true)
 			for index = 1, 8 do env.Everlook.island.notify({ source = "MyAddon", key = "n" .. index, text = "Notice " .. index, detail = "Something happened", persist = true }) end
 			open(addon, frames)
 			return addon.smart_island.view().scroll_height
@@ -372,8 +372,8 @@ return function(root, check, island_world, quest_world)
 	-- The quest card: ready is green, and the plan's rows say they can be pinned.
 	do
 		local addon, env, event, state, _, _, frames = quest_world()
-		addon.module.set("smart_island", "quest_context", true)
-		addon.module.set("smart_island", "quest_plan", true)
+		addon.module.set("island", "quest_context", true)
+		addon.module.set("island", "quest_plan", true)
 		for _, quest in ipairs(state.quests) do quest.ready = true end
 		event("QUEST_LOG_UPDATE")
 		open(addon, frames)
@@ -485,8 +485,8 @@ return function(root, check, island_world, quest_world)
 	-- The quest source: its card and plan are sections like anyone's.
 	do
 		local addon, env, event, state, _, tickers, frames = quest_world()
-		addon.module.set("smart_island", "quest_context", true)
-		addon.module.set("smart_island", "quest_plan", true)
+		addon.module.set("island", "quest_context", true)
+		addon.module.set("island", "quest_plan", true)
 		open(addon, frames)
 		local function panel_text(text)
 			for _, frame in ipairs(frames) do
@@ -521,8 +521,8 @@ return function(root, check, island_world, quest_world)
 				end
 			end
 		end)())
-		addon.module.set("smart_island", "enabled", false)
-		addon.module.set("smart_island", "enabled", true)
+		addon.module.set("island", "enabled", false)
+		addon.module.set("island", "enabled", true)
 		open(addon, frames)
 		check("turning the island off and on again brings the card back", panel_text("NEXT UP") ~= nil and addon.smart_island.view().sections >= 4)
 		state.quests, state.watched, state.selected = {}, {}, nil

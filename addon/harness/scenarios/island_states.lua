@@ -6,7 +6,7 @@ harness.load_addon("Everlook_Island")
 harness.load_addon("Everlook_IslandWarnings")
 game.login()
 if EverlookMinimapButton then EverlookMinimapButton:Hide() end
-Everlook.module.set("smart_island", "enabled", true)
+Everlook.module.set("island", "enabled", true)
 harness.advance(1)
 
 local island = harness.find("EverlookSmartIsland")
@@ -51,8 +51,8 @@ end
 close()
 
 -- Gear and bags both low, with the closed pill told to say so.
-Everlook.module.set("smart_island", "source_durability", true)
-Everlook.module.set("smart_island", "source_bags", true)
+Everlook.module.set("island", "source_durability", true)
+Everlook.module.set("island", "source_bags", true)
 game.slots = { [1] = { 5, 50 }, [5] = { 10, 20 } }
 game.bags = { [0] = 0, [1] = 1 }
 harness.event("UPDATE_INVENTORY_DURABILITY")

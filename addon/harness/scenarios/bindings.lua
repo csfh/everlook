@@ -7,7 +7,7 @@ harness.load_addon("Everlook_Island")
 harness.load_addon("Everlook_IslandShare")
 harness.load_addon("Everlook_RadialMenu")
 game.login()
-Everlook.module.set("smart_island", "enabled", true)
+Everlook.module.set("island", "enabled", true)
 harness.advance(1)
 
 local headers = {}

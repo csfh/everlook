@@ -118,7 +118,7 @@ local function turned_in(quest_id)
 	state.recap.quests = state.recap.quests + 1
 end
 
-Everlook.module.extend("smart_island", {
+Everlook.module.extend("island", {
 	id = "recap", addon = addon_name, order = 90,
 	options = {
 		feed_recap = { name = "Session recap", default = false, description = "Posts a summary every 30 minutes: quests completed, experience gained, net money and time on. The first one comes after half an hour. A missing reading is marked incomplete or unavailable, and an empty bar at the level cap counts as no experience. Turning this off clears the notice.", presets = { Quiet = false, Standard = false, Informative = true } },
