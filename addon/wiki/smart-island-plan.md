@@ -2,11 +2,11 @@
 
 Make the island useful in a glance, quiet during play, and easy for other addons to feed. Keep the current level/XP chip, hover preview, click-to-pin, and tap/hold binding. The feature stays optional and starts disabled.
 
-This plan comes from reading `smart_island.lua` and its tests. Appearance, contrast over the game world, UI scale, and feel have not been verified in the client. The notification interface and a bounded animated toast stack are implemented. The rounded surface, fixed summary header and measured history rows are implemented. A ten-entry retained inbox, unread dwell, bounded scrolling and paused inspection lifetimes are implemented. Rich detail, native currency, severity priority and one ongoing-status row are implemented. Pointer transitions, toast handoff and one-shot level feedback are implemented. Source policies and controls are the next stages in the approved plans under plans/. Client appearance remains unverified.
+This plan comes from reading `smart_island.lua` and its tests. Appearance, contrast over the game world, UI scale, and feel have not been verified in the client. The notification interface and a bounded animated toast stack are implemented. The rounded surface, fixed summary header and measured history rows are implemented. A ten-entry retained inbox, unread dwell, bounded scrolling and paused inspection lifetimes are implemented. Rich detail, native currency, severity priority and one ongoing-status row are implemented. Pointer transitions, toast handoff and one-shot level feedback are implemented. Source policies and controls are the next stages. Client appearance remains unverified.
 
-## What the source shows
+## What the source showed when this plan was written
 
-| Current behavior | Proposed improvement | Player benefit |
+| Behavior then | Proposed improvement | Player benefit |
 | --- | --- | --- |
 | Toasts now wrap at up to 320 units wide (`size_toast`); expanded history still uses unwrapped rows. | Refine sizing at different UI scales and wrap full text in the expanded view. | Long notices remain readable in both views. |
 | The expanded view centers metric labels across the full frame height (`ensure_frame`). | Give the summary a fixed header row and place notice rows below it. | New history rows do not shift the summary into the list. |
@@ -15,7 +15,7 @@ This plan comes from reading `smart_island.lua` and its tests. Appearance, contr
 | Four notices are kept, and leaving the expanded view clears them (`leave_open`). | Separate opening, reading, and dismissing. Retain a small session inbox until explicit dismissal. | A quick hover cannot discard a warning. |
 | Money and bag changes produce individual notices (`snapshot_then`). | Batch money deltas and notify for meaningful bag/durability thresholds. | Routine play produces less interruption. |
 
-These are source findings. They do not establish a measured contrast failure or an in-game rendering defect.
+These were source findings at the time, and the functions they name are as the code had them then; the paragraph above says what has been built since. They do not establish a measured contrast failure or an in-game rendering defect.
 
 ## 1. Feed notifications through one interface
 
