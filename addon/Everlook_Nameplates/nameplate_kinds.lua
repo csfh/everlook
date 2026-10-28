@@ -4,7 +4,9 @@ local Everlook = Everlook
 -- The kinds of nameplate the game makes, told apart from what the plate itself says. The game builds a plate the
 -- same way for all of them and switches parts on and off, so a kind is read from those switches. Anything a plate
 -- does not answer is read from the unit, and anything neither answers leaves the kind unknown, which a strategy
--- treats as hands off.
+-- treats as hands off. The kinds after name_only (simplified, widgets_only, forbidden, personal) come from
+-- Blizzard's code and have not been seen in the client; the others are what plates in the client held on
+-- 2026-10-11, which harness/scenarios/lib/nameplates.lua is shaped from.
 local plates = Everlook.nameplates or {}
 Everlook.nameplates = plates
 plates.api = 1

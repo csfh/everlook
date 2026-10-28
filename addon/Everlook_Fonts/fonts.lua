@@ -9,7 +9,10 @@ local people_font = "Interface\\AddOns\\Everlook_Fonts\\assets\\manrope.ttf"
 -- Each game font is a family with one member per alphabet, and SetFont
 -- replaces only the member for the client's own alphabet. Korean and Chinese
 -- text keeps the game's fonts that way, but on a Korean or Chinese client the
--- replaced member is one neither font can draw.
+-- replaced member is one neither font can draw. The 12.0.0 source does not say
+-- SetFont keeps the other members; other addons' fixes do (ls_Glass showed
+-- squares for other scripts until it copied the font object first). How one
+-- line that mixes alphabets draws is not checked.
 local unsupported_locales = { koKR = true, zhCN = true, zhTW = true }
 local interface_globals = { "STANDARD_TEXT_FONT", "DAMAGE_TEXT_FONT" }
 -- The engine draws names in the world with these. NAMEPLATE_FONT names a font

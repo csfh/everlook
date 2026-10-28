@@ -103,6 +103,9 @@ local function CreateButton()
 	button:Show()
 end
 
+-- The client hands the saved variables to Lua when ADDON_LOADED fires for this addon, after its files have run,
+-- so this is the first place EverlookDB can be read, and it is still nil on a new install. The client writes it to
+-- WTF/Account/<account>/SavedVariables/Everlook.lua on /reload, logout, disconnect or quit.
 EventUtil.ContinueOnAddOnLoaded(addon_name, function()
 	EverlookDB = EverlookDB or {}
 

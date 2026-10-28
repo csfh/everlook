@@ -3,7 +3,9 @@ local wheel = {}
 Everlook.wheel = wheel
 
 -- A ring of labels around the cursor. Moving the cursor toward a label chooses it. The wheel only draws and
--- measures. What the labels do is up to the caller.
+-- measures. What the labels do is up to the caller. It draws its own ring because the game's
+-- RadialWheelFrameTemplate drew for an addon frame but showed no wedge text with text-only wedges, and its art is
+-- named for a wedge count (Radial_Wheel_Frame_Count_<n>) the Lua does not list.
 
 -- Pixels from the centre inside which nothing is chosen, so a press that never moves chooses nothing.
 local DEAD_ZONE = 22

@@ -7,6 +7,8 @@ local previous = {}
 local hooked = {}
 local applying = false
 
+-- The swing timers are not in wow-ui-source's 12.0.0 tag. Their reference is the exported Forever source at
+-- commit e3ecc27, where Blizzard_SwingTimer.xml names the three frames above.
 -- UpdateSystemSettingScale applies the displayed percent with SetScale.
 -- Apply that visual scale without writing shared Edit Mode settings or
 -- setting maps: those writes taint the manager and its protected UI.

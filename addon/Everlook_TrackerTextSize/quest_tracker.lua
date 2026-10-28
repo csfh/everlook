@@ -27,7 +27,9 @@ end
 -- tainted, and the next layout reads what it wrote and fails on a call the game
 -- keeps from tainted code, such as the aura check in the scenario tracker. So
 -- this sets the two fonts itself, which is all that call does to anything an
--- addon may touch, and the tracker lays itself out at its next update.
+-- addon may touch, and the tracker lays itself out at its next update. Seen in
+-- the game: after SetTextSize, the next layout hit GetAuraDataByIndex in
+-- ShouldShowMawBuffs with "Auras cannot be accessed when secret while tainted".
 local function set_size(size)
 	local line, header = _G["ObjectiveTrackerFont" .. size], _G["ObjectiveTrackerFont" .. (size + 2)]
 	if not line or not header then return false end
@@ -38,6 +40,8 @@ local function set_size(size)
 	return true
 end
 
+-- The tracker's font can be a native userdata as well as a table. A check for a
+-- table alone once skipped the tracker without a word.
 local function writable(frame, setting)
 	if type(frame) ~= "table" then return false end
 	if type(frame.IsInitialized) ~= "function" or not frame:IsInitialized() then return false end

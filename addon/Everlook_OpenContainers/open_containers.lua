@@ -52,6 +52,10 @@ local function item_guid(bag, slot)
 	return guid
 end
 
+-- LOOT_OPENED's isFromItem cannot say which bag item opened the window, so each slot's sources are matched
+-- against the item's GUID. GetLootSourceInfo, which gives source GUID and quantity in turn, is not called by
+-- the 12.0.0 interface code, but the name is in the installed Forever client. That its GUIDs match
+-- C_Item.GetItemGUID is still to be seen in the game; mocks cannot show it.
 local function own_slot(slot, guid)
 	local sources = { GetLootSourceInfo(slot) }
 	if #sources == 0 then return false end

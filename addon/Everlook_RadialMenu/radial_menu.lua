@@ -31,6 +31,11 @@ end
 
 -- Pings use secure macros; focus and raid marks use the button's native unit actions.
 -- Other wedges call functions that addon code may use during the key release. Protected attributes wait out combat.
+-- The game closes the plain calls to addon code: C_Ping.TogglePingListener, C_Ping.SendMacroPing, FocusUnit,
+-- SetRaidTarget and C_FriendList.AddFriend are marked HasRestrictions, and calling the first raised the blocked
+-- action warning in the game on 2026-10-04. Marks and focus once went through /tm and /focus with
+-- [@mouseover,exists], which lost the unit when the cursor left it during the flick. SecureTemplates.lua's native
+-- raidtarget and focus actions take the recorded unit instead; raidtarget with action "set" keeps an identical mark.
 
 -- Trade and inspect work on a unit token. The one that was "mouseover" is stale, so the recorded guid is
 -- resolved again. A token that does not resolve back to the same guid means the unit is out of reach.
@@ -71,7 +76,10 @@ local function call(type, text, run, available)
 end
 
 -- The ping macros are the game's numeric aliases: 1 attack, 2 warning, 3 on my way, 4 assist. They ping whatever
--- is under the cursor when the key goes up, which is why the wheel is steered by direction and not distance.
+-- is under the cursor when the key goes up, which is why the wheel is steered by direction and not distance: no
+-- addon API gives the world point under the cursor (GetCursorPosition is the screen, and
+-- C_PingSecure.GetTargetWorldPing is secure only). The plain form is on purpose, because SlashCommandsOverrides.lua
+-- returns early from a /ping with a bracket and no target.
 local function ping(number, text)
 	return macro("ping_" .. number, text, function() return "/ping " .. number end)
 end
@@ -95,7 +103,9 @@ local add_friend = macro("add_friend", function() return label("ADD_FRIEND", "Ad
 local inspect = call("inspect", function() return label("INSPECT", "Inspect") end,
 	function(who) local token = token_for(who); if token and InspectUnit then InspectUnit(token) end end)
 local inspect_player = call(inspect.type, inspect.text, inspect.run, function(who) return who.is_player end)
--- Follow uses the game's native name format, which omits your realm and handles Forever surnames.
+-- Follow uses the game's native name format, which omits your realm and handles Forever surnames, with the exact
+-- lookup UnitPopupFollowButtonMixin uses. An earlier fix always added the realm and missed. FollowUnit carries no
+-- HasRestrictions in PlayerScriptDocumentation.lua. The native names and focus action still want a Forever check.
 local follow = call("follow", function() return label("FOLLOW", "Follow") end,
 	function(who) FollowUnit(who.follow_name, true) end,
 	function(who) return who.follow_name ~= nil and FollowUnit ~= nil end)
@@ -143,7 +153,8 @@ local function wedges_for(context, who)
 end
 
 -- Over the 3D world the game lists no frame at all, so an empty list is the world. Any frame other than
--- the world frame is interface in the way.
+-- the world frame is interface in the way. Seen in the game on 2026-10-04: a check written from the 12.0.0 source
+-- expected { WorldFrame }, found nothing and did nothing, and scriptErrors was 0, so nothing said so.
 local function context_under_cursor()
 	local foci = GetMouseFoci and GetMouseFoci()
 	if not foci or (foci[1] and foci[1] ~= WorldFrame) then return nil end
@@ -238,7 +249,8 @@ end
 
 local button = CreateFrame("Button", BUTTON, UIParent, "SecureActionButtonTemplate")
 button:RegisterForClicks("AnyDown", "AnyUp")
--- A key press fires nothing. The macro is set when the key comes up, and runs then.
+-- A key press fires nothing. The macro is set when the key comes up, and runs then. The default comes from the
+-- ActionButtonUseKeyDown CVar, so it is set here rather than left to the player's setting.
 button:SetAttribute("useOnKeyDown", false)
 -- A binding's click has to reach a live button, so it is shown, but nothing can see it or click it. EllesmereUI's
 -- Quickdraw sets its button up the same way and gets clicks from its key.

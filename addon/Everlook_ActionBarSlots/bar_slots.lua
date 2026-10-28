@@ -55,7 +55,11 @@ local function switch_on()
 	if result.created or result.changed then C_EditMode.SaveLayouts(info) end
 	ensured = true
 	-- Written first: the switch below makes the game send EDIT_MODE_LAYOUTS_UPDATED while it
-	-- runs, which comes back here.
+	-- runs, which comes back here. Checked in the game on 2026-10-12: switching away and back
+	-- left EditModeManagerFrame.layoutInfo untainted (issecurevariable stayed true). A layout
+	-- also keeps where the chat window and other frames sit, and one anchored to a bar that is
+	-- off sends that frame to the top left. Whether the game applies a saved layout without a
+	-- reload is still to be seen in the game.
 	all[guid] = result.previous or all[guid] or { stay = true }
 	if result.created then
 		C_EditMode.OnLayoutAdded(result.index, true, false)

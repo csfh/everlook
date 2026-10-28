@@ -2069,6 +2069,66 @@ function island.unregister_event(handle)
 	return true
 end
 
+-- The supported interface for Everlook modules and other addons, with Everlook.module. It exists
+-- once this addon has loaded, even while Smart island is off, and is missing when the player turns
+-- the addon off in the addon list. Another addon lists `## OptionalDeps: Everlook_Island`, checks
+-- `Everlook` and `Everlook.island` before using them, and calls with dot syntax. Other fields on
+-- `Everlook` are internal. A call returns its result, or nil and a reason; "disabled" means Smart
+-- island is off, and nothing sent while it is off is kept or replayed. `api` below goes up only
+-- when something is added: section came with 1, react with 2, rank and the capsule's arrow, ring,
+-- labels, badge and min_width with 3.
+--
+-- notify(payload) -> handle. A plain table, copied on the way in. Unknown fields are ignored, and
+-- a bad field is refused as invalid_<field> without adding a row or starting a timer. Text fields
+-- are nonblank, nonsecret strings:
+--   text (required, 512 bytes), detail (512), source (64, default "everlook"), key (64: updates
+--   the notice with the same source and key and keeps its handle), kind (32: picks the icon,
+--   default "info"), stack (64: joins a live notice with the same source and stack, counting xN
+--   and adding money), icon (generic, money, bags, repair, level, quest, flight, mail, hearth,
+--   reputation, profession, loot or clock).
+--   severity: info, success, warning or error. duration: 1 to 30 seconds, default the Notification
+--   read time. persist: true keeps the inbox row until the player right-clicks it or the producer
+--   dismisses it. money: signed whole copper within 2^53. progress: 0 to 1.
+--   presentation: toast (the default), inbox (a row without a card) or status (needs source and
+--   key: one live activity row that an update refreshes, history after 30 seconds without one).
+--   capsule, status only: the closed pill's one row, { icon, text (64), arrow (radians, or a
+--   function the island asks at most ten times a second), ring = { fraction, tone }, labels (up to
+--   three), badge (16), trailing, progress, min_width (64 to 360) }. rank, status with a capsule:
+--   normal, background (holds the pill until a normal status, is never kept or toasted, and is
+--   withdrawn with dismiss) or resting.
+--   runs: 1 to 6 of { text, tone }, a mark, or { money }. item_id, spell_id: a native icon and
+--   tooltip. interaction: buttons (the default with actions), expand or inbox. actions: up to two
+--   { id, label, type, enabled }, type "callback" with on_click(handle, id) and allow_in_combat,
+--   "item" with item_id, or "spell" with spell_id. Item and spell actions are secure buttons that
+--   run only from the player's click; the island never uses the item or casts the spell.
+--   A tone is primary, secondary, muted, accent, gold, success, warning or error. A mark is an icon
+--   name, an atlas token (64 bytes of letters, digits, _ and -), an item id or a spell id.
+-- dismiss(handle) -> true when it removed something. update(handle, changes) takes any notify
+-- field but source and key. set_actions(handle, list) replaces the buttons. set_action_enabled(
+-- handle, id, enabled) greys a callback button out or back (action_not_toggleable for item and
+-- spell). A card frozen in combat answers combat_locked. unknown_handle and unknown_action are the
+-- other refusals.
+--
+-- section(spec) -> handle: content in the open island, never a toast and never saved. { source,
+-- key, region = header, metrics, pane_a or pane_b, title, order (100 to 999, default 500), expires
+-- (1 to 3600 seconds), blocks }. The same source and key replaces it. A block is a kind and only
+-- that kind's fields: row { row, action, tooltip, role }, text { text (320) or runs }, heading
+-- { text (48) }, gap { size = within, near or section }, meter { label, value, fraction, tone },
+-- cells { cells (1 to 6) }, table { title, columns (1 to 3), rows (1 to 8), footer, action }. Text
+-- is plain, so a pipe is refused. At most 12 sections, 30 blocks each and 8 KB of text per source,
+-- past which the answer is "limit". update(handle, { title, order, blocks, expires }) and dismiss
+-- take a section's handle too.
+--
+-- react(kind or { kind, strength (0 to 1), source }) -> true: a brief flash of the island's body
+-- for kill, loot, level, warning, error or info. Everlook picks the color and length. Refusals:
+-- do_not_disturb, invalid_reaction, and limited past four in a second.
+--
+-- register_event(event, callback) -> subscription. callback(event, ...) gets the native arguments
+-- and returns a notify payload, nil to skip, or a payload with reaction = <kind> to flash as well.
+-- It runs only while Smart island is on, survives turning it off and on, and is dropped by a
+-- reload. Refusals: invalid_event, invalid_callback, unavailable. unregister_event(subscription)
+-- -> true or false. The arguments can be secret: check issecretvalue before comparing or
+-- formatting one.
 Everlook.island = {
 	notify = island.notify,
 	dismiss = island.dismiss,

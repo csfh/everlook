@@ -58,7 +58,9 @@ function Everlook.quest_automation.decide(facts)
 end
 
 -- Without a repeatable check, leave the quest alone unless repeatable quests
--- are included. A missing gold cost is treated as paid.
+-- are included. A missing gold cost is treated as paid. These guards once called
+-- GetQuestRequiredMoney and IsQuestRepeatable, names the client does not have, and
+-- guarded nothing; GetQuestMoneyToGet is what the default quest frame calls.
 local function repeatable()
 	if not (C_QuestLog and C_QuestLog.IsRepeatableQuest and GetQuestID) then return not module.get(id, "repeatable") end
 	return C_QuestLog.IsRepeatableQuest(GetQuestID()) and not module.get(id, "repeatable")

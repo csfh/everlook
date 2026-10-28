@@ -85,6 +85,8 @@ function Everlook.chat_tweaks.stamp(message)
 	if not module.enabled(id) or not module.get(id, "timestamps") then
 		return message
 	end
+	-- Chat text can be secret, and a filter that rewrites a line must hand secret text on untouched. That is
+	-- also why chat has no clickable web addresses yet.
 	if issecretvalue and issecretvalue(message) then
 		return message
 	end
