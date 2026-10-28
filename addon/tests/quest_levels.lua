@@ -1,5 +1,5 @@
 -- Quest levels: puts the level in brackets in front of a quest title on the quest log list, using the game's own quest level.
-return function(root, check, lib)
+return function(check, lib)
 	local load_files = lib.load_files
 	local addon, play, fire = load_files({ "world", "module", "quest_levels" })
 	-- Quest levels: the level goes on the quest log list after the game has drawn it, and nothing of the game's is replaced.

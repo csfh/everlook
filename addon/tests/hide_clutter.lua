@@ -1,5 +1,5 @@
 -- Hide clutter: stops a new talking head, center-screen zone name, red error, or raid warning when that choice is on, and hides the stance bar when that choice is on.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	local addon, env, event = load_all()
 	local function listening(names)

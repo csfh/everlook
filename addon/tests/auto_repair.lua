@@ -1,5 +1,5 @@
 -- Auto repair: repairs your gear when a repair vendor opens and something needs repair.
-return function(root, check, lib)
+return function(check, lib)
 	local read_source, load_all, island_world, fire_after, secret_stat = lib.read_source, lib.load_all, lib.island_world, lib.fire_after, lib.secret_stat
 	local addon, env, event = load_all()
 	local repairs = {}

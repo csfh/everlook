@@ -1,7 +1,7 @@
 -- The module registry on its own: registration from other addons, settings
 -- page order, and extensions that add to a module another addon registered, then every shipped module
 -- loaded together.
-return function(root, check, lib)
+return function(check, lib)
 	local source, load_all = lib.source, lib.load_all
 	local function load_registry()
 		local namespace = {}

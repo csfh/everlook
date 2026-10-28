@@ -1,8 +1,8 @@
 -- Island section: the public contract other addons build sections on, and how the panes draw them.
 -- Every call goes through Everlook.island, the way an outside addon would make it.
-return function(root, check, lib)
+return function(check, lib)
 	local island_world, quest_world = lib.island_world, lib.quest_world
-	local layout = dofile(root .. "/tests/lib/layout.lua")
+	local layout = lib.layout
 
 	-- The island is off until it is turned on.
 	local function world()

@@ -1,5 +1,5 @@
 -- Minimap: the minimap button: where it sits, what a click and the tooltip do.
-return function(root, check, lib)
+return function(check, lib)
 	local source = lib.source
 	local minimap_scripts, toggles, tooltip_lines = {}, 0, {}
 	local env = setmetatable({}, { __index = _G })

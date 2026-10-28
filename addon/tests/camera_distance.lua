@@ -1,5 +1,5 @@
 -- Camera distance: sets the farthest the camera can zoom out, using the factor on Maximum camera distance, from 1 to 4.
-return function(root, check, lib)
+return function(check, lib)
 	local load_files = lib.load_files
 	local addon, play, fire = load_files({ "world", "module", "camera_distance" })
 	local distance = "1.0"

@@ -1,5 +1,5 @@
 -- The install check: module folders from another release than the core.
-return function(root, check, lib)
+return function(check, lib)
 	local source = lib.source
 	local function load(versions, modules)
 		local Everlook

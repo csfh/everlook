@@ -1,5 +1,5 @@
 -- Island recap: sums up quests, experience, money and time every 30 minutes.
-return function(_, check, lib)
+return function(check, lib)
 	local read_source, island_world, quest_world, secret_stat, notice_key = lib.read_source, lib.island_world, lib.quest_world, lib.secret_stat, lib.notice_key
 	local function show_recap(addon, env)
 		local buttons = {}

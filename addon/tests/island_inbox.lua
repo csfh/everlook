@@ -1,5 +1,5 @@
 -- Island inbox: the notices the open island keeps, which of them are unread, and which go when it is full.
-return function(_, check, lib)
+return function(check, lib)
 	local island_world, fire_after, finish_animations = lib.island_world, lib.fire_after, lib.finish_animations
 	do
 		local addon, env, _, state, afters, _, frames = island_world()

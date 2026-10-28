@@ -1,5 +1,5 @@
 -- Telling the player when a module is on beside an addon that changes the same thing.
-return function(root, check, lib)
+return function(check, lib)
 	local source = lib.source
 	local function load(loaded_addons, enabled_modules)
 		local said = {}

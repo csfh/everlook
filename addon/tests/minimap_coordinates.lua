@@ -1,5 +1,5 @@
 -- Minimap coordinates: shows where you are on the current map, under the minimap, as the horizontal position and then the vertical one, each with one decimal, and keeps that line current while you move.
-return function(root, check, lib)
+return function(check, lib)
 	local load_files = lib.load_files
 	local addon, play, fire = load_files({ "world", "module", "minimap_coordinates" })
 	check("coordinates format a map position", addon.minimap_coordinates.format(0.5, 0.25) == "50.0, 25.0")

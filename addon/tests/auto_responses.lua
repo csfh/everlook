@@ -1,5 +1,5 @@
 -- Auto responses: when a summon confirmation, a resurrection offer, or a good item's delete confirmation appears, this accepts the summon or the resurrection and closes it, or types the delete word, if that choice below is on.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	local addon, env, event = load_all()
 	local confirmed, accepted_res, popups_hidden = 0, 0, {}

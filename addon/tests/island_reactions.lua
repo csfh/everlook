@@ -1,5 +1,5 @@
 -- Island reactions: what the module decides is worth a flash, and what it leaves alone.
-return function(root, check, lib)
+return function(check, lib)
 	local island_world = lib.island_world
 	local function surface_pieces(frames)
 		local list = {}

@@ -1,6 +1,6 @@
 -- Island row: where each part of the closed pill's row hangs, and how a title too long for it takes the longest
 -- wording that fits, then a cut at a word, never inside one.
-return function(root, check, lib)
+return function(check, lib)
 	local source, quest_world = lib.source, lib.quest_world
 	local Everlook = {}
 	local env = setmetatable({ Everlook = Everlook }, { __index = _G })

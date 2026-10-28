@@ -1,5 +1,5 @@
 -- Unit frame names: adds the points on Extra points to the player and target names on the default unit frames, and grows each name's region so the larger text is not clipped.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	local names, name_env, name_event = load_all()
 	local function name_font(size, height)

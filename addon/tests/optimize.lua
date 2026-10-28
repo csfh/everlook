@@ -1,5 +1,5 @@
 -- Holding the garbage collector while the game loads, and starting it again.
-return function(root, check, lib)
+return function(check, lib)
 	local source = lib.source
 
 	-- A load: `opts` says what the saved settings are and whether the player is in.
@@ -100,13 +100,13 @@ return function(root, check, lib)
 	-- What ships never asks for a full collection, which is a stall of its own.
 	do
 		local offenders = {}
-		local listing = assert(io.popen('ls "' .. root .. '"'))
+		local listing = assert(io.popen('ls "' .. lib.root .. '"'))
 		for folder in listing:lines() do
 			if folder:match("^Everlook[%w_]*$") then
-				for line in io.lines(root .. "/" .. folder .. "/" .. folder .. ".toc") do
+				for line in io.lines(lib.root .. "/" .. folder .. "/" .. folder .. ".toc") do
 					local file = line:match("^([%w_]+)%.lua%s*$")
 					if file then
-						local handle = assert(io.open(root .. "/" .. folder .. "/" .. file .. ".lua", "r"))
+						local handle = assert(io.open(lib.root .. "/" .. folder .. "/" .. file .. ".lua", "r"))
 						local text = handle:read("*a")
 						handle:close()
 						if text:find('collectgarbage%("collect"%)') or text:find("collectgarbage%('collect'%)") or text:find("collectgarbage%(%)") then

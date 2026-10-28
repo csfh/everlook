@@ -1,5 +1,5 @@
 -- Compact chat: shows say, yell, party, raid, guild, officer, instance, and whisper lines as a short label (S, Y, P, PL, R, RL, RW, G, O, I, IL, W, or To), the name, then the message, with no brackets, and a numbered channel as its number.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	-- Blizzard builds a chat line as format(CHAT_<TYPE>_GET .. message, name).
 	-- Replacing those format strings sets the prefix and the message color

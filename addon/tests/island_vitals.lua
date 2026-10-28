@@ -1,5 +1,5 @@
 -- Island vitals: the level, experience, money, durability and bag readings the island and its feeds share.
-return function(_, check, lib)
+return function(check, lib)
 	local read_source, island_world = lib.read_source, lib.island_world
 	do
 		local addon, _, event, state = island_world()

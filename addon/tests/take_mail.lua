@@ -1,5 +1,5 @@
 -- Take mail: takes the money and the attached items from the open mailbox, one letter at a time, and that letter leaves the inbox.
-return function(root, check, lib)
+return function(check, lib)
 	local load_files = lib.load_files
 	local addon, play, fire = load_files({ "world", "module", "take_mail" })
 	local taken = {}

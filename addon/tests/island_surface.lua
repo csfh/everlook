@@ -1,5 +1,5 @@
 -- Island surface: the rounded body, its opacity and the game's tooltip border.
-return function(_, check, lib)
+return function(check, lib)
 	local island_world = lib.island_world
 	do
 		local addon, _, _, _, _, _, frames = island_world()

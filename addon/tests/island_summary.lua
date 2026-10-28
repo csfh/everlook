@@ -1,8 +1,8 @@
 -- Island summary: the open island's level line and status cells, and the resting level chip, a capsule the
 -- island's own source pushes as a resting status, the lowest rung under a status and a background status.
-return function(root, check, lib)
+return function(check, lib)
 	local island_world = lib.island_world
-	local layout = dofile(root .. "/tests/lib/layout.lua")
+	local layout = lib.layout
 
 	local function world()
 		local addon, env, event, state, afters, tickers, frames = island_world()
@@ -224,7 +224,7 @@ return function(root, check, lib)
 				end
 			end
 		end
-		local measure = dofile(root .. "/tests/lib/layout.lua").new()
+		local measure = lib.layout.new()
 		local function cell(text) local found = label(text); return found and measure.rectangle(found.parent) end
 		check("the open summary has a Status heading", label("STATUS") ~= nil)
 		local money, gear, bags = cell("Money"), cell("Gear"), cell("Bags")

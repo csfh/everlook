@@ -1,5 +1,5 @@
 -- Island reaction: the arithmetic of a brief flash on the island's body, then how the island shows it.
-return function(root, check, lib)
+return function(check, lib)
 	local island_world = lib.island_world
 	local function near(actual, expected) return actual ~= nil and math.abs(actual - expected) < 1e-9 end
 

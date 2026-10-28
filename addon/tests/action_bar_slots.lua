@@ -1,7 +1,7 @@
 -- The action bar slots module: how it edits an Edit Mode layout as plain data, and how it
 -- switches to that layout and back, on a stand-in for C_EditMode. How the game reacts to
 -- the calls, and whether they taint its action bars, is not tested here.
-return function(root, check, lib)
+return function(check, lib)
 	local source = lib.source
 
 	local SYSTEM, ALWAYS, VISIBLE = 0, 9, 5

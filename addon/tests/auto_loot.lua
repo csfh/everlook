@@ -1,5 +1,5 @@
 -- Auto loot: loots each unlocked slot right away when the loot window opens with auto loot.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	local addon, env, event = load_all()
 	local looted = {}

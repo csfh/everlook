@@ -1,5 +1,5 @@
 -- Island invites: shows a toast when someone invites you to a group.
-return function(_, check, lib)
+return function(check, lib)
 	local island_world, notice_key = lib.island_world, lib.notice_key
 	do
 		local addon, _, event = island_world()

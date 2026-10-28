@@ -1,5 +1,5 @@
 -- Island notice: how a producer's payload is read into a notice, and which payloads are refused.
-return function(_, check, lib)
+return function(check, lib)
 	local island_world, secret_stat = lib.island_world, lib.secret_stat
 	do
 		local addon, env = island_world()

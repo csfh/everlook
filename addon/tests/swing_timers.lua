@@ -1,5 +1,5 @@
 -- Swing timers: sets the main hand, off hand, and ranged swing timers to the size on Timer scale, and leaves Edit Mode's saved size alone.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	local addon, env, event = load_all()
 	local scale_setting = 7

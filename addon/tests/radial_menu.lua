@@ -1,5 +1,5 @@
 -- Radial menu: hold the key over a player, a hostile unit, an object, the ground, or your own character, flick toward an action, and let go.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	-- Radial wheel: geometry and drawing.
 	do

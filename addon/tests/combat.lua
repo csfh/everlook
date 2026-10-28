@@ -1,5 +1,5 @@
 -- The shared secret-value helpers and the out-of-combat queue.
-return function(root, check, lib)
+return function(check, lib)
 	local source = lib.source
 	local function load(extra)
 		local Everlook = {}

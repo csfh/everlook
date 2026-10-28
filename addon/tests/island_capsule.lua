@@ -1,10 +1,10 @@
 -- Island capsule: the closed pill's one row, from the spec a producer gives a status to the states people see it in.
-return function(root, check, lib)
+return function(check, lib)
 	local island_world, quest_world, secret_stat = lib.island_world, lib.quest_world, lib.secret_stat
 	do
 		-- The capsule spec a producer gives a status: what it accepts, what it draws, and how it stays right
 		-- as it changes. Every call goes through Everlook.island, as an outside addon would make it.
-		local layout = dofile(root .. "/tests/lib/layout.lua")
+		local layout = lib.layout
 
 		local function world()
 			local addon, env, event, state, afters, tickers, frames = island_world()
@@ -190,7 +190,7 @@ return function(root, check, lib)
 	do
 		-- The closed capsule in the states people see it: its resolved rectangles are written out so a change
 		-- to how it is drawn can be compared with how it was, and its measurements are held here.
-		local layout = dofile(root .. "/tests/lib/layout.lua")
+		local layout = lib.layout
 
 		local function ready(world)
 			local addon, env, event, state, afters, tickers, frames = world()

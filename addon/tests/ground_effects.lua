@@ -1,5 +1,5 @@
 -- Ground effects: sets how much ground clutter, such as grass, the game draws, how far away, and how far it fades out.
-return function(root, check, lib)
+return function(check, lib)
 	local load_files = lib.load_files
 	local addon, play, fire = load_files({ "world", "module", "ground_effects" })
 	-- Ground effects set three of the game's settings, remember each one, and put each back.

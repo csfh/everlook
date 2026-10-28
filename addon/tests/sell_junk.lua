@@ -1,5 +1,5 @@
 -- Sell junk: sells gray items when a vendor opens, and says what that junk brought in once selling stops.
-return function(root, check, lib)
+return function(check, lib)
 	local read_source, load_all, island_world, fire_after = lib.read_source, lib.load_all, lib.island_world, lib.fire_after
 	local addon2, env2, event2, hooks, tickers, frames = load_all()
 	local bags = {

@@ -1,5 +1,5 @@
 -- Island experience: shows the experience you earned in the last hour and day in the open island.
-return function(_, check, lib)
+return function(check, lib)
 	local island_world = lib.island_world
 	do
 		local addon, env, event, state = island_world()

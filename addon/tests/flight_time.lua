@@ -1,5 +1,5 @@
 -- Flight time: shows a timer at the top of the screen for a flight you take after this is on, with the destination and the elapsed time, and remembers the route when that flight lasts more than a second.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all, island_world, secret_stat = lib.load_all, lib.island_world, lib.secret_stat
 	local addon, env, _, hooks, _, frames = load_all()
 	local time, flying = 0, false

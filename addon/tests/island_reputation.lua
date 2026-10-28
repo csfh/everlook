@@ -1,5 +1,5 @@
 -- Island reputation: tells you when a faction reaches a higher standing.
-return function(_, check, lib)
+return function(check, lib)
 	local island_world = lib.island_world
 	do
 		local addon, env, event, state, _, tickers = island_world()

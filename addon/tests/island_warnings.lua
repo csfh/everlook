@@ -1,5 +1,5 @@
 -- Island warnings: warns about low bag space and worn equipment, and sums up routine money changes.
-return function(_, check, lib)
+return function(check, lib)
 	local island_world, finish_animations, secret_stat = lib.island_world, lib.finish_animations, lib.secret_stat
 	do
 		local addon, env, event, state, afters = island_world()

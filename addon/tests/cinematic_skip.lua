@@ -1,5 +1,5 @@
 -- Cinematic skip: closes a cinematic or a movie when it starts.
-return function(root, check, lib)
+return function(check, lib)
 	local load_files = lib.load_files
 	local addon, play, fire = load_files({ "world", "module", "cinematic_skip" })
 	-- The game's own CinematicFrame_CancelCinematic, as Shared/CinematicFrame.lua:133-141 has it at

@@ -1,7 +1,7 @@
 -- The combined bag module: the grid it lays out, the item level it labels gear
 -- with, its registration, and how it applies and undoes a layout on a stand-in
 -- for the stock frame. How the stock frame behaves in the game is not tested here.
-return function(root, check, lib)
+return function(check, lib)
 	local source = lib.source
 	local ITEM, SPACING = 37, 5
 

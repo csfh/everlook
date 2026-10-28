@@ -1,5 +1,5 @@
 -- Useful tooltips: adds item and creature IDs, a vendor price, and a bag count to the matching tooltip.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	local addon, env = load_all()
 	-- The vendor price the game reports for the test item, as the Sell junk tests set it.

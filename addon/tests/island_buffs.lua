@@ -1,5 +1,5 @@
 -- Island buffs: warns when a long buff has under a minute left.
-return function(_, check, lib)
+return function(check, lib)
 	local island_world, notice_key = lib.island_world, lib.notice_key
 	do
 		local addon, env, _, state, _, tickers = island_world()

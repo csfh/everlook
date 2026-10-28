@@ -1,5 +1,5 @@
 -- Island toasts: the notices shown while the island is closed, their slots, lifetimes and motion, and do not disturb.
-return function(_, check, lib)
+return function(check, lib)
 	local read_source, island_world, fire_after, finish_animations, last_toast_text, notice_key = lib.read_source, lib.island_world, lib.fire_after, lib.finish_animations, lib.last_toast_text, lib.notice_key
 	do
 		local addon, env, _, _, _, _, frames = island_world()

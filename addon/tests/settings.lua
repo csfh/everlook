@@ -1,5 +1,5 @@
 -- Settings: the native settings page: its subpages, rows, sliders and the /everlook command.
-return function(root, check, lib)
+return function(check, lib)
 	local source, load_all = lib.source, lib.load_all
 	local addon, env = load_all()
 	local registered, pages, headers, rows = {}, 0, {}, {}

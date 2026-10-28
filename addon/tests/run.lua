@@ -89,7 +89,7 @@ local suites = {
 	"world",
 }
 for _, name in ipairs(suites) do
-	assert(loadfile(root .. "/tests/" .. name .. ".lua"))()(root, check, lib)
+	assert(loadfile(root .. "/tests/" .. name .. ".lua"))()(check, lib)
 end
 
 if failed > 0 then

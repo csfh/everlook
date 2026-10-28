@@ -1,5 +1,5 @@
 -- Island quests: which quest the island follows and suggests, the way to it, and how a quest shows in the pill and the open island.
-return function(root, check, lib)
+return function(check, lib)
 	local read_source, island_world, quest_world, secret_stat, notice_key = lib.read_source, lib.island_world, lib.quest_world, lib.secret_stat, lib.notice_key
 	do
 		local addon, env, event, state, _, tickers = quest_world()
@@ -118,7 +118,7 @@ return function(root, check, lib)
 		end
 		check("expanded quest plan is headed Next up and explains its order", label("NEXT UP") and containing("Closest to you and matched to your level"))
 		local current = addon.island.view().quests.current
-		local lay = dofile(root .. "/tests/lib/layout.lua").new()
+		local lay = lib.layout.new()
 		local function pane_title()
 			-- The quest's name is on the capsule too, so take the one that is down in the pane.
 			local found
@@ -362,7 +362,7 @@ return function(root, check, lib)
 		check("the arrow follows the suggestion", asked[#asked] == 23 and state.selected == 22)
 		addon.island.pin_quest(21)
 		-- A new quest is a new capsule, and may be drawn in the other slot once its fade has played, so the arrow is found again.
-		dofile(root .. "/tests/lib/layout.lua").settle(frames)
+		lib.layout.settle(frames)
 		capsule, inspection, closed_arrow, open_arrow = arrows()
 		check("the arrow follows the pinned quest", asked[#asked] == 21 and state.selected == 22 and closed_arrow.shown)
 		state.quests[1].waypoint = { map = 12, x = 0.5, y = 0.25 }

@@ -1,5 +1,5 @@
 -- Fonts: sets chat and player names in Manrope and the rest of the interface in Expressway, and waits while you are in combat.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	local addon, env, event, hooks, _, frames = load_all()
 	local font

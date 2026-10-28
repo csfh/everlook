@@ -1,5 +1,5 @@
 -- Tooltip cursor: when the game places its default tooltip, this moves that tooltip just off the mouse cursor, so the pointer stays visible, and it follows the cursor.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	local cursor, cursor_env, _, cursor_hooks = load_all()
 	local owned = {}

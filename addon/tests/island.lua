@@ -1,5 +1,5 @@
 -- Island: a small pill at the top of the screen that shows your level, your quest and notices.
-return function(root, check, lib)
+return function(check, lib)
 	local read_source, load_all = lib.read_source, lib.load_all
 	local island_world, fire_after, finish_animations = lib.island_world, lib.fire_after, lib.finish_animations
 	local last_toast_text, shown_bar, secret_stat, quest_world = lib.last_toast_text, lib.shown_bar, lib.secret_stat, lib.quest_world
@@ -345,7 +345,7 @@ return function(root, check, lib)
 				if region.text == "Money" then metric = region end
 			end
 		end
-		local lay = dofile(root .. "/tests/lib/layout.lua").new()
+		local lay = lib.layout.new()
 		check("the open bar shows the time and the experience percent beside the level", clock ~= nil and experience ~= nil
 			and lay.rectangle(clock).top == lay.rectangle(heading).top + (lay.rectangle(heading).height - lay.rectangle(clock).height) / 2)
 		check("the first section clears the level text by a section gap", lay.rectangle(status).top >= lay.rectangle(heading).bottom + 16 - 4)
@@ -543,7 +543,7 @@ return function(root, check, lib)
 					if region.text == "Money" and region.shown ~= false then money_cell = region.parent end
 				end
 			end
-			local lay = dofile(root .. "/tests/lib/layout.lua").new()
+			local lay = lib.layout.new()
 			local position_box, money_box = lay.rectangle(position), lay.rectangle(money_cell)
 			check("the position cell shares money's row, to its right",
 				position_box.top == money_box.top and position_box.left == money_box.right + 24)
@@ -584,7 +584,7 @@ return function(root, check, lib)
 		local function status_top()
 			for _, object in ipairs(frames) do
 				for _, region in ipairs(object.regions or {}) do
-					if region.text == "STATUS" and region.shown ~= false then return dofile(root .. "/tests/lib/layout.lua").new().rectangle(region).top - 12 end
+					if region.text == "STATUS" and region.shown ~= false then return lib.layout.new().rectangle(region).top - 12 end
 				end
 			end
 		end
@@ -735,7 +735,7 @@ return function(root, check, lib)
 	end
 	do
 		-- Resolves the recorded anchors to rectangles, so these checks read where parts land.
-		local layout = dofile(root .. "/tests/lib/layout.lua")
+		local layout = lib.layout
 		local addon, _, _, _, _, _, frames = quest_world()
 		addon.module.set("island", "quest_context", true)
 		addon.module.set("island", "reduced_motion", true)
@@ -780,7 +780,7 @@ return function(root, check, lib)
 		check("the title starts at the text column, 34 from the left edge", title.left - capsule.left == 34)
 	end
 	do
-		local layout = dofile(root .. "/tests/lib/layout.lua")
+		local layout = lib.layout
 		local addon, env, _, _, _, _, frames = quest_world()
 		addon.module.set("island", "quest_context", true)
 		-- Reduced motion snaps the closed pill and the open panel to their final size, which the fake frames cannot animate.
@@ -971,7 +971,7 @@ return function(root, check, lib)
 		addon.module.set("island", "enabled", true)
 		local function face() for _, f in ipairs(frames) do if f.name == "EverlookIslandFace" then return f end end end
 		-- The text on the pill that shows now: a region of a visible frame under the face.
-		local layout_tests = dofile(root .. "/tests/lib/layout.lua")
+		local layout_tests = lib.layout
 		local function shown(text)
 			layout_tests.settle(frames)
 			for _, frame in ipairs(frames) do
@@ -1017,7 +1017,7 @@ return function(root, check, lib)
 		local quiet_offset = badge_point()[4]
 		addon.island.notify({ source = "Test", key = "unread", text = "Something new" })
 		check("an unread count moves the capsule badge left to clear it", badge_point()[4] < quiet_offset)
-		local measure = dofile(root .. "/tests/lib/layout.lua").new()
+		local measure = lib.layout.new()
 		local function region_for(text)
 			for _, frame in ipairs(frames) do
 				for _, region in ipairs(frame.regions or {}) do
@@ -1176,14 +1176,14 @@ return function(root, check, lib)
 		-- .point, .scripts and the like) that a real frame does not have, so production code that reads one of
 		-- them works in the tests and silently does nothing in the game.
 		local island_world = lib.island_world
-		local layout = dofile(root .. "/tests/lib/layout.lua")
+		local layout = lib.layout
 
 		do
-			local listing = io.popen("cd " .. root .. " && ls Everlook*/*.lua")
+			local listing = io.popen("cd " .. lib.root .. " && ls Everlook*/*.lua")
 			local fields = { "mouse", "point", "points", "clicks", "scripts", "regions", "animation_groups", "pass_through", "attributes", "scroll_child", "scroll_offset" }
 			local offences = {}
 			for path in listing:lines() do
-				local handle = assert(io.open(root .. "/" .. path, "r"))
+				local handle = assert(io.open(lib.root .. "/" .. path, "r"))
 				local number = 0
 				for line in handle:lines() do
 					number = number + 1
@@ -1253,7 +1253,7 @@ return function(root, check, lib)
 		-- mouse, so a test can ask what is under a point the way the game does, and find a button that
 		-- something else covers or clips.
 		local island_world, quest_world = lib.island_world, lib.quest_world
-		local layout = dofile(root .. "/tests/lib/layout.lua")
+		local layout = lib.layout
 
 		local function inside(frame, ancestor)
 			while frame do

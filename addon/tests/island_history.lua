@@ -1,5 +1,5 @@
 -- Island history: the inbox kept across a reload or relog.
-return function(_, check, lib)
+return function(check, lib)
 	local island_world = lib.island_world
 	do
 		local function with_character(env)

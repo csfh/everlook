@@ -2,7 +2,7 @@
 -- island and quest states on top of it. A suite gets these through the lib table run.lua hands it.
 return function(root)
 	local source = dofile(root .. "/tests/lib/source.lua")(root)
-	local lib = { source = source, layout = dofile(root .. "/tests/lib/layout.lua") }
+	local lib = { root = root, source = source, layout = dofile(root .. "/tests/lib/layout.lua") }
 	function lib.read_source(name)
 		local handle = assert(io.open((source(name)), "r"))
 		local text = handle:read("*a")

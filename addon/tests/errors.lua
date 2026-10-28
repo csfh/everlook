@@ -1,5 +1,5 @@
 -- The ring of errors Everlook caught.
-return function(root, check, lib)
+return function(check, lib)
 	local source = lib.source
 	local Everlook = {}
 	local env = setmetatable({ time = function() return 77 end }, { __index = _G })

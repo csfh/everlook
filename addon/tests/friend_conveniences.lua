@@ -1,5 +1,5 @@
 -- Friend conveniences: accepting or declining a party invite or a duel by the player's choices, quietly in combat or while Shift is held.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	local addon, env, event = load_all()
 	local invited = 0

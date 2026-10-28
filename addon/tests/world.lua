@@ -1,5 +1,5 @@
 -- World: the core's shared helpers, from a creature's id in its GUID to the readable, finite and text checks.
-return function(root, check, lib)
+return function(check, lib)
 	local source = lib.source
 	local function load_core(extra)
 		local Everlook = {}

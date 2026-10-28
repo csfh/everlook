@@ -1,5 +1,5 @@
 -- Tracker text size: sets the quest tracker objectives to the size on Objective size, from 12 to 20, and keeps the headers two points larger.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	local addon, env, event = load_all()
 	local text_setting = 4

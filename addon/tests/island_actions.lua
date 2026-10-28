@@ -1,5 +1,5 @@
 -- Island actions: the buttons and secure item and spell actions on a notice, notice lifetimes, and the built-in feeds that use them.
-return function(root, check, lib)
+return function(check, lib)
 	local source, island_world, quest_world, fire_after, finish_animations, secret_stat, notice_key = lib.source, lib.island_world, lib.quest_world, lib.fire_after, lib.finish_animations, lib.secret_stat, lib.notice_key
 	local function button_named(frames, label)
 		for index = 1, #frames do

@@ -1,5 +1,5 @@
 -- Quest automation: when a gossip window, a greeting, the quest detail, or the turn-in window opens, this accepts or turns in the quest if the matching choice below is on.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	local addon, env, event = load_all()
 	local accepted, rewards = 0, {}

@@ -1,5 +1,5 @@
 -- Action shortcuts: shortens Shift and Alt on the default action bars, so s-4 and a-4 read as S4 and A4, and s-a-4 reads as SA4.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	local addon, env, event = load_all()
 	do

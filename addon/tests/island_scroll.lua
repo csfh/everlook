@@ -1,5 +1,5 @@
 -- Island scroll: the slim scroll bar of a list in the open island.
-return function(_, check, lib)
+return function(check, lib)
 	local island_world = lib.island_world
 	do
 		local addon = island_world()

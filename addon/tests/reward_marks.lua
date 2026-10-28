@@ -1,5 +1,5 @@
 -- The coin mark on the reward choice that sells for the most.
-return function(root, check, lib)
+return function(check, lib)
 	local source = lib.source
 
 	local function setup(options)

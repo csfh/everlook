@@ -1,5 +1,5 @@
 -- Quest text size: sets the quest description, objectives, reward, and progress text to the size you choose, and waits while you are in combat.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	local addon, env = load_all()
 	-- A font object the way the game's quest text font answers, as the Fonts tests build one.

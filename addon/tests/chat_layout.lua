@@ -1,5 +1,5 @@
 -- Chat layout: moves each chat window's edit box above its tab, or above the window when it has no tab, and hides the chat buttons, while those choices are on, and sets how long lines stay before they fade, including after the game rebuilds those windows.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	local addon, env, event = load_all()
 	local function chat_frame(time_visible)

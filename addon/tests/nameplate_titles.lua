@@ -1,5 +1,5 @@
 -- Nameplate titles: nPCs get the same name style as players, with their title under the name.
-return function(root, check, lib)
+return function(check, lib)
 	local load_all = lib.load_all
 	do
 		-- NPC titles give the nameplate view a subtitle line for a friendly NPC, and keep the game's settings.

@@ -1,5 +1,5 @@
 -- The load trace: when each part of a load happened, and what it cost.
-return function(root, check, lib)
+return function(check, lib)
 	local source = lib.source
 
 	local function load(setup)

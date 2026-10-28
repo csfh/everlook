@@ -1,5 +1,5 @@
 -- The scheduler: one time limit a frame for every task that can wait.
-return function(root, check, lib)
+return function(check, lib)
 	local source = lib.source
 
 	-- `cost` is what each piece of work takes, in milliseconds of the fake clock.
