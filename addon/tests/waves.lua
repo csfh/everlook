@@ -89,7 +89,7 @@ return function(root, check)
 	end
 
 	local addon, play, fire = load({
-		"world", "module", "tooltips", "useful_tooltips", "chat_layout", "coordinates", "quest_levels", "cinematic_skip", "camera_distance", "ground_effects", "take_mail",
+		"world", "module", "tooltips", "useful_tooltips", "chat_layout", "minimap_coordinates", "quest_levels", "cinematic_skip", "camera_distance", "ground_effects", "take_mail",
 	})
 	play.TooltipDataProcessor = {
 		AddTooltipPostCall = function(kind, callback)
@@ -121,27 +121,27 @@ return function(root, check)
 	check("a secret tooltip id adds no line", #lines == 0)
 	play.issecretvalue = nil
 
-	check("coordinates format a map position", addon.coordinates.format(0.5, 0.25) == "50.0, 25.0")
-	check("coordinates stay blank without a position", addon.coordinates.format(nil, 0.2) == "")
+	check("coordinates format a map position", addon.minimap_coordinates.format(0.5, 0.25) == "50.0, 25.0")
+	check("coordinates stay blank without a position", addon.minimap_coordinates.format(nil, 0.2) == "")
 	play.C_Map = {}
-	check("coordinates stay blank without a map position", addon.coordinates.player_text() == "")
+	check("coordinates stay blank without a map position", addon.minimap_coordinates.player_text() == "")
 	play.C_Map = {
 		GetBestMapForUnit = function() return 37 end,
 		GetPlayerMapPosition = function()
 			return { x = 0.5, y = 0.25 }
 		end,
 	}
-	check("coordinates read a table position", addon.coordinates.player_text() == "50.0, 25.0")
+	check("coordinates read a table position", addon.minimap_coordinates.player_text() == "50.0, 25.0")
 	play.C_Map.GetPlayerMapPosition = function()
 		return { GetXY = function() return 0.2, 0.4 end }
 	end
-	check("coordinates read a vector position", addon.coordinates.player_text() == "20.0, 40.0")
+	check("coordinates read a vector position", addon.minimap_coordinates.player_text() == "20.0, 40.0")
 	play.C_Map.GetPlayerMapPosition = function() return nil end
-	check("coordinates are blank when the client gives no position", addon.coordinates.player_text() == "")
+	check("coordinates are blank when the client gives no position", addon.minimap_coordinates.player_text() == "")
 	play.C_Map.GetPlayerMapPosition = function()
 		return { GetXY = function() return nil, nil end }
 	end
-	check("coordinates are blank when the position has no numbers", addon.coordinates.player_text() == "")
+	check("coordinates are blank when the position has no numbers", addon.minimap_coordinates.player_text() == "")
 	play.C_Map = nil
 	play.Minimap = {}
 	addon.module.set("minimap_coordinates", "enabled", true)

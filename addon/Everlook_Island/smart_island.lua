@@ -691,11 +691,11 @@ end
 
 local function read_coords()
 	readout.coords_text = nil
-	local coordinates = Everlook.coordinates
-	if not module.enabled("minimap_coordinates") or not coordinates or not coordinates.player_text then
+	local minimap_coordinates = Everlook.minimap_coordinates
+	if not module.enabled("minimap_coordinates") or not minimap_coordinates or not minimap_coordinates.player_text then
 		return
 	end
-	local text = coordinates.player_text()
+	local text = minimap_coordinates.player_text()
 	if text ~= "" then readout.coords_text = text end
 end
 

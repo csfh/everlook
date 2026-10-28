@@ -5,9 +5,9 @@ local id = "minimap_coordinates"
 local ticker
 local label
 
-Everlook.coordinates = {}
+Everlook.minimap_coordinates = {}
 
-function Everlook.coordinates.format(x, y)
+function Everlook.minimap_coordinates.format(x, y)
 	if type(x) ~= "number" or type(y) ~= "number" then
 		return ""
 	end
@@ -38,9 +38,9 @@ local function player_xy()
 	return x, y
 end
 
-function Everlook.coordinates.player_text()
+function Everlook.minimap_coordinates.player_text()
 	local x, y = player_xy()
-	return Everlook.coordinates.format(x, y)
+	return Everlook.minimap_coordinates.format(x, y)
 end
 
 local function hide()
@@ -74,7 +74,7 @@ local function apply(enabled)
 			hide()
 			return
 		end
-		label:SetText(Everlook.coordinates.player_text())
+		label:SetText(Everlook.minimap_coordinates.player_text())
 	end)
 end
 
