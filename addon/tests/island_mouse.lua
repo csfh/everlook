@@ -1,8 +1,9 @@
 -- Where the mouse goes. The fake frames know their strata, level, rectangle and whether they take the
 -- mouse, so a test can ask what is under a point the way the game does, and find a button that
 -- something else covers or clips.
-return function(root, check, island_world, quest_world)
-	local layout = dofile(root .. "/tests/layout.lua")
+return function(root, check, lib)
+	local island_world, quest_world = lib.island_world, lib.quest_world
+	local layout = dofile(root .. "/tests/lib/layout.lua")
 
 	local function inside(frame, ancestor)
 		while frame do

@@ -1,7 +1,8 @@
 -- The resting display: the level chip is a capsule the island's own source pushes as a resting status,
 -- the lowest rung under a status and a background status.
-return function(root, check, island_world)
-	local layout = dofile(root .. "/tests/layout.lua")
+return function(root, check, lib)
+	local island_world = lib.island_world
+	local layout = dofile(root .. "/tests/lib/layout.lua")
 
 	local function world()
 		local addon, env, event, state, afters, tickers, frames = island_world()

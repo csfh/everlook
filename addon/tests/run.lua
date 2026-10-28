@@ -3,7 +3,8 @@ if root == "" then
 	root = "."
 end
 
-local source = dofile(root .. "/tests/suite.lua")(root)
+local lib = dofile(root .. "/tests/lib/worlds.lua")(root)
+local source = lib.source
 local failed, checked = 0, 0
 
 local function check(name, condition)
@@ -90,7 +91,7 @@ local kept = {
 	"quest_decide", "reward_marks", "island_contrast",
 }
 for _, name in ipairs(kept) do
-	assert(loadfile(root .. "/tests/" .. name .. ".lua"))()(root, check)
+	assert(loadfile(root .. "/tests/" .. name .. ".lua"))()(root, check, lib)
 end
 
 if failed > 0 then

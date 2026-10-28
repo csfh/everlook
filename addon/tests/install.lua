@@ -1,6 +1,6 @@
 -- The install check: module folders from another release than the core.
-return function(root, check)
-	local source = dofile(root .. "/tests/suite.lua")(root)
+return function(root, check, lib)
+	local source = lib.source
 	local function load(versions, modules)
 		local Everlook
 		Everlook = { module = { modules = modules }, say = function(text) Everlook.said = text end }

@@ -1,7 +1,8 @@
 -- The closed capsule in the states people see it: its resolved rectangles are written out so a change
 -- to how it is drawn can be compared with how it was, and its measurements are held here.
-return function(root, check, island_world, quest_world)
-	local layout = dofile(root .. "/tests/layout.lua")
+return function(root, check, lib)
+	local island_world, quest_world = lib.island_world, lib.quest_world
+	local layout = dofile(root .. "/tests/lib/layout.lua")
 
 	local function ready(world)
 		local addon, env, event, state, afters, tickers, frames = world()

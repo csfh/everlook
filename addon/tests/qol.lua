@@ -1,214 +1,6 @@
-return function(root, check)
-	local source = dofile(root .. "/tests/suite.lua")(root)
-	local function load_qol(left_out)
-		left_out = left_out or {}
-		local addon = { say = function() end }
-		local frames, callbacks, hooks, tickers = {}, {}, {}, {}
-		local env = setmetatable({}, { __index = _G })
-		env._G = env
-		-- world.lua shares the namespace as the global Everlook.
-		env.Everlook = addon
-		env.EverlookSaved = {}
-		env.IsShiftKeyDown = function() return false end
-		env.CreateColor = function(red, green, blue, alpha) return { r = red, g = green, b = blue, a = alpha } end
-		env.InCombatLockdown = function() return false end
-		env.EventUtil = {
-			ContinueOnAddOnLoaded = function(_, callback) callbacks[#callbacks + 1] = callback end,
-			ContinueOnPlayerLogin = function() end,
-		}
-		env.C_Timer = {
-			After = function(_, callback) callback() end,
-			NewTicker = function(_, callback)
-				local ticker = { callback = callback, Cancel = function(self) self.cancelled = true end }
-				tickers[#tickers + 1] = ticker
-				return ticker
-			end,
-		}
-		env.hooksecurefunc = function(target, method, callback)
-			if type(target) ~= "table" then hooks[target] = method; return end
-			local original = target[method]
-			target[method] = function(self, ...)
-				original(self, ...)
-				callback(self, ...)
-			end
-		end
-		env.CreateFrame = function(kind, name, parent, template)
-			-- The game refuses an anchor that is a table and not a frame or a region, as "Wrong object type for function".
-			local function check_anchor(_, relative)
-				if type(relative) == "table" and relative.regions == nil and relative.parent == nil and relative.GetObjectType == nil then
-					error("SetPoint(): Wrong object type for function", 3)
-				end
-			end
-			local frame = { events = {}, scripts = {}, shown = true, name = name, parent = parent, template = template, attributes = {}, regions = {}, kind = kind,
-				-- A button takes the mouse until told not to. A plain frame does not.
-				mouse = kind == "Button",
-				-- A frame starts in its parent's strata, one level above it. Creation order breaks a tie, the later on top.
-				strata = parent and parent.strata or "MEDIUM", level = (parent and parent.level or 0) + 1, order = #frames + 1 }
-			function frame:SetAttribute(key, value) self.attributes[key] = value end
-			function frame:GetAttribute(key) return self.attributes[key] end
-			function frame:RegisterForClicks(...) self.clicks = { ... } end
-			function frame:EnableMouse(enabled) self.mouse = enabled end
-			function frame:IsMouseEnabled() return self.mouse == true end
-			function frame:SetPassThroughButtons(...) self.pass_through = { ... } end
-			function frame:EnableMouseWheel(enabled) self.mouse_wheel = enabled end
-			function frame:SetScrollChild(child) self.scroll_child = child end
-			function frame:SetVerticalScroll(offset) self.scroll_offset = offset end
-			function frame:SetEnabled(enabled) self.enabled = enabled end
-			-- A ring is a cooldown held at a percentage: started that share of 100 seconds ago.
-			function frame:SetCooldown(start, duration) self.cooldown = { start = start, duration = duration } end
-			function frame:SetSwipeColor(...) self.swipe_color = { ... } end
-			function frame:Pause() self.paused = true end
-			function frame:SetAlpha(alpha) self.alpha = alpha end
-			function frame:RegisterEvent(event) self.events[event] = true; return true end
-			function frame:UnregisterEvent(event) self.events[event] = nil end
-			function frame:UnregisterEvent(event) self.events[event] = nil end
-			function frame:SetScript(name, callback) self.scripts[name] = callback end
-			function frame:SetSize(width, height) self.width, self.height = width, height end
-			function frame:SetScale(scale) self.scale = scale end
-			function frame:SetWidth(width) self.width = width end
-			function frame:SetHeight(height) self.height = height end
-			function frame:GetWidth() return self.width end
-			function frame:GetHeight() return self.height end
-			function frame:SetHitRectInsets(...) self.hit_insets = { ... } end
-			-- point keeps the last anchor, points all of them since the last clear.
-			function frame:SetPoint(...) check_anchor(...); self.point = { ... }; self.points = self.points or {}; self.points[#self.points + 1] = self.point end
-			function frame:GetPoint(index) local point = self.points and self.points[index or 1]; if point then return unpack(point) end end
-			function frame:ClearAllPoints() self.point, self.points = nil, {} end
-			function frame:SetFrameStrata(strata) self.strata = strata end
-			-- A frame's level moves the levels of everything under it by the same amount, as the client does
-			-- (read in the client: raising the island's panel one level raised its buttons one level).
-			function frame:SetFrameLevel(level)
-				local delta = level - self.level
-				self.level = level
-				if delta == 0 then return end
-				for _, other in ipairs(frames) do
-					local walker = other.parent
-					while walker do
-						if walker == self then other.level = other.level + delta; break end
-						walker = walker.parent
-					end
-				end
-			end
-			function frame:GetFrameLevel() return self.level end
-			function frame:GetFrameStrata() return self.strata end
-			function frame:SetClampedToScreen() end
-			function frame:SetClipsChildren(enabled) self.clips = enabled and true or false end
-			function frame:SetAllPoints(target) self.all_points = target or true end
-			function frame:SetMinMaxValues(min_value, max_value) self.min, self.max = min_value, max_value end
-			function frame:SetValue(value) self.value = value end
-			function frame:SetStatusBarColor(...) self.bar_color = { ... } end
-			function frame:SetStatusBarTexture(texture) self.status_texture = texture end
-			function frame:Hide() self.shown = false end
-			function frame:IsShown() return self.shown ~= false end
-			function frame:GetChildren()
-				local list = {}
-				for _, other in ipairs(frames) do
-					if other.parent == self and other.kind ~= nil and other.name ~= "" then list[#list + 1] = other end
-				end
-				return unpack(list)
-			end
-			function frame:Show() self.shown = true end
-			function frame:CreateTexture(_, layer)
-				local texture = {
-					parent = self, layer = layer,
-					SetAllPoints = function(texture, target) texture.all_points = target or true end, SetColorTexture = function(self, ...) self.color = { ... } end,
-					SetTexture = function(self, path) self.path = path end, SetTexCoord = function() end,
-					SetAtlas = function(self, atlas) self.atlas = atlas end,
-					SetVertexColor = function(self, ...) self.color = { ... } end,
-					SetGradient = function(self, orientation, low, high) self.gradient = { orientation = orientation, low = low, high = high } end,
-					SetPoint = function(self, ...) check_anchor(...); self.point = { ... }; self.points = self.points or {}; self.points[#self.points + 1] = self.point end,
-					ClearAllPoints = function(self) self.point, self.points = nil, {} end,
-					SetSize = function(self, width, height) self.width, self.height = width, height end,
-					SetRotation = function(self, radians) self.rotation = radians end,
-					Show = function(self) self.shown = true end, Hide = function(self) self.shown = false end,
-				}
-				self.regions[#self.regions + 1] = texture
-				return texture
-			end
-			function frame:CreateAnimationGroup()
-				local group = { animations = {}, scripts = {} }
-				self.animation_groups = self.animation_groups or {}
-				self.animation_groups[#self.animation_groups + 1] = group
-				function group:SetScript(name, callback) self.scripts[name] = callback end
-				function group:SetToFinalAlpha() end
-				function group:Stop() self.playing = false end
-				function group:Play()
-					self.playing = true
-					for _, animation in ipairs(self.animations) do animation.progress = 0 end
-				end
-				function group:CreateAnimation(kind)
-					local animation = { kind = kind, progress = 0 }
-					function animation:SetOffset(x, y) self.x, self.y = x, y end
-					function animation:SetFromAlpha(value) self.from = value end
-					function animation:SetToAlpha(value) self.to = value end
-					function animation:SetDuration(value) self.duration = value end
-					function animation:SetSmoothing(value) self.smoothing = value end
-					function animation:SetTarget(target) self.target = target end
-					function animation:GetSmoothProgress() return self.progress end
-					self.animations[#self.animations + 1] = animation
-					return animation
-				end
-				return group
-			end
-			function frame:CreateFontString(_, _, font)
-				local label = {
-					font = font, parent = self,
-					SetPoint = function(self, ...) check_anchor(...); self.point = { ... }; self.points = self.points or {}; self.points[#self.points + 1] = self.point end,
-					ClearAllPoints = function(self) self.point, self.points = nil, {} end,
-					SetJustifyH = function(self, justify) self.justify = justify end, SetFontObject = function(self, font) self.font = font end, SetWordWrap = function(self, enabled) self.wrap = enabled end,
-					SetText = function(self, text) self.text = text end,
-					SetWidth = function(self, width) self.width = width end, SetHeight = function(self, height) self.height = height end,
-					SetTextColor = function(self, ...) self.color = { ... } end, SetSpacing = function(self, spacing) self.spacing = spacing end,
-					SetMaxLines = function(self, lines) self.max_lines = lines end, GetLineHeight = function() return 14 end,
-					GetStringWidth = function(self) return #(self.text or ""):gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("|T.-|t", "OO") * 7 end,
-					SetNonSpaceWrap = function() end, SetAlpha = function(self, alpha) self.alpha = alpha end,
-					GetStringHeight = function(self)
-						-- Colour codes draw nothing, so they take no room.
-						local shown_length = #((self.text or ""):gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""))
-						local lines = self.wrap and math.max(1, math.ceil(shown_length / math.max(1, math.floor((self.width and self.width > 0 and self.width or 300) / 7)))) or 1
-						if self.max_lines and self.max_lines > 0 then lines = math.min(lines, self.max_lines) end
-						return lines * 14 + (lines - 1) * (self.spacing or 0)
-					end,
-					Hide = function(self) self.shown = false end, Show = function(self) self.shown = true end,
-					SetShown = function(self, value) self.shown = value end,
-				}
-				self.regions[#self.regions + 1] = label
-				return label
-			end
-			function frame:SetParent(next_parent)
-				self.parent = next_parent
-				if next_parent then self.strata, self.level = next_parent.strata or self.strata, (next_parent.level or 0) + 1 end
-			end
-			local guarded_methods = { "SetAttribute", "SetPoint", "ClearAllPoints", "SetScale", "SetSize", "Hide", "Show", "SetParent", "SetScript" }
-			for method_index = 1, #guarded_methods do
-				local method = guarded_methods[method_index]
-				local original = frame[method]
-				frame[method] = function(self, ...)
-					if type(self.template) == "string" and self.template:find("Secure", 1, true) and env.InCombatLockdown() then
-						error("protected " .. method .. " during combat")
-					end
-					if original then return original(self, ...) end
-				end
-			end
-			frames[#frames + 1] = frame
-			return frame
-		end
-		for _, file in ipairs({ "world", "module", "tooltips", "blizzard_settings", "quest_text_size", "flight_time", "friend_conveniences", "useful_tooltips", "auto_loot", "quest_automation", "auto_repair", "sell_junk", "open_containers", "fonts", "hide_clutter", "auto_responses", "chat_layout", "minimap_coordinates", "quest_levels", "reward_marks", "cinematic_skip", "camera_distance", "swing_timers", "unit_frame_names", "nameplates_kinds", "nameplates", "nameplate_titles", "quest_nameplates", "tracker_text_size", "take_mail", "tooltip_cursor", "compact_chat", "radial_menu_wheel", "radial_menu", "island_capsule", "island_row", "island_grid", "island_section", "island_blocks", "island_reaction", "island_summary", "island_quests", "island_actions", "island_vitals", "island_history", "island_surface", "island_scroll", "island_notice", "island_inbox", "island_toasts", "island_constants", "island", "island_feed_kit", "island_share", "island_quest_notices", "island_loot", "island_hearth", "island_reputation", "island_professions", "island_mail", "island_invites", "island_buffs", "island_recap", "island_experience", "island_reactions", "island_warnings", "action_shortcuts", "bags_layout", "bags_item_level", "bags_junk", "bags_categories", "bags_pins", "bags_assign", "bags_alts", "bags_recent", "bags_folds", "bags_headers", "bags_chips", "bags_search", "bags_marker", "bags", "action_bar_slots_layouts", "action_bar_slots" }) do
-			if not left_out[file] then
-				local chunk = assert(loadfile(source(file)))
-				setfenv(chunk, env)
-				chunk("Everlook", addon)
-			end
-		end
-		for _, callback in ipairs(callbacks) do callback() end
-		local function event(name, ...)
-			for _, frame in ipairs(frames) do
-				if frame.events[name] and frame.scripts.OnEvent then frame.scripts.OnEvent(frame, name, ...) end
-			end
-		end
-		return addon, env, event, hooks, tickers, frames
-	end
-	local addon, env, event = load_qol()
+return function(root, check, lib)
+	local source, load_all = lib.source, lib.load_all
+	local addon, env, event = load_all()
 	check("Everlook has thirty-two independent modules", #addon.module.modules == 32)
 	for _, module in ipairs(addon.module.modules) do
 		check(module.id .. " starts disabled", not addon.module.enabled(module.id))
@@ -271,7 +63,7 @@ return function(root, check)
 		shift_button.binding_text = "s-5"
 		shift_button:UpdateHotkeys()
 		check("disabled hooks leave native shortcut refreshes alone", shift_button.HotKey.text == "s-5")
-		local late_addon, late_env, late_event = load_qol()
+		local late_addon, late_env, late_event = load_all()
 		late_addon.module.set("action_shortcuts", "enabled", true)
 		local late_button = action_button("a-4")
 		late_env.ActionBarButtonEventsFrame = { ForEachFrame = function(_, callback) callback(late_button) end, RegisterFrame = function() end }
@@ -532,7 +324,7 @@ return function(root, check)
 	event("MERCHANT_SHOW")
 	check("unlimited guild allowance permits repair", repairs[3] == true)
 
-	local addon2, env2, event2, hooks, tickers, frames = load_qol()
+	local addon2, env2, event2, hooks, tickers, frames = load_all()
 	local bags = {
 		{ itemID = 1, quality = 0, stackCount = 2 },
 		{ itemID = 2, quality = 0, stackCount = 1 },
@@ -565,7 +357,7 @@ return function(root, check)
 	tickers[2].callback()
 	check("closing vendor cancels queued sales", #sold == 2 and tickers[2].cancelled)
 
-	local addon3, env3, event3, _, tickers3 = load_qol()
+	local addon3, env3, event3, _, tickers3 = load_all()
 	local bags3 = {
 		{ itemID = 1, quality = 0, stackCount = 1 },
 		{ itemID = 2, quality = 0, stackCount = 1, questID = 42, isActive = false },
@@ -616,7 +408,7 @@ return function(root, check)
 
 	do
 		local function container_world()
-			local module, world, event, _, timers = load_qol()
+			local module, world, event, _, timers = load_all()
 			local bags = {
 				{ itemID = 11, stackCount = 2, hasLoot = true },
 				{ itemID = 12, stackCount = 1 },
@@ -792,7 +584,7 @@ return function(root, check)
 
 	do
 		-- NPC titles give the nameplate view a subtitle line for a friendly NPC, and keep the game's settings.
-		local titles, title_env, title_event, _, _, _, _ = load_qol()
+		local titles, title_env, title_event, _, _, _, _ = load_all()
 		local function made_plate(unit, title_row)
 			local name = { justify = "CENTER" }
 			function name:GetFont() return "Fonts\\Plate.ttf", 16, "OUTLINE" end
@@ -903,7 +695,7 @@ return function(root, check)
 			cvars.UnitNameNPC == "0" and cvars.UnitNameFriendlySpecialNPCName == "1")
 	end
 
-	local names, name_env, name_event = load_qol()
+	local names, name_env, name_event = load_all()
 	local function name_font(size, height)
 		local font = { path = "Fonts\\FRIZQT__.TTF", size = size, flags = "", height = height }
 		function font:GetFont() return self.path, self.size, self.flags end
@@ -959,7 +751,7 @@ return function(root, check)
 
 	-- The default tooltip anchor is Blizzard's own call, so one hook on it moves
 	-- every tooltip the game places, unit and item tooltips alike.
-	local cursor, cursor_env, _, cursor_hooks = load_qol()
+	local cursor, cursor_env, _, cursor_hooks = load_all()
 	local owned = {}
 	cursor_env.GameTooltip = { SetOwner = function(self, owner, anchor, x, y) owned[#owned + 1] = { self = self, owner = owner, anchor = anchor, x = x, y = y } end }
 	cursor_env.GameTooltip_SetDefaultAnchor = function() end
@@ -975,12 +767,12 @@ return function(root, check)
 	cursor.module.set("tooltip_cursor", "enabled", false)
 	default_anchor(cursor_env.GameTooltip, parent)
 	check("a disabled module leaves the tooltip where the game put it", #owned == 1)
-	local bare, bare_env, _, bare_hooks = load_qol()
+	local bare, bare_env, _, bare_hooks = load_all()
 	bare_env.hooksecurefunc = nil
 	bare_env.GameTooltip = { SetOwner = function() error("without the hook there is nothing to move") end }
 	bare.module.set("tooltip_cursor", "enabled", true)
 	check("without hooksecurefunc the module does nothing", next(bare_hooks) == nil)
-	local missing, missing_env, _, missing_hooks = load_qol()
+	local missing, missing_env, _, missing_hooks = load_all()
 	missing_env.GameTooltip_SetDefaultAnchor = nil
 	missing.module.set("tooltip_cursor", "enabled", true)
 	check("without the default anchor call the module does nothing", missing_hooks.GameTooltip_SetDefaultAnchor == nil)
@@ -989,7 +781,7 @@ return function(root, check)
 	-- Replacing those format strings sets the prefix and the message color
 	-- without touching message text, which can be secret in restricted content.
 	local function chat_world()
-		local chat, chat_env, chat_event = load_qol()
+		local chat, chat_env, chat_event = load_all()
 		local added = {}
 		local function frame()
 			local window = {}
@@ -1083,7 +875,7 @@ return function(root, check)
 		-- A reload in the middle: a new session with the same saved variables, and the game still holding "none".
 		chat_env.timestamps = "%H:%M "
 		chat.module.set("compact_chat", "enabled", true)
-		local reloaded, reloaded_env = load_qol()
+		local reloaded, reloaded_env = load_all()
 		reloaded_env.EverlookSaved.modules = chat_env.EverlookSaved.modules
 		reloaded_env.EverlookSaved.compact_chat_before = chat_env.EverlookSaved.compact_chat_before
 		reloaded_env.GetCVar = chat_env.GetCVar
@@ -1101,7 +893,7 @@ return function(root, check)
 	chat.module.set("compact_chat", "enabled", false)
 	chat_env.ChatFrame1:AddMessage(say)
 	check("a disabled module leaves lines alone", chat_lines[6].text == say)
-	local plain, plain_env = load_qol()
+	local plain, plain_env = load_all()
 	plain.module.set("compact_chat", "enabled", true)
 	check("a client with none of the chat globals is left alone", plain_env.CHAT_GUILD_GET == nil)
 
@@ -1136,7 +928,7 @@ return function(root, check)
 		flying = true
 		update()
 		check("a flight in the air is kept in the saved variables", env2.EverlookSaved.modules.flight_time.current and env2.EverlookSaved.modules.flight_time.current.started == 100)
-		local resumed, resumed_env, _, resumed_hooks, _, resumed_frames = load_qol()
+		local resumed, resumed_env, _, resumed_hooks, _, resumed_frames = load_all()
 		resumed_env.EverlookSaved.modules = env2.EverlookSaved.modules
 		resumed_env.GetTime = env2.GetTime
 		resumed_env.UnitOnTaxi = env2.UnitOnTaxi
@@ -1349,7 +1141,7 @@ return function(root, check)
 	end
 
 	do
-		local typography, typography_env, typography_event = load_qol()
+		local typography, typography_env, typography_event = load_all()
 		local function inherited_font(parent, size, kind)
 			local object = { parent = parent, size = size, path = size and "original.ttf" or nil }
 			function object:GetObjectType() return kind or "Font" end
@@ -1443,7 +1235,7 @@ return function(root, check)
 		env2.GetCVar, env2.SetCVar = nil, nil
 	end
 
-	local tracker_addon, tracker_env, tracker_event = load_qol()
+	local tracker_addon, tracker_env, tracker_event = load_all()
 	local text_setting = 4
 	tracker_env.Enum = { EditModeObjectiveTrackerSetting = { TextSize = text_setting } }
 	local tracker = { text_size = 12, line = 12, header = 14 }
@@ -1546,7 +1338,7 @@ return function(root, check)
 	clear(tip); posts[1](tip, { id = 1 })
 	check("disabled tooltip hooks add no lines", #lines == 6)
 
-	local addon5, env5, event5 = load_qol()
+	local addon5, env5, event5 = load_all()
 	local function listening(names)
 		local frame = { events = {} }
 		for _, name in ipairs(names) do frame.events[name] = true end
@@ -1669,7 +1461,7 @@ return function(root, check)
 	addon5.module.set("hide_clutter", "stance_bar", false)
 	check("a missing stance bar is skipped", not env5.RaidWarningFrame.events.CHAT_MSG_RAID_WARNING)
 
-	local addon6, env6, event6 = load_qol()
+	local addon6, env6, event6 = load_all()
 	local confirmed, accepted_res, popups_hidden = 0, 0, {}
 	env6.Enum = { SummonReason = { Scenario = 2 } }
 	env6.C_SummonInfo = { ConfirmSummon = function() confirmed = confirmed + 1 end }
@@ -1737,7 +1529,7 @@ return function(root, check)
 	env6.StaticPopupDialogs.DELETE_GOOD_ITEM.OnShow(dialog)
 	check("the delete popup is hooked once, not once per enable", shown == hooked_twice + 1 and typed == "DELETE")
 
-	local addon7, env7, event7 = load_qol()
+	local addon7, env7, event7 = load_all()
 	local function chat_frame(time_visible)
 		local box = { points = { { "TOPLEFT", "frame", "BOTTOMLEFT", -5, -2 }, { "RIGHT", "bar", "RIGHT", 8, 0 } } }
 		function box:GetNumPoints() return #self.points end
@@ -2027,7 +1819,7 @@ return function(root, check)
 	check("the Everlook page has no collection controls", rows[1] == nil)
 	-- Radial wheel: geometry and drawing.
 	do
-		local radial_addon = load_qol()
+		local radial_addon = load_all()
 		local wheel = radial_addon.radial_menu_wheel
 		check("the first wedge is straight up", wheel.sector(4, 0, 100) == 1)
 		check("wedges run clockwise from the top", wheel.sector(4, 100, 0) == 2 and wheel.sector(4, 0, -100) == 3 and wheel.sector(4, -100, 0) == 4)
@@ -2045,7 +1837,7 @@ return function(root, check)
 		check("a label sits along its own direction", xa > 0 and ya > 0 and math.abs(xa / ya - 1) < 1e-6)
 	end
 	local function drawn_wheel(radial_addon, radial_env)
-		if not radial_addon then radial_addon, radial_env = load_qol() end
+		if not radial_addon then radial_addon, radial_env = load_all() end
 		local made = {}
 		local function fake(kind, name)
 			local object = { kind = kind, name = name, points = {}, shown = false }
@@ -2119,7 +1911,7 @@ return function(root, check)
 
 	-- Radial menu: what is under the cursor decides the wheel, and the secure button fires the choice.
 	local function radial_fixture(real_wheel)
-		local radial_addon, radial_env, event, _, _, frames = load_qol()
+		local radial_addon, radial_env, event, _, _, frames = load_all()
 		local button
 		for _, frame in ipairs(frames) do if frame.name == "EverlookRadialMenuButton" then button = frame end end
 		local hover = { exists = false, is_self = false, is_player = false, can_attack = false, guid = "Player-1-0A", name = "Thrall", realm = "Orgrimmar",
@@ -2569,139 +2361,8 @@ return function(root, check)
 	end
 
 	-- Island: a closed experience chip that opens into one data bar.
-	local function island_world()
-		local addon, env, event, hooks, tickers, frames = load_qol()
-		local afters, state = {}, {
-			xp = 450, xp_max = 1000, level = 12, money = 12345,
-			hour = 14, minute = 5, time = 100,
-			slots = { [1] = { 40, 50 }, [5] = { 10, 20 } },
-			bags = { [0] = 6, [1] = 2 }, bag_families = {},
-			health_reads = 0, name_reads = 0, power_reads = 0,
-		}
-		local function forbidden(kind)
-			return function()
-				state[kind] = (state[kind] or 0) + 1
-				error(kind .. " is not a safe island readout")
-			end
-		end
-		env.C_Timer.After = function(delay, callback)
-			afters[#afters + 1] = { delay = delay, callback = callback }
-		end
-		env.UIParent = { regions = {} }
-		env.BACKPACK_CONTAINER = 0
-		env.NUM_BAG_SLOTS = 1
-		env.INVSLOT_FIRST_EQUIPPED = 1
-		env.INVSLOT_LAST_EQUIPPED = 19
-		env.UnitXP = function() return state.xp end
-		env.UnitXPMax = function() return state.xp_max end
-		env.UnitLevel = function() return state.level end
-		env.GetMoney = function() return state.money end
-		env.GetGameTime = function() return state.hour, state.minute end
-		env.GetTime = function() return state.time end
-		env.GetInventoryItemDurability = function(slot)
-			local pair = state.slots[slot]
-			if pair then return pair[1], pair[2] end
-		end
-		env.C_Container = {
-			GetContainerNumFreeSlots = function(bag) return state.bags[bag] or 0, state.bag_families[bag] or 0 end,
-		}
-		env.C_Map = {
-			GetBestMapForUnit = function() return 37 end,
-			GetPlayerMapPosition = function()
-				return { GetXY = function() return 0.5, 0.25 end }
-			end,
-		}
-		env.UnitHealth = forbidden("health_reads")
-		env.UnitHealthMax = forbidden("health_reads")
-		env.UnitPower = forbidden("power_reads")
-		env.UnitName = forbidden("name_reads")
-		env.MainMenuExpBar = { Hide = function() error("the default experience bar must stay") end }
-		env.StatusTrackingBarManager = { Hide = function() error("the default experience bar must stay") end }
-		env.EverlookMinimapButton = { SetParent = function() error("the minimap button must stay") end }
-		-- The geometry tests measure the plain level chip. The wider pill has its own tests.
-		addon.module.set("island", "closed_xp", false)
-		return addon, env, event, state, afters, tickers, frames, hooks
-	end
-	local function fire_after(afters, delay)
-		for index = 1, #afters do
-			if afters[index].delay == delay and not afters[index].done then
-				afters[index].done = true
-				afters[index].callback()
-				return true
-			end
-		end
-	end
-	local function finish_animations(frames)
-		local pending = {}
-		for _, frame in ipairs(frames) do
-			for _, group in ipairs(frame.animation_groups or {}) do
-				if group.playing then pending[#pending + 1] = group end
-			end
-		end
-		for _, group in ipairs(pending) do
-			group.playing = false
-			for _, animation in ipairs(group.animations) do animation.progress = 1 end
-			if group.scripts.OnFinished then group.scripts.OnFinished(group) end
-		end
-	end
-	local function last_toast_text(addon)
-		local toasts = addon.island.view().toasts
-		return toasts[#toasts] and toasts[#toasts].text
-	end
-	-- A bar is a status bar that is showing. The island draws none of its own now.
-	local function shown_bar(frames)
-		for index = 1, #frames do
-			if frames[index].value ~= nil and frames[index].shown == true then return frames[index] end
-		end
-	end
-	local function secret_stat()
-		local value = newproxy(true)
-		local meta = getmetatable(value)
-		meta.__add = function() error("arithmetic on a secret value") end
-		meta.__sub = function() error("arithmetic on a secret value") end
-		meta.__mul = function() error("arithmetic on a secret value") end
-		meta.__div = function() error("arithmetic on a secret value") end
-		meta.__unm = function() error("arithmetic on a secret value") end
-		meta.__lt = function() error("comparison on a secret value") end
-		meta.__le = function() error("comparison on a secret value") end
-		return value
-	end
-	local function quest_world()
-		local addon, env, event, state, afters, tickers, frames = island_world()
-		state.quests, state.watched, state.selected = {
-			{ questID = 21, title = "Nearby dangerous", level = 18, distance = 100 },
-			{ questID = 22, title = "Suitable farther", level = 12, distance = 800 },
-			{ questID = 23, title = "Ready to return", level = 40, distance = 400, ready = true },
-			{ questID = 24, title = "Across the sea", level = 12, distance = 1, remote = true },
-		}, { 21, 22 }, 22
-		for _, quest in ipairs(state.quests) do quest.objectives = { { text = "Collect things", numFulfilled = 1, numRequired = 6, finished = false } } end
-		local function find(id)
-			for _, quest in ipairs(state.quests) do if quest.questID == id then return quest end end
-		end
-		env.C_QuestLog = {
-			GetNumQuestLogEntries = function() return #state.quests end,
-			GetInfo = function(index) return state.quests[index] end,
-			GetNumQuestWatches = function() return #state.watched end,
-			GetQuestIDForQuestWatchIndex = function(index) return state.watched[index] end,
-			GetQuestObjectives = function(id) return find(id).objectives end,
-			GetDistanceSqToQuest = function(id)
-				local quest = find(id)
-				return quest.distance and quest.distance * quest.distance, not quest.remote
-			end,
-			ReadyForTurnIn = function(id) return find(id).ready or false end,
-		}
-		env.C_SuperTrack = { GetSuperTrackedQuestID = function() return state.selected end }
-		addon.module.set("island", "enabled", true)
-		-- The older quest tests exercise the fallbacks that apply without a suggestion. The suggestion has its own tests.
-		addon.module.set("island", "quest_plan", false)
-		-- Quest events collapse inside half a second. These tests treat each event as its own moment.
-		local burst_event = event
-		event = function(name, ...)
-			if name:find("^QUEST_") or name == "SUPER_TRACKING_CHANGED" then state.time = state.time + 1 end
-			return burst_event(name, ...)
-		end
-		return addon, env, event, state, afters, tickers, frames
-	end
+	local island_world, fire_after, finish_animations = lib.island_world, lib.fire_after, lib.finish_animations
+	local last_toast_text, shown_bar, secret_stat, quest_world = lib.last_toast_text, lib.shown_bar, lib.secret_stat, lib.quest_world
 	do
 		local addon, env, event, state, _, tickers = quest_world()
 		check("quest context starts off", addon.island.view().quests == nil)
@@ -2821,7 +2482,7 @@ return function(root, check)
 		end
 		check("expanded quest plan is headed Next up and explains its order", label("NEXT UP") and containing("Closest to you and matched to your level"))
 		local current = addon.island.view().quests.current
-		local lay = dofile(root .. "/tests/layout.lua").new()
+		local lay = dofile(root .. "/tests/lib/layout.lua").new()
 		local function pane_title()
 			-- The quest's name is on the capsule too, so take the one that is down in the pane.
 			local found
@@ -2979,7 +2640,7 @@ return function(root, check)
 			end
 		end
 		if os.getenv("ISLAND_LAYOUT_DIR") then
-			local layout = dofile(root .. "/tests/layout.lua")
+			local layout = dofile(root .. "/tests/lib/layout.lua")
 			local top
 			for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then top = frame end end
 			layout.settle(frames)
@@ -3184,7 +2845,7 @@ return function(root, check)
 		check("the arrow follows the suggestion", asked[#asked] == 23 and state.selected == 22)
 		addon.island.pin_quest(21)
 		-- A new quest is a new capsule, and may be drawn in the other slot once its fade has played, so the arrow is found again.
-		dofile(root .. "/tests/layout.lua").settle(frames)
+		dofile(root .. "/tests/lib/layout.lua").settle(frames)
 		capsule, inspection, closed_arrow, open_arrow = arrows()
 		check("the arrow follows the pinned quest", asked[#asked] == 21 and state.selected == 22 and closed_arrow.shown)
 		state.quests[1].waypoint = { map = 12, x = 0.5, y = 0.25 }
@@ -4071,7 +3732,7 @@ return function(root, check)
 		check("changed content rearms unread without duplicating history", addon.island.view().unread_count == 1 and #addon.island.view().notices == 1)
 	end
 	do
-		local island, island_env = load_qol()
+		local island, island_env = load_all()
 		local found
 		for _, module in ipairs(island.module.modules) do
 			if module.id == "island" then found = module end
@@ -4136,7 +3797,7 @@ return function(root, check)
 				if region.text == "Money" then metric = region end
 			end
 		end
-		local lay = dofile(root .. "/tests/layout.lua").new()
+		local lay = dofile(root .. "/tests/lib/layout.lua").new()
 		check("the open bar shows the time and the experience percent beside the level", clock ~= nil and experience ~= nil
 			and lay.rectangle(clock).top == lay.rectangle(heading).top + (lay.rectangle(heading).height - lay.rectangle(clock).height) / 2)
 		check("the first section clears the level text by a section gap", lay.rectangle(status).top >= lay.rectangle(heading).bottom + 16 - 4)
@@ -4335,7 +3996,7 @@ return function(root, check)
 					if region.text == "Money" and region.shown ~= false then money_cell = region.parent end
 				end
 			end
-			local lay = dofile(root .. "/tests/layout.lua").new()
+			local lay = dofile(root .. "/tests/lib/layout.lua").new()
 			local position_box, money_box = lay.rectangle(position), lay.rectangle(money_cell)
 			check("the position cell shares money's row, to its right",
 				position_box.top == money_box.top and position_box.left == money_box.right + 24)
@@ -4395,7 +4056,7 @@ return function(root, check)
 		local function status_top()
 			for _, object in ipairs(frames) do
 				for _, region in ipairs(object.regions or {}) do
-					if region.text == "STATUS" and region.shown ~= false then return dofile(root .. "/tests/layout.lua").new().rectangle(region).top - 12 end
+					if region.text == "STATUS" and region.shown ~= false then return dofile(root .. "/tests/lib/layout.lua").new().rectangle(region).top - 12 end
 				end
 			end
 		end
@@ -4588,7 +4249,7 @@ return function(root, check)
 			"island_mail", "island_invites", "island_buffs", "island_recap", "island_experience", "island_warnings" }) do
 			feeds[file] = true
 		end
-		local addon, env, event = load_qol(feeds)
+		local addon, env, event = load_all(feeds)
 		addon.module.set("island", "enabled", true)
 		check("the island runs with its feed addons turned off", addon.island.apply_preset("Informative")
 			and addon.module.get("island", "closed_clock") == true and addon.module.get("island", "feed_loot") == nil)
@@ -4606,7 +4267,7 @@ return function(root, check)
 	end
 
 	do
-		local addon, env = load_qol()
+		local addon, env = load_all()
 		check("the island's one table sits on the shared namespace, with its public calls", env.Everlook.island == addon.island and type(env.Everlook.island.notify) == "function" and type(env.Everlook.island.view) == "function")
 	end
 
@@ -6134,7 +5795,7 @@ return function(root, check)
 	island_action_tests()
 	do
 		-- Resolves the recorded anchors to rectangles, so these checks read where parts land.
-		local layout = dofile(root .. "/tests/layout.lua")
+		local layout = dofile(root .. "/tests/lib/layout.lua")
 		local addon, _, _, _, _, _, frames = quest_world()
 		addon.module.set("island", "quest_context", true)
 		addon.module.set("island", "reduced_motion", true)
@@ -6179,7 +5840,7 @@ return function(root, check)
 		check("the title starts at the text column, 34 from the left edge", title.left - capsule.left == 34)
 	end
 	do
-		local layout = dofile(root .. "/tests/layout.lua")
+		local layout = dofile(root .. "/tests/lib/layout.lua")
 		local addon, env, _, _, _, _, frames = quest_world()
 		addon.module.set("island", "quest_context", true)
 		-- Reduced motion snaps the closed pill and the open panel to their final size, which the fake frames cannot animate.
@@ -6244,18 +5905,18 @@ return function(root, check)
 		check("four metric cells across are 156 wide, three columns each, on the 24 gutter",
 			money.width == 156 and gear.left - money.left == 156 + 24 and bags.left - gear.left == 156 + 24 and money.left - island.left == 12)
 	end
-	assert(loadfile(root .. "/tests/island_seam.lua"))()(root, check, island_world, quest_world, secret_stat)
-	assert(loadfile(root .. "/tests/island_sections.lua"))()(root, check, island_world, quest_world)
-	assert(loadfile(root .. "/tests/island_reaction.lua"))()(root, check, island_world, quest_world)
-	assert(loadfile(root .. "/tests/island_capsule_states.lua"))()(root, check, island_world, quest_world)
-	assert(loadfile(root .. "/tests/island_capsule_api.lua"))()(root, check, island_world)
-	assert(loadfile(root .. "/tests/island_resting.lua"))()(root, check, island_world)
-	assert(loadfile(root .. "/tests/island_realclient.lua"))()(root, check, island_world)
-	assert(loadfile(root .. "/tests/island_mouse.lua"))()(root, check, island_world, quest_world)
-	assert(loadfile(root .. "/tests/nameplates.lua"))()(root, check, island_world)
-	assert(loadfile(root .. "/tests/quest_nameplates.lua"))()(root, check, island_world)
-	assert(loadfile(root .. "/tests/island_reactions.lua"))()(root, check, island_world)
-	assert(loadfile(root .. "/tests/island_share.lua"))()(root, check, load_qol)
-assert(loadfile(root .. "/tests/sell_junk_marked.lua"))()(root, check, load_qol)
+	assert(loadfile(root .. "/tests/island_seam.lua"))()(root, check, lib)
+	assert(loadfile(root .. "/tests/island_sections.lua"))()(root, check, lib)
+	assert(loadfile(root .. "/tests/island_reaction.lua"))()(root, check, lib)
+	assert(loadfile(root .. "/tests/island_capsule_states.lua"))()(root, check, lib)
+	assert(loadfile(root .. "/tests/island_capsule_api.lua"))()(root, check, lib)
+	assert(loadfile(root .. "/tests/island_resting.lua"))()(root, check, lib)
+	assert(loadfile(root .. "/tests/island_realclient.lua"))()(root, check, lib)
+	assert(loadfile(root .. "/tests/island_mouse.lua"))()(root, check, lib)
+	assert(loadfile(root .. "/tests/nameplates.lua"))()(root, check, lib)
+	assert(loadfile(root .. "/tests/quest_nameplates.lua"))()(root, check, lib)
+	assert(loadfile(root .. "/tests/island_reactions.lua"))()(root, check, lib)
+	assert(loadfile(root .. "/tests/island_share.lua"))()(root, check, lib)
+assert(loadfile(root .. "/tests/sell_junk_marked.lua"))()(root, check, lib)
 
 end

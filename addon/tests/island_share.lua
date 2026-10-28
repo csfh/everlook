@@ -1,4 +1,5 @@
-return function(_, check, load_qol)
+return function(_, check, lib)
+	local load_all = lib.load_all
 	local function arm(env)
 		env.LE_PARTY_CATEGORY_HOME = 1
 		env.LE_PARTY_CATEGORY_INSTANCE = 2
@@ -36,7 +37,7 @@ return function(_, check, load_qol)
 	end
 
 	local function ready()
-		local addon, env, event = load_qol()
+		local addon, env, event = load_all()
 		arm(env)
 		addon.module.set("island", "enabled", true)
 		return addon, env, event

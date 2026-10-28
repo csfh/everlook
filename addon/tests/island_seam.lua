@@ -1,5 +1,6 @@
-return function(root, check, island_world, quest_world, secret_stat)
-	local source = dofile(root .. "/tests/suite.lua")(root)
+return function(root, check, lib)
+	local island_world, quest_world, secret_stat = lib.island_world, lib.quest_world, lib.secret_stat
+	local source = lib.source
 	local function read_source(name)
 		local handle = assert(io.open((source(name)), "r"))
 		local text = handle:read("*a")
@@ -650,7 +651,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 		addon.module.set("island", "enabled", true)
 		local function face() for _, f in ipairs(frames) do if f.name == "EverlookIslandFace" then return f end end end
 		-- The text on the pill that shows now: a region of a visible frame under the face.
-		local layout_tests = dofile(root .. "/tests/layout.lua")
+		local layout_tests = dofile(root .. "/tests/lib/layout.lua")
 		local function shown(text)
 			layout_tests.settle(frames)
 			for _, frame in ipairs(frames) do
@@ -693,7 +694,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 				end
 			end
 		end
-		local measure = dofile(root .. "/tests/layout.lua").new()
+		local measure = dofile(root .. "/tests/lib/layout.lua").new()
 		local function cell(text) local found = label(text); return found and measure.rectangle(found.parent) end
 		check("the open summary has a Status heading", label("STATUS") ~= nil)
 		local money, gear, bags = cell("Money"), cell("Gear"), cell("Bags")
@@ -938,7 +939,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 		local quiet_offset = badge_point()[4]
 		addon.island.notify({ source = "Test", key = "unread", text = "Something new" })
 		check("an unread count moves the capsule badge left to clear it", badge_point()[4] < quiet_offset)
-		local measure = dofile(root .. "/tests/layout.lua").new()
+		local measure = dofile(root .. "/tests/lib/layout.lua").new()
 		local function region_for(text)
 			for _, frame in ipairs(frames) do
 				for _, region in ipairs(frame.regions or {}) do

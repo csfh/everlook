@@ -1,5 +1,6 @@
 -- Reactions: the arithmetic of a brief flash on the island's body, then how the island shows it.
-return function(root, check, island_world, quest_world, secret_stat)
+return function(root, check, lib)
+	local island_world, quest_world, secret_stat = lib.island_world, lib.quest_world, lib.secret_stat
 	local function near(actual, expected) return actual ~= nil and math.abs(actual - expected) < 1e-9 end
 
 	do
@@ -189,7 +190,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 	do
 		local dir = os.getenv("ISLAND_LAYOUT_DIR")
 		if dir then
-			local layout = dofile(root .. "/tests/layout.lua")
+			local layout = dofile(root .. "/tests/lib/layout.lua")
 			local function dump(name, make_world, kind, open_it)
 				local addon, env, event, state, _, _, frames = make_world()
 				addon.module.set("island", "enabled", true)

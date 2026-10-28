@@ -1,6 +1,6 @@
 -- Holding the garbage collector while the game loads, and starting it again.
-return function(root, check)
-	local source = dofile(root .. "/tests/suite.lua")(root)
+return function(root, check, lib)
+	local source = lib.source
 
 	-- A load: `opts` says what the saved settings are and whether the player is in.
 	local function load(opts)

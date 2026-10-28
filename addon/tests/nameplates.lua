@@ -1,6 +1,7 @@
 -- The nameplate view: which kind a plate is, which kinds it works on, the places providers fill, and that a plate the
 -- game lays out again keeps the layout.
-return function(root, check, island_world)
+return function(root, check, lib)
+	local island_world = lib.island_world
 	local addon, env, event, _, afters = island_world()
 	local function settle()
 		for _, after in ipairs(afters) do

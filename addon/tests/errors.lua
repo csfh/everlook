@@ -1,6 +1,6 @@
 -- The ring of errors Everlook caught.
-return function(root, check)
-	local source = dofile(root .. "/tests/suite.lua")(root)
+return function(root, check, lib)
+	local source = lib.source
 	local Everlook = {}
 	local env = setmetatable({ time = function() return 77 end }, { __index = _G })
 	env._G = env

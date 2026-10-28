@@ -1,7 +1,7 @@
 -- The module registry on its own: registration from other addons, settings
 -- page order, and extensions that add to a module another addon registered.
-return function(root, check)
-	local source = dofile(root .. "/tests/suite.lua")(root)
+return function(root, check, lib)
+	local source = lib.source
 	local function load_registry()
 		local namespace = {}
 		local loaded, waiting, frames = {}, {}, {}

@@ -1,6 +1,6 @@
 -- The settings page is built a few frames after login, or at once when it is opened first.
-return function(root, check)
-	local source = dofile(root .. "/tests/suite.lua")(root)
+return function(root, check, lib)
+	local source = lib.source
 
 	local function load(with_sched, cvars)
 		local said = {}

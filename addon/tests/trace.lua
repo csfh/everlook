@@ -1,6 +1,6 @@
 -- The load trace: when each part of a load happened, and what it cost.
-return function(root, check)
-	local source = dofile(root .. "/tests/suite.lua")(root)
+return function(root, check, lib)
+	local source = lib.source
 
 	local function load(setup)
 		local Everlook = {}

@@ -1,6 +1,6 @@
 -- What quest automation decides at each window, from the facts alone, and why it does nothing when it does nothing.
-return function(root, check)
-	local source = dofile(root .. "/tests/suite.lua")(root)
+return function(root, check, lib)
+	local source = lib.source
 	local Everlook = { module = { register = function() end, get = function() return false end, paused = function() return false end } }
 	local env = setmetatable({}, { __index = _G })
 	env._G = env

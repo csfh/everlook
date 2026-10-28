@@ -1,6 +1,6 @@
 -- The coin mark on the reward choice that sells for the most.
-return function(root, check)
-	local source = dofile(root .. "/tests/suite.lua")(root)
+return function(root, check, lib)
+	local source = lib.source
 
 	local function setup(options)
 		options = options or {}

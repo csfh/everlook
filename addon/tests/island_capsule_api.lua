@@ -1,7 +1,8 @@
 -- The capsule spec a producer gives a status: what it accepts, what it draws, and how it stays right
 -- as it changes. Every call goes through Everlook.island, as an outside addon would make it.
-return function(root, check, island_world)
-	local layout = dofile(root .. "/tests/layout.lua")
+return function(root, check, lib)
+	local island_world = lib.island_world
+	local layout = dofile(root .. "/tests/lib/layout.lua")
 
 	local function world()
 		local addon, env, event, state, afters, tickers, frames = island_world()

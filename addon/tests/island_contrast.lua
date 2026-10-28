@@ -1,6 +1,6 @@
 -- The island's text must stay readable on its most see-through setting over the brightest ground in the game.
-return function(root, check)
-	local source = dofile(root .. "/tests/suite.lua")(root)
+return function(root, check, lib)
+	local source = lib.source
 	local Everlook = { island_grid = { widths = { one = 1, two = 2 } } }
 	local env = setmetatable({ Everlook = Everlook }, { __index = _G })
 	env._G = env

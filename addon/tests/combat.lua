@@ -1,6 +1,6 @@
 -- The shared secret-value helpers and the out-of-combat queue.
-return function(root, check)
-	local source = dofile(root .. "/tests/suite.lua")(root)
+return function(root, check, lib)
+	local source = lib.source
 	local function load(extra)
 		local Everlook = {}
 		local env

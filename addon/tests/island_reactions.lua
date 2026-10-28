@@ -1,5 +1,6 @@
 -- Everlook_IslandReactions: what it decides is worth a flash, and what it leaves alone.
-return function(root, check, island_world)
+return function(root, check, lib)
+	local island_world = lib.island_world
 	local function surface_pieces(frames)
 		local list = {}
 		for _, frame in ipairs(frames) do

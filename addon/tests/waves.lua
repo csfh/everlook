@@ -1,5 +1,5 @@
-return function(root, check)
-	local source = dofile(root .. "/tests/suite.lua")(root)
+return function(root, check, lib)
+	local source = lib.source
 	local function load(files)
 		local addon = {}
 		local frames, callbacks, tickers = {}, {}, {}

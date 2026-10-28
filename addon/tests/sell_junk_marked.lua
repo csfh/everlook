@@ -1,10 +1,11 @@
 -- Sell junk with items the player marked in Bags, using the real Bags module.
 -- Marked items go through the same checks as a grey item, except the grey quality.
-return function(root, check, load_qol)
+return function(root, check, lib)
+	local load_all = lib.load_all
 	-- One vendor visit. `setup` can change the world after the Bags settings are in place and
 	-- before the vendor opens. `during` runs after the vendor opened and before the first sale.
 	local function visit(setup, during)
-		local addon, env, event, _, tickers = load_qol()
+		local addon, env, event, _, tickers = load_all()
 		local slots = {
 			{ itemID = 1, quality = 0, stackCount = 1 },
 			{ itemID = 2, quality = 1, stackCount = 1 },
@@ -54,7 +55,7 @@ return function(root, check, load_qol)
 	check("a grey item and a marked item sell, and an unmarked white item stays", (visit()) == "1,3")
 	check("without the option only the grey item sells", (visit(function(w) w.addon.module.set("sell_junk", "marked_junk", false) end)) == "1")
 	check("the option is off until it is turned on", (function()
-		local addon = load_qol()
+		local addon = load_all()
 		for _, module in ipairs(addon.module.modules) do
 			if module.id == "sell_junk" then return module.options.marked_junk and module.options.marked_junk.default == false end
 		end

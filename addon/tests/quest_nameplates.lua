@@ -1,6 +1,7 @@
 -- The quest mark beside a nameplate: whom it marks, where it goes, that the name is left-aligned beside it and put
 -- back, and that it all comes and goes with the plate.
-return function(root, check, island_world)
+return function(root, check, lib)
+	local island_world = lib.island_world
 	local addon, env, event, _, afters = island_world()
 	-- A burst of quest log events is looked at once, a moment after the last.
 	local function settle()

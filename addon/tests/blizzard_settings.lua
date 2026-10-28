@@ -1,7 +1,7 @@
 -- ensure and release for the game's own settings, on a stand-in for the toggle calls.
 -- What the game does with a changed setting is not tested here.
-return function(root, check)
-	local source = dofile(root .. "/tests/suite.lua")(root)
+return function(root, check, lib)
+	local source = lib.source
 
 	local function world(options)
 		options = options or {}

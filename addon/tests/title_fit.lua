@@ -1,6 +1,6 @@
 -- A title that does not fit: the longest wording that does, then a cut at a word, never inside one.
-return function(root, check)
-	local source = dofile(root .. "/tests/suite.lua")(root)
+return function(root, check, lib)
+	local source = lib.source
 	local Everlook = {}
 	local env = setmetatable({ Everlook = Everlook }, { __index = _G })
 	env._G = env

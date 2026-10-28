@@ -1,6 +1,6 @@
 -- Telling the player when a module is on beside an addon that changes the same thing.
-return function(root, check)
-	local source = dofile(root .. "/tests/suite.lua")(root)
+return function(root, check, lib)
+	local source = lib.source
 	local function load(loaded_addons, enabled_modules)
 		local said = {}
 		local Everlook

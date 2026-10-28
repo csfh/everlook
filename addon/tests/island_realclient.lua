@@ -1,8 +1,9 @@
 -- What the game does that the fake frames do not. The fakes keep their state in plain fields (.mouse,
 -- .point, .scripts and the like) that a real frame does not have, so production code that reads one of
 -- them works in the tests and silently does nothing in the game.
-return function(root, check, island_world)
-	local layout = dofile(root .. "/tests/layout.lua")
+return function(root, check, lib)
+	local island_world = lib.island_world
+	local layout = dofile(root .. "/tests/lib/layout.lua")
 
 	do
 		local listing = io.popen("cd " .. root .. " && ls Everlook*/*.lua")
