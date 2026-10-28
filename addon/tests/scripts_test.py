@@ -288,6 +288,24 @@ class LayoutTest(unittest.TestCase):
                 expected = re.sub(r"(?<!^)(?=[A-Z])", "_", folder.name.removeprefix("Everlook_")).lower()
                 self.assertEqual(ids, [expected])
 
+    def test_files_and_tables_are_named_for_the_module(self):
+        # A module's files are <id>.lua and <id>_<part>.lua, an Island extension's is island_<id>.lua,
+        # and a file puts on Everlook only the module's table, Everlook.<id>, or one named for itself.
+        for folder in self.folders():
+            if folder.name == "Everlook":
+                continue
+            name = folder.name.removeprefix("Everlook_")
+            extension = self.is_island(name) and name != "Island"
+            module_id = re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
+            for path in sorted(folder.glob("*.lua")):
+                with self.subTest(file=f"{folder.name}/{path.name}"):
+                    if extension:
+                        self.assertEqual(path.stem, module_id)
+                    else:
+                        self.assertTrue(path.stem == module_id or path.stem.startswith(module_id + "_"), path.stem)
+                    tables = set(re.findall(r"^\s*Everlook\.([a-z_]+)\s*=", path.read_text(), re.M))
+                    self.assertLessEqual(tables, {module_id, path.stem})
+
     NAMEPLATE_PROVIDERS = {"QuestNameplates", "NameplateTitles"}
 
     def test_modules_depend_on_everlook_and_sit_in_its_group(self):
