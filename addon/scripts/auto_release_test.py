@@ -6,7 +6,6 @@ from pathlib import Path
 
 import auto_release
 
-PRODUCT = "addon"
 VERSION_FILE = "Everlook/Everlook.toc"
 TAG = "addon-v"
 
@@ -130,8 +129,7 @@ class Planning(unittest.TestCase):
     def test_a_harness_commit_does_not_release_the_addon(self) -> None:
         (self.repo / "harness").mkdir()
         after = self.commit("harness/runtime.rs", "two\n", "fix: model a frame rule")
-        paths = auto_release.PRODUCTS[PRODUCT]["paths"]
-        self.assertEqual(auto_release.plan_release(self.repo, self.before, after, VERSION_FILE, paths), (None, False))
+        self.assertEqual(auto_release.plan_release(self.repo, self.before, after, VERSION_FILE, auto_release.ADDON_PATHS), (None, False))
 
     def test_only_the_version_line_the_bump_writes_counts_as_a_hand_set_version(self) -> None:
         self.assertTrue(auto_release.version_field_changed("-## Version: 1.0.0\n+## Version: 1.1.0\n"))
@@ -141,7 +139,7 @@ class Planning(unittest.TestCase):
 
     def test_bumps_the_version_file(self) -> None:
         after = self.commit("src.txt", "two\n", "feat: change")
-        version, bumped, release, level = auto_release.maybe_bump(PRODUCT, self.repo, self.before, after)
+        version, bumped, release, level = auto_release.maybe_bump(self.repo, self.before, after)
         self.assertEqual((version, bumped, release, level), ("0.5.0", True, True, "minor"))
         self.assertIn("0.5.0", (self.repo / VERSION_FILE).read_text())
 
@@ -170,7 +168,7 @@ class Notes(unittest.TestCase):
         self.commit("fix: stop the crash")
         self.commit("docs: explain")
         self.commit("chore: release x 0.2.0")
-        notes = auto_release.release_notes(self.repo, TAG + "0.1.0", PRODUCT)
+        notes = auto_release.release_notes(self.repo, TAG + "0.1.0")
         self.assertIn("## Features", notes)
         self.assertIn("show a chip", notes)
         self.assertIn("## Fixes and improvements", notes)
@@ -181,18 +179,18 @@ class Notes(unittest.TestCase):
         self.commit("fix: stop the crash\n\nReported-by: Ana\nReported-by: Bo")
         self.commit("fix: keep the window open\n\nReported-by: ana")
         self.commit("docs: explain\n\nReported-by: Cy")
-        notes = auto_release.release_notes(self.repo, TAG + "0.1.0", PRODUCT)
+        notes = auto_release.release_notes(self.repo, TAG + "0.1.0")
         self.assertIn("## Thanks", notes)
         self.assertIn("For reporting what these fix: Ana, Bo.", notes)
         self.assertNotIn("Cy", notes)
 
     def test_no_thanks_section_without_a_reporter(self) -> None:
         self.commit("fix: stop the crash")
-        self.assertNotIn("Thanks", auto_release.release_notes(self.repo, TAG + "0.1.0", PRODUCT))
+        self.assertNotIn("Thanks", auto_release.release_notes(self.repo, TAG + "0.1.0"))
 
     def test_housekeeping_only_is_a_maintenance_release(self) -> None:
         self.commit("chore: tidy")
-        self.assertEqual(auto_release.release_notes(self.repo, TAG + "0.1.0", PRODUCT), "Maintenance release.\n")
+        self.assertEqual(auto_release.release_notes(self.repo, TAG + "0.1.0"), "Maintenance release.\n")
 
 
 if __name__ == "__main__":

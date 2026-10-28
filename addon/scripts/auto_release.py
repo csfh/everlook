@@ -21,6 +21,10 @@ SEMVER = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 # The one form of the version line: the bump writes it, and the hand-set check reads only it.
 TOC_VERSION = re.compile(r"^(## Version: )(\S+)", re.MULTILINE)
 ZERO_SHA = "0" * 40
+VERSION_FILE = "Everlook/Everlook.toc"
+# The harness is a test tool that lives here; its commits never release the addon.
+ADDON_PATHS = [".", ":(exclude)harness"]
+TAG_PREFIX = "addon-v"
 
 
 LEVELS = ("patch", "minor", "major")
@@ -70,7 +74,7 @@ def highest(levels: list[str | None]) -> str | None:
 
 
 def bump_addon(root: Path, level: str = "patch") -> str:
-    toc_path = root / "Everlook" / "Everlook.toc"
+    toc_path = root / VERSION_FILE
     text = toc_path.read_text()
     match = TOC_VERSION.search(text)
     if match is None:
@@ -91,11 +95,11 @@ def commit_known(root: Path, sha: str) -> bool:
 
 
 def commits_touching(
-    root: Path, before: str, after: str, product_paths: list[str]
+    root: Path, before: str, after: str, paths: list[str]
 ) -> list[tuple[str, str]]:
-    """Subject and body of each commit in before..after that touches the product."""
+    """Subject and body of each commit in before..after that touches the paths."""
     out = git(
-        root, "log", "--format=%s%x1f%b%x1e", f"{before}..{after}", "--", *product_paths
+        root, "log", "--format=%s%x1f%b%x1e", f"{before}..{after}", "--", *paths
     )
     commits = []
     for record in out.split("\x1e"):
@@ -105,15 +109,6 @@ def commits_touching(
     return commits
 
 
-PRODUCTS = {
-    "addon": {
-        "file": "Everlook/Everlook.toc",
-        # The harness is a test tool that lives here; its commits never release the addon.
-        "paths": [".", ":(exclude)harness"],
-        "tag": "addon-v",
-    },
-}
-PRODUCT_PATHS = {name: product["paths"] for name, product in PRODUCTS.items()}
 NOTE_SECTIONS = (
     ("major", "Breaking changes"),
     ("minor", "Features"),
@@ -121,17 +116,16 @@ NOTE_SECTIONS = (
 )
 
 
-def release_notes(root: Path, since: str, product: str) -> str:
-    """Markdown notes for the commits that touched a product since a ref.
+def release_notes(root: Path, since: str) -> str:
+    """Markdown notes for the commits that touched the addon since a ref.
 
     Housekeeping commits and release commits are left out. A missing or empty
     ref falls back to the latest commit, so a first release still has notes.
     """
-    paths = PRODUCT_PATHS[product]
     if since in ("", ZERO_SHA):
-        out = git(root, "log", "-1", "--format=%h%x1f%s%x1f%b%x1e", "--", *paths)
+        out = git(root, "log", "-1", "--format=%h%x1f%s%x1f%b%x1e", "--", *ADDON_PATHS)
     else:
-        out = git(root, "log", f"--format=%h%x1f%s%x1f%b%x1e", f"{since}..HEAD", "--", *paths)
+        out = git(root, "log", f"--format=%h%x1f%s%x1f%b%x1e", f"{since}..HEAD", "--", *ADDON_PATHS)
     grouped: dict[str, list[str]] = {level: [] for level, _ in NOTE_SECTIONS}
     thanks: dict[str, str] = {}
     for record in out.split("\x1e"):
@@ -175,11 +169,10 @@ def latest_tag(root: Path, prefix: str, ref: str) -> str | None:
 
 
 def release_base(root: Path, tag_prefix: str | None, version_file: str, ref: str) -> str | None:
-    """Where counting starts for a product: its last release tag.
+    """Where counting starts: the last release tag.
 
-    A product that was released before tags were made has none. Its last
-    "chore: release" commit on its own version file marks the same point, so
-    work after it is still counted when a push fails to release it.
+    Without one, the last "chore: release" commit on the version file marks the
+    same point, so work after it is still counted when a push fails to release it.
     """
     tag = latest_tag(root, tag_prefix, ref) if tag_prefix else None
     if tag is not None:
@@ -196,12 +189,12 @@ def plan_release(
     before: str,
     after: str,
     version_file: str,
-    product_paths: list[str],
+    paths: list[str],
     tag_prefix: str | None = None,
 ) -> tuple[str | None, bool]:
     """Return (bump level, whether to release).
 
-    Commits are counted from the product's last release (see release_base), so
+    Commits are counted from the last release (see release_base), so
     a push whose tests failed or whose run was cancelled still counts in the
     next one. With no release at all, only this push counts. A level of None
     with release True means the push already set the version by hand, so the
@@ -213,7 +206,7 @@ def plan_release(
     base = release_base(root, tag_prefix, version_file, after)
     if base is None and before in ("", ZERO_SHA):
         return "patch", True
-    commits = commits_touching(root, base or before, after, product_paths)
+    commits = commits_touching(root, base or before, after, paths)
     ours = [(s, b) for s, b in commits if not RELEASE_SUBJECT.match(s)]
     if not ours:
         return None, False
@@ -260,51 +253,35 @@ def write_output(version: str, bumped: bool, release: bool, level: str | None) -
 
 
 def current_addon_version(root: Path) -> str:
-    match = TOC_VERSION.search((root / "Everlook" / "Everlook.toc").read_text())
+    match = TOC_VERSION.search((root / VERSION_FILE).read_text())
     if match is None:
         raise ValueError("addon/Everlook/Everlook.toc has no Version field")
     return match.group(2)
 
 
-VERSIONS = {
-    "addon": (current_addon_version, bump_addon),
-}
-
-
-def maybe_bump(
-    product: str, root: Path, before: str, after: str
-) -> tuple[str, bool, bool, str | None]:
-    current, bump = VERSIONS[product]
-    info = PRODUCTS[product]
-    level, release = plan_release(
-        root, before, after, info["file"], info["paths"], info["tag"]
-    )
+def maybe_bump(root: Path, before: str, after: str) -> tuple[str, bool, bool, str | None]:
+    level, release = plan_release(root, before, after, VERSION_FILE, ADDON_PATHS, TAG_PREFIX)
     if level is not None:
-        return bump(root, level), True, True, level
-    return current(root), False, release, None
+        return bump_addon(root, level), True, True, level
+    return current_addon_version(root), False, release, None
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("maybe-bump-addon", "release-notes"))
+    parser.add_argument("command", choices=("maybe-bump", "release-notes"))
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--before", default=ZERO_SHA)
     parser.add_argument("--after", default="HEAD")
-    parser.add_argument("--product", choices=tuple(PRODUCT_PATHS))
     parser.add_argument("--since", default="")
     args = parser.parse_args(argv)
     root = args.root.resolve()
     if args.command == "release-notes":
-        if args.product is None:
-            parser.error("release-notes needs --product")
         since = args.since
-        info = PRODUCTS[args.product]
-        if latest_tag(root, info["tag"], "HEAD") is None:
-            since = release_base(root, info["tag"], info["file"], "HEAD") or since
-        sys.stdout.write(release_notes(root, since, args.product))
+        if latest_tag(root, TAG_PREFIX, "HEAD") is None:
+            since = release_base(root, TAG_PREFIX, VERSION_FILE, "HEAD") or since
+        sys.stdout.write(release_notes(root, since))
         return 0
-    product = args.command.removeprefix("maybe-bump-")
-    version, bumped, release, level = maybe_bump(product, root, args.before, args.after)
+    version, bumped, release, level = maybe_bump(root, args.before, args.after)
     write_output(version, bumped, release, level)
     return 0
 
