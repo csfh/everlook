@@ -160,9 +160,9 @@ return function(root, check, island_world)
 	env.InCombatLockdown = function() return false end
 	addon.module.set("nameplates", "player_bars", true)
 	check("health bars on friendly players turn the game's name-only setting off", cvars.nameplateShowOnlyNameForFriendlyPlayerUnits == "0")
-	check("and the setting it was is kept", env.EverlookDB.nameplates_cvars and env.EverlookDB.nameplates_cvars.nameplateShowOnlyNameForFriendlyPlayerUnits == "1")
+	check("and the setting it was is kept", env.EverlookDB.nameplates_before and env.EverlookDB.nameplates_before.nameplateShowOnlyNameForFriendlyPlayerUnits == "1")
 	addon.module.set("nameplates", "player_bars", false)
-	check("turning them off puts the setting back as it was", cvars.nameplateShowOnlyNameForFriendlyPlayerUnits == "1" and env.EverlookDB.nameplates_cvars == nil)
+	check("turning them off puts the setting back as it was", cvars.nameplateShowOnlyNameForFriendlyPlayerUnits == "1" and env.EverlookDB.nameplates_before == nil)
 	env.InCombatLockdown = function() return true end
 	set_calls = 0
 	addon.module.set("nameplates", "player_bars", true)
@@ -178,7 +178,7 @@ return function(root, check, island_world)
 	check("a changed spacing is applied at once", cvars.nameplateOverlapH == "0.4")
 	addon.module.set("nameplates", "stacking", false)
 	check("turning stacking off puts motion and both spacings back as the game had them", cvars.nameplateMotion == "0" and cvars.nameplateOverlapH == "0.8" and cvars.nameplateOverlapV == "1.1")
-	check("and nothing is kept for them", env.EverlookDB.nameplates_cvars == nil)
+	check("and nothing is kept for them", env.EverlookDB.nameplates_before == nil)
 	addon.module.set("nameplates", "stacking", true)
 	cvars.nameplateOverlapV = nil
 	addon.module.set("nameplates", "spacing_v", 2)
@@ -190,10 +190,10 @@ return function(root, check, island_world)
 	addon.module.set("nameplates", "pets", false)
 	addon.module.set("nameplates", "pets", true)
 	check("friendly pets turn the game's pet nameplates on and keep what it was",
-		cvars.nameplateShowFriendlyPlayerPets == "1" and env.EverlookDB.nameplates_cvars.nameplateShowFriendlyPlayerPets == "0")
+		cvars.nameplateShowFriendlyPlayerPets == "1" and env.EverlookDB.nameplates_before.nameplateShowFriendlyPlayerPets == "0")
 	addon.module.set("nameplates", "pets", false)
 	check("turning pets off puts the setting back as it was", cvars.nameplateShowFriendlyPlayerPets == "0"
-		and (env.EverlookDB.nameplates_cvars == nil or env.EverlookDB.nameplates_cvars.nameplateShowFriendlyPlayerPets == nil))
+		and (env.EverlookDB.nameplates_before == nil or env.EverlookDB.nameplates_before.nameplateShowFriendlyPlayerPets == nil))
 	addon.module.set("nameplates", "pets", true)
 	cvars.nameplateShowFriendlyPlayerPets = nil
 

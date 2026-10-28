@@ -110,20 +110,20 @@ local function set_timestamps(hidden)
 		-- player since, and becomes the choice to put back.
 		local current = GetCVar(cvar)
 		local readable = type(current) == "string" and not (issecretvalue and issecretvalue(current))
-		if EverlookDB.timestampsBefore == nil or (readable and current ~= "none") then
+		if EverlookDB.compact_chat_before == nil or (readable and current ~= "none") then
 			if not readable then
 				return
 			end
-			EverlookDB.timestampsBefore = current
+			EverlookDB.compact_chat_before = current
 		end
 		SetCVar(cvar, "none")
-	elseif EverlookDB.timestampsBefore ~= nil then
+	elseif EverlookDB.compact_chat_before ~= nil then
 		-- Only the "none" this set is put back. A format the player picked since then is theirs.
 		local current = GetCVar(cvar)
 		if type(current) == "string" and not (issecretvalue and issecretvalue(current)) and current == "none" then
-			SetCVar(cvar, EverlookDB.timestampsBefore)
+			SetCVar(cvar, EverlookDB.compact_chat_before)
 		end
-		EverlookDB.timestampsBefore = nil
+		EverlookDB.compact_chat_before = nil
 	end
 end
 

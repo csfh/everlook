@@ -322,7 +322,7 @@ end
 local function switch_cvars(enabled)
 	if type(InCombatLockdown) ~= "function" or InCombatLockdown() or not GetCVar or not SetCVar then return end
 	EverlookDB = EverlookDB or {}
-	local saved = type(EverlookDB.nameplates_cvars) == "table" and EverlookDB.nameplates_cvars or {}
+	local saved = type(EverlookDB.nameplates_before) == "table" and EverlookDB.nameplates_before or {}
 	local wanted = enabled and wanted_cvars() or {}
 	for name, original in pairs(saved) do
 		if wanted[name] == nil then
@@ -337,7 +337,7 @@ local function switch_cvars(enabled)
 			SetCVar(name, value)
 		end
 	end
-	EverlookDB.nameplates_cvars = next(saved) ~= nil and saved or nil
+	EverlookDB.nameplates_before = next(saved) ~= nil and saved or nil
 end
 
 local function apply_module(enabled)

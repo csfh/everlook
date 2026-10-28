@@ -15,8 +15,8 @@ local order = { "density", "distance", "fade" }
 -- first has to be kept between sessions too, or turning this off after a reload would put back our own numbers.
 local function before()
 	EverlookDB = EverlookDB or {}
-	EverlookDB.groundEffectsBefore = EverlookDB.groundEffectsBefore or {}
-	return EverlookDB.groundEffectsBefore
+	EverlookDB.ground_effects_before = EverlookDB.ground_effects_before or {}
+	return EverlookDB.ground_effects_before
 end
 
 local function read(name)

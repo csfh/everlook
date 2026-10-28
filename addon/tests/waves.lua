@@ -277,7 +277,7 @@ return function(root, check)
 	do
 		local reloaded, reloaded_env = load({ "world", "module", "camera_distance" })
 		reloaded_env.EverlookDB.qol = play.EverlookDB.qol
-		reloaded_env.EverlookDB.cameraBefore = play.EverlookDB.cameraBefore
+		reloaded_env.EverlookDB.camera_distance_before = play.EverlookDB.camera_distance_before
 		reloaded_env.GetCVar = play.GetCVar
 		reloaded_env.SetCVar = play.SetCVar
 		reloaded.module.set("camera_distance", "enabled", false)
@@ -306,7 +306,7 @@ return function(root, check)
 	do
 		local reloaded, reloaded_env = load({ "world", "module", "ground_effects" })
 		reloaded_env.EverlookDB.qol = play.EverlookDB.qol
-		reloaded_env.EverlookDB.groundEffectsBefore = play.EverlookDB.groundEffectsBefore
+		reloaded_env.EverlookDB.ground_effects_before = play.EverlookDB.ground_effects_before
 		reloaded_env.GetCVar = play.GetCVar
 		reloaded_env.SetCVar = play.SetCVar
 		reloaded.module.set("ground_effects", "enabled", false)

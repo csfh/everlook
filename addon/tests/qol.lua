@@ -1071,7 +1071,7 @@ return function(root, check)
 	-- The player picks a format in Options, Social while the module has timestamps hidden.
 	chat_env.timestamps = "%I:%M "
 	chat.module.set("compact_chat", "enabled", false)
-	check("a format the player picked meanwhile is kept, not overwritten", chat_env.timestamps == "%I:%M " and chat_env.EverlookDB.timestampsBefore == nil)
+	check("a format the player picked meanwhile is kept, not overwritten", chat_env.timestamps == "%I:%M " and chat_env.EverlookDB.compact_chat_before == nil)
 	chat.module.set("compact_chat", "enabled", true)
 	-- Picked again, then the chat windows change and the module hides timestamps once more before it lets go.
 	chat_env.timestamps = "%H:%M:%S "
@@ -1085,7 +1085,7 @@ return function(root, check)
 		chat.module.set("compact_chat", "enabled", true)
 		local reloaded, reloaded_env = load_qol()
 		reloaded_env.EverlookDB.qol = chat_env.EverlookDB.qol
-		reloaded_env.EverlookDB.timestampsBefore = chat_env.EverlookDB.timestampsBefore
+		reloaded_env.EverlookDB.compact_chat_before = chat_env.EverlookDB.compact_chat_before
 		reloaded_env.GetCVar = chat_env.GetCVar
 		reloaded_env.SetCVar = chat_env.SetCVar
 		reloaded.module.set("compact_chat", "enabled", false)
@@ -1427,9 +1427,9 @@ return function(root, check)
 		addon2.module.set("quest_text_size", "enabled", true)
 		check("the at once option is off by default and the variable is left alone", #sets == 0 and values.instantQuestText == "0")
 		addon2.module.set("quest_text_size", "instant_text", true)
-		check("turned on, it sets the variable and keeps the player's value", values.instantQuestText == "1" and env2.EverlookDB.instantTextBefore == "0")
+		check("turned on, it sets the variable and keeps the player's value", values.instantQuestText == "1" and env2.EverlookDB.quest_text_size_before == "0")
 		addon2.module.set("quest_text_size", "enabled", false)
-		check("turning the module off puts the player's value back and forgets it", values.instantQuestText == "0" and env2.EverlookDB.instantTextBefore == nil)
+		check("turning the module off puts the player's value back and forgets it", values.instantQuestText == "0" and env2.EverlookDB.quest_text_size_before == nil)
 		addon2.module.set("quest_text_size", "enabled", true)
 		values.instantQuestText = "1"
 		addon2.module.set("quest_text_size", "instant_text", false)
@@ -1437,7 +1437,7 @@ return function(root, check)
 		values.instantQuestText = nil
 		local before = #sets
 		addon2.module.set("quest_text_size", "instant_text", true)
-		check("a client with no such variable is left alone", #sets == before and env2.EverlookDB.instantTextBefore == nil)
+		check("a client with no such variable is left alone", #sets == before and env2.EverlookDB.quest_text_size_before == nil)
 		addon2.module.set("quest_text_size", "instant_text", false)
 		addon2.module.set("quest_text_size", "enabled", false)
 		env2.GetCVar, env2.SetCVar = nil, nil
@@ -5712,7 +5712,7 @@ return function(root, check)
 			local report = addon.island_experience.report()
 			check("the first plain reading stores a baseline and adds 0",
 				report.ready and report.hour.total == 0 and report.day.total == 0
-				and env.EverlookDB.experience["Player-1-ABC"].baseline.xp == 0
+				and env.EverlookDB.island_experience["Player-1-ABC"].baseline.xp == 0
 				and joined(report):find("Hour  0", 1, true) and not joined(report):find("XP incomplete", 1, true))
 			state.xp = 250
 			addon.island_experience.on_event("PLAYER_XP_UPDATE")
@@ -5720,7 +5720,7 @@ return function(root, check)
 			check("a same-level gain lands in the hour and the day",
 				report.hour.total == 250 and report.day.total == 250 and report.hour.other == 250
 				and report.hour.quest == 0 and report.hour.kill == 0
-				and env.EverlookDB.experience["Player-1-ABC"].buckets["1000800"].total == 250)
+				and env.EverlookDB.island_experience["Player-1-ABC"].buckets["1000800"].total == 250)
 
 			addon, env, state = open_world(function(state)
 				state.xp, state.xp_max = 900, 1000
@@ -5856,7 +5856,7 @@ return function(root, check)
 			addon.island_experience.on_event("PLAYER_XP_UPDATE")
 			report = addon.island_experience.report()
 			check("a gain older than 25 hours is dropped on the next commit",
-				report.day.total == 1 and env.EverlookDB.experience["Player-1-ABC"].buckets["1000800"] == nil)
+				report.day.total == 1 and env.EverlookDB.island_experience["Player-1-ABC"].buckets["1000800"] == nil)
 
 			addon, env, state = open_world()
 			addon.island_experience.on_event("PLAYER_XP_UPDATE")
@@ -5897,12 +5897,12 @@ return function(root, check)
 			addon.island_experience.on_event("PLAYER_XP_UPDATE")
 			check("a second character keeps a separate total",
 				addon.island_experience.report().hour.total == 50
-				and env.EverlookDB.experience["Player-2-DEF"].buckets["1000800"].total == 50)
+				and env.EverlookDB.island_experience["Player-2-DEF"].buckets["1000800"].total == 50)
 			state.guid, state.xp = "Player-1-ABC", 100
 			addon.island_experience.on_event("PLAYER_ENTERING_WORLD")
 			check("returning to the first character restores that ledger",
 				addon.island_experience.report().hour.total == 100
-				and env.EverlookDB.experience["Player-1-ABC"].buckets["1000800"].total == 100)
+				and env.EverlookDB.island_experience["Player-1-ABC"].buckets["1000800"].total == 100)
 
 			addon, env, state = open_world(function(state, env)
 				local hidden_guid = secret_stat()
@@ -5913,7 +5913,7 @@ return function(root, check)
 			state.xp = 10
 			addon.island_experience.on_event("PLAYER_XP_UPDATE")
 			check("a secret character id keeps the hour in memory and writes nothing",
-				addon.island_experience.report().hour.total == 10 and env.EverlookDB.experience == nil)
+				addon.island_experience.report().hour.total == 10 and env.EverlookDB.island_experience == nil)
 
 			addon, env, state = open_world()
 			addon.island_experience.on_event("PLAYER_XP_UPDATE")
@@ -5922,7 +5922,7 @@ return function(root, check)
 			addon.module.set("island", "enabled", false)
 			check("disabling Smart island leaves the saved ledger in place",
 				addon.island_experience.report() == nil
-				and env.EverlookDB.experience["Player-1-ABC"].buckets["1000800"].total == 80)
+				and env.EverlookDB.island_experience["Player-1-ABC"].buckets["1000800"].total == 80)
 
 			addon, _, state = open_world()
 			state.xp_max = 2000
