@@ -102,13 +102,6 @@ for name in "${folders[@]}"; do
 done
 
 # What was built, as checksums a player can check a download against.
-(
-  cd "${outdir}"
-  if command -v sha256sum >/dev/null 2>&1; then
-    sha256sum "Everlook-${version}.tar.gz" "Everlook-${version}.zip" > SHA256SUMS
-  else
-    shasum -a 256 "Everlook-${version}.tar.gz" "Everlook-${version}.zip" > SHA256SUMS
-  fi
-)
+(cd "${outdir}" && sha256sum "Everlook-${version}.tar.gz" "Everlook-${version}.zip" > SHA256SUMS)
 
 echo "${archive}"
