@@ -2182,4 +2182,1526 @@ return function(root, check, lib)
 		check("four metric cells across are 156 wide, three columns each, on the 24 gutter",
 			money.width == 156 and gear.left - money.left == 156 + 24 and bags.left - gear.left == 156 + 24 and money.left - island.left == 12)
 	end
+	do
+		local island_world, quest_world, secret_stat = lib.island_world, lib.quest_world, lib.secret_stat
+		local source = lib.source
+		local function read_source(name)
+			local handle = assert(io.open((source(name)), "r"))
+			local text = handle:read("*a")
+			handle:close()
+			return text
+		end
+
+		local function notice_key(addon, key)
+			for _, notice in ipairs(addon.island.view().notices) do
+				if notice.key == key then return notice end
+			end
+		end
+
+		local function show_recap(addon, env)
+			local buttons = {}
+			env.CreateSettingsButtonInitializer = function(name, _, click)
+				return { name = name, click = click }
+			end
+			local module
+			for _, candidate in ipairs(addon.module.modules) do
+				if candidate.id == "island" then module = candidate end
+			end
+			local layout = { AddInitializer = function(_, row) buttons[row.name] = row end }
+			for _, section in ipairs(addon.module.sections(module) or {}) do
+				if section.after then section.after(layout) end
+			end
+			return buttons["Session recap"] and buttons["Session recap"].click()
+		end
+
+		check("repair uses one notice call", not read_source("auto_repair.lua"):find("confirm_money", 1, true))
+		check("junk uses one notice call", not read_source("sell_junk.lua"):find("confirm_money", 1, true))
+		do
+			local named = false
+			for _, feed in ipairs({ "island_share", "island_quest_notices", "island_loot", "island_hearth", "island_reputation", "island_professions",
+				"island_mail", "island_invites", "island_buffs", "island_recap", "island_warnings" }) do
+				named = named or read_source("island.lua"):find(feed, 1, true) ~= nil
+			end
+			check("the island chunk does not name its feed addons", not named)
+		end
+		check("recap experience uses the shared bar advance",
+			not read_source("island_recap.lua"):find("xp_level + 1", 1, true))
+		check("the level cap stays behind the shared readings",
+			not read_source("island_recap.lua"):find("GetMaxPlayerLevel", 1, true)
+			and not read_source("island_experience.lua"):find("GetMaxPlayerLevel", 1, true))
+		check("the island does not read the player map",
+			not read_source("island.lua"):find("GetPlayerMapPosition", 1, true)
+			and not read_source("island.lua"):find("GetBestMapForUnit", 1, true))
+		check("quest direction reads the waypoint and leaves tracking alone",
+			read_source("island_quests.lua"):find("GetNextWaypoint", 1, true) ~= nil
+			and not read_source("island_quests.lua"):find("SetSuperTrackedQuestID", 1, true)
+			and not read_source("island_quests.lua"):find("C_Navigation", 1, true))
+		check("the island does not resolve item or spell icons",
+			not read_source("island.lua"):find("GetItemIconByID", 1, true)
+			and not read_source("island.lua"):find("GetSpellTexture", 1, true))
+		check("activity thresholds stay out of the island chunk",
+			not read_source("island.lua"):find("free-slots", 1, true)
+			and not read_source("island.lua"):find("Paid from personal funds", 1, true)
+			and not read_source("island.lua"):find("The bags are full", 1, true))
+		check("figure phrasing stays behind vitals",
+			not read_source("island.lua"):find("format_money", 1, true)
+			and not read_source("island.lua"):find("format_bags", 1, true)
+			and not read_source("island.lua"):find("format_percent", 1, true)
+			and not read_source("island_vitals.lua"):find("format_bags", 1, true)
+			and not read_source("island_vitals.lua"):find("format_percent", 1, true)
+			and not read_source("island_vitals.lua"):find(".format_", 1, true))
+		do
+			local addon = island_world()
+			local advance = addon.island_vitals.advance
+			check("a bar advance is the shared experience delta",
+				advance({ level = 10, xp = 100, xp_max = 1000 }, { level = 10, xp = 250, xp_max = 1000 }) == 150
+				and advance({ level = 10, xp = 400, xp_max = 1000 }, { level = 11, xp = 50, xp_max = 2000 }) == 650
+				and advance({ level = 10, xp = 100, xp_max = 1000 }, { level = 10, xp = 50, xp_max = 1000 }) == nil
+				and advance({ level = 10, xp = 100, xp_max = 1000 }, { level = 12, xp = 0, xp_max = 1000 }) == nil)
+			local whole = addon.island_vitals.whole
+			check("a bar reading is whole by the one shared rule", type(whole) == "function"
+				and whole(12) == 12 and whole(0) == 0 and whole(-1) == nil and whole(1.5) == nil
+				and whole(0 / 0) == nil and whole(math.huge) == nil and whole("12") == nil)
+			check("experience detail keeps no rule of its own for a whole reading",
+				not read_source("island_experience.lua"):find("local function whole", 1, true))
+			check("island feeds read an item link's id through the core, with no parser of their own",
+				not read_source("island_share.lua"):find("item:(%d+)", 1, true)
+				and not read_source("island_loot.lua"):find("item:(%d+)", 1, true))
+		end
+
+		do
+			local addon, env, event = quest_world()
+			addon.module.set("island", "source_quest_completion", true)
+			addon.module.set("island", "feed_recap", true)
+			event("QUEST_TURNED_IN", 23, 10, 50)
+			local completed = 0
+			for _, notice in ipairs(addon.island.view().notices) do
+				if notice.text == "Quest completed" then completed = completed + 1 end
+			end
+			local completion = nil
+			for _, notice in ipairs(addon.island.view().notices) do
+				if notice.text == "Quest completed" then completion = notice end
+			end
+			check("one turn-in publishes one completion notice", completed == 1 and completion.detail == "Ready to return" and completion.money == 50)
+			local secret = secret_stat()
+			env.issecretvalue = function(value) return rawequal(value, secret) end
+			event("QUEST_TURNED_IN", secret, 10, 50)
+			completed = 0
+			for _, notice in ipairs(addon.island.view().notices) do
+				if notice.text == "Quest completed" then completed = completed + 1 end
+			end
+			check("a secret turn-in does not add a completion notice", completed == 1)
+			check("show recap counts that turn-in once", show_recap(addon, env) == true
+				and notice_key(addon, "session-recap").detail:find("Quests completed: 1", 1, true))
+		end
+
+		do
+			local addon, env, event, state, _, tickers = island_world()
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "feed_recap", true)
+			state.level = 14
+			tickers[1].callback()
+			check("a missed level marks experience incomplete", show_recap(addon, env) == true
+				and notice_key(addon, "session-recap").detail:find("XP incomplete", 1, true))
+			local secret = secret_stat()
+			env.issecretvalue = function(value) return rawequal(value, secret) end
+			event("QUEST_TURNED_IN", secret)
+			event("QUEST_TURNED_IN", 18)
+			env.GetMoney = function() return secret end
+			show_recap(addon, env)
+			local recap = notice_key(addon, "session-recap")
+			check("secret quests and money stay out of the recap", recap.detail:find("Quests completed: 1", 1, true)
+				and recap.detail:find("Money unavailable", 1, true) and recap.money == nil)
+		end
+
+		do
+			local addon, env, _, state = island_world()
+			state.level, state.xp, state.xp_max = 90, 0, 0
+			env.GetMaxPlayerLevel = function() return 90 end
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "feed_recap", true)
+			check("the level cap is one question", addon.island_vitals.at_cap(90) == true and addon.island_vitals.at_cap(12) == false)
+			check("the level cap baseline stays quiet", #addon.island.view().notices == 0)
+			check("an empty bar at the level cap counts no experience", show_recap(addon, env) == true
+				and notice_key(addon, "session-recap").detail:find("XP gained: 0", 1, true)
+				and not notice_key(addon, "session-recap").detail:find("XP incomplete", 1, true))
+			local addon2, env2, event2, state2 = island_world()
+			state2.level, state2.xp, state2.xp_max = 89, 500, 1000
+			env2.GetMaxPlayerLevel = function() return 90 end
+			addon2.module.set("island", "enabled", true)
+			addon2.module.set("island", "feed_recap", true)
+			state2.level, state2.xp, state2.xp_max = 90, 0, 0
+			event2("PLAYER_LEVEL_UP", 90)
+			check("reaching the level cap keeps the last bar", show_recap(addon2, env2) == true
+				and notice_key(addon2, "session-recap").detail:find("XP gained: 500", 1, true))
+			local addon3, env3, _, state3 = island_world()
+			state3.level, state3.xp, state3.xp_max = 12, 0, 0
+			env3.GetMaxPlayerLevel = function() return 90 end
+			addon3.module.set("island", "enabled", true)
+			addon3.module.set("island", "feed_recap", true)
+			check("a zero bar below the level cap stays incomplete", show_recap(addon3, env3) == true
+				and notice_key(addon3, "session-recap").detail:find("XP incomplete", 1, true))
+		end
+		do
+			local addon, env, event, state, _, tickers = island_world()
+			local scans = 0
+			env.C_Reputation = {
+				GetNumFactions = function() scans = scans + 1; return 0 end,
+				GetFactionDataByIndex = function() end,
+			}
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "feed_reputation", true)
+			local baseline = scans
+			for _ = 1, 5 do event("QUEST_LOG_UPDATE") end
+			check("quest log bursts do not poll the reputation feed", scans == baseline)
+			for _ = 1, 4 do state.time = state.time + 1; tickers[1].callback() end
+			check("the timed poll keeps reputation on a slow beat", scans - baseline <= 1)
+			state.time = state.time + 5
+			tickers[1].callback()
+			check("the slow beat still comes around", scans - baseline >= 1)
+		end
+		do
+			local addon, env, event, state, afters = island_world()
+			local scans = 0
+			env.C_QuestLog = {
+				GetNumQuestLogEntries = function() scans = scans + 1; return 0 end,
+				GetNumQuestWatches = function() return 0 end,
+				GetInfo = function() end,
+			}
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "quest_context", true)
+			state.time = state.time + 10
+			local baseline = scans
+			for _ = 1, 6 do event("QUEST_LOG_UPDATE") end
+			check("a quest event burst scans the log once at once", scans - baseline == 1)
+			for _, after in ipairs(afters) do after.callback() end
+			check("the rest of the burst scans once more when the window ends", scans - baseline == 2)
+		end
+		do
+			local addon, _, _, state, _, tickers, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			local island_frame
+			for _, candidate in ipairs(frames) do if candidate.name == "EverlookIsland" then island_frame = candidate end end
+			local placements = 0
+			local place = island_frame.SetPoint
+			island_frame.SetPoint = function(...) placements = placements + 1; return place(...) end
+			for _ = 1, 3 do state.time = state.time + 1; tickers[1].callback() end
+			check("an idle closed pill does not repaint on the timer", placements == 0)
+		end
+		do
+			local addon = island_world()
+			local age = addon.island.age_text
+			check("notice ages step from seconds to minutes to hours",
+				age(5) == "Just now" and age(125) == "2m ago" and age(3600) == "1h ago" and age(3900) == "1h 5m ago")
+		end
+		do
+			local addon, _, _, _, _, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			local function surface_alphas()
+				local alphas = {}
+				for _, frame in ipairs(frames) do
+					for _, region in ipairs(frame.regions or {}) do
+						if region.color and region.color[1] == 13 / 255 then alphas[#alphas + 1] = region.color[4] end
+					end
+				end
+				return alphas
+			end
+			local before = surface_alphas()
+			check("the island surface starts at 96 percent", #before > 0 and before[1] == 0.96)
+			addon.module.set("island", "opacity", 82)
+			local after = surface_alphas()
+			check("the opacity option retints the surfaces already built", #after == #before and after[1] == 0.82)
+		end
+		do
+			local addon = island_world()
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "inbox_size", 20)
+			addon.module.set("island", "toast_count", 1)
+			for index = 1, 15 do addon.island.notify({ source = "Test", key = "n" .. index, text = "Notice " .. index }) end
+			local view = addon.island.view()
+			check("the inbox keeps as many notices as the option allows", #view.notices == 15)
+			check("the toast count option caps the stack", #view.toasts == 1)
+			addon.module.set("island", "inbox_size", 10)
+			check("lowering the inbox size trims the oldest notices", #addon.island.view().notices == 10)
+		end
+		do
+			local addon = island_world()
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "do_not_disturb", true)
+			addon.island.notify({ source = "Test", key = "quiet", text = "Routine", severity = "warning" })
+			addon.island.notify({ source = "Test", key = "info", text = "Info" })
+			local view = addon.island.view()
+			check("do not disturb sends warnings and routine notices to the inbox", #view.toasts == 0 and #view.notices == 2)
+			addon.island.notify({ source = "Test", key = "bad", text = "Failure", severity = "error" })
+			check("do not disturb still toasts an error", #addon.island.view().toasts == 1)
+		end
+		do
+			-- A notice that never toasts, under Do not disturb, kept quiet in combat or with toasts off,
+			-- stays in the inbox until it is seen or dismissed. The inbox size still caps it.
+			local function run_out(afters, seconds)
+				for index = 1, #afters do
+					local timer = afters[index]
+					if timer.delay == seconds and not timer.done then timer.done = true; timer.callback() end
+				end
+			end
+			local addon, env, _, state, afters = island_world()
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "do_not_disturb", true)
+			addon.island.notify({ source = "Test", key = "quiet", text = "Routine", duration = 4 })
+			run_out(afters, 4)
+			check("a notice do not disturb kept from toasting outlasts its duration", notice_key(addon, "quiet") ~= nil)
+			-- Held, not tapped, so letting go closes it again.
+			env.everlook_island_key("down")
+			state.time = state.time + 2
+			run_out(afters, 0.75)
+			check("opening the island lets it be seen", notice_key(addon, "quiet") and notice_key(addon, "quiet").unread == false)
+			env.everlook_island_key("up")
+			check("and letting go closes it", addon.island.view().mode ~= "open")
+			run_out(afters, 4)
+			check("once seen it goes when its time runs out", notice_key(addon, "quiet") == nil)
+
+			addon, env, _, _, afters = island_world()
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "toasts", false)
+			addon.island.notify({ source = "Test", key = "untoasted", text = "Routine", duration = 4 })
+			run_out(afters, 4)
+			check("with toasts off a notice outlasts its duration in the inbox", notice_key(addon, "untoasted") ~= nil)
+
+			addon, env, _, _, afters = island_world()
+			addon.module.set("island", "enabled", true)
+			env.InCombatLockdown = function() return true end
+			addon.island.notify({ source = "Test", key = "fight", text = "Routine", duration = 4 })
+			run_out(afters, 4)
+			check("a routine notice kept quiet in combat outlasts its duration", notice_key(addon, "fight") ~= nil)
+
+			addon = island_world()
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "do_not_disturb", true)
+			for index = 1, 12 do addon.island.notify({ source = "Test", key = "q" .. index, text = "Quiet " .. index }) end
+			check("the inbox size still caps notices that never toasted", #addon.island.view().notices == 10)
+		end
+		do
+			local addon = island_world()
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "size", 120)
+			check("an unknown preset changes nothing", addon.island.apply_preset("Loud") == false)
+			check("the Informative preset turns the feeds on", addon.island.apply_preset("Informative") == true
+				and addon.module.get("island", "feed_loot") == true and addon.module.get("island", "quest_context") == true)
+			check("the Quiet preset turns them off and keeps the warnings", addon.island.apply_preset("Quiet") == true
+				and addon.module.get("island", "feed_loot") == false and addon.module.get("island", "source_bags") == true)
+			check("presets leave placement and size alone", addon.module.get("island", "size") == 120)
+		end
+		do
+			local addon, env, _, state, _, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			local island_frame
+			for _, candidate in ipairs(frames) do if candidate.name == "EverlookIsland" then island_frame = candidate end end
+			local shift, cursor = false, { 500, 500 }
+			env.IsShiftKeyDown = function() return shift end
+			env.GetCursorPosition = function() return cursor[1], cursor[2] end
+			island_frame.scripts.OnDragStart(island_frame)
+			cursor = { 600, 400 }
+			island_frame.scripts.OnDragStop(island_frame)
+			check("a drag without Shift leaves the placement alone",
+				addon.module.get("island", "position_x") == 0 and addon.module.get("island", "position_top") == 12)
+			shift, cursor = true, { 500, 500 }
+			island_frame.scripts.OnDragStart(island_frame)
+			cursor = { 600, 400 }
+			island_frame.scripts.OnDragStop(island_frame)
+			check("Shift and drag writes the placement options",
+				addon.module.get("island", "position_x") == 100 and addon.module.get("island", "position_top") == 112)
+			island_frame.scripts.OnClick(island_frame)
+			check("the click that ends a drag does not pin the island", addon.island.view().pinned == false)
+			state.time = state.time + 1
+			island_frame.scripts.OnClick(island_frame)
+			check("a later click still pins it", addon.island.view().pinned == true)
+		end
+		do
+			local addon, _, _, state, afters, tickers, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			local island_frame
+			for _, candidate in ipairs(frames) do if candidate.name == "EverlookIsland" then island_frame = candidate end end
+			addon.module.set("island", "hide_when_idle", true)
+			check("the pill stays through the first quiet seconds", island_frame.alpha ~= 0)
+			state.time = state.time + 6
+			for _, after in ipairs(afters) do after.callback() end
+			check("an idle pill fades out", island_frame.alpha == 0)
+			addon.island.notify({ source = "Test", key = "back", text = "Hello" })
+			check("a notice brings the pill back", island_frame.alpha == 1)
+			addon.module.set("island", "hide_when_idle", false)
+			check("turning the option off keeps it visible", island_frame.alpha == 1)
+		end
+		do
+			-- Turned off and on again from the settings page while the pill had faded.
+			local addon, _, _, state, afters, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			local island_frame
+			for _, candidate in ipairs(frames) do if candidate.name == "EverlookIsland" then island_frame = candidate end end
+			addon.module.set("island", "hide_when_idle", true)
+			state.time = state.time + 6
+			for _, after in ipairs(afters) do after.callback() end
+			check("a quiet pill has faded before it is turned off", island_frame.alpha == 0)
+			addon.module.set("island", "enabled", false)
+			addon.module.set("island", "enabled", true)
+			check("turned off and on again while quiet, the pill is back for its quiet seconds", island_frame.alpha == 1)
+			state.time = state.time + 6
+			for _, after in ipairs(afters) do after.callback() end
+			check("and fades once those seconds are up", island_frame.alpha == 0)
+		end
+		do
+			local function with_character(env)
+				env.UnitGUID = function() return "Player-1-00000001" end
+				env.GetServerTime = function() return 1000000 end
+			end
+			local first, first_env, first_event, first_state = island_world()
+			with_character(first_env)
+			first.module.set("island", "enabled", true)
+			first.island.notify({ source = "Test", key = "kept", text = "Kept row", detail = "Some detail", money = 500 })
+			first.island.notify({ source = "Test", key = "live", text = "Bags are full", severity = "warning", persist = true })
+			first.island.notify({ source = "Test", key = "act", text = "Has action", actions = {
+				{ id = "go", label = "Go", type = "callback", on_click = function() end } } })
+			first_state.time = first_state.time + 120
+			first_env.GetServerTime = function() return 1000120 end
+			local saved = first_env.EverlookSaved
+			first_event("PLAYER_LOGOUT")
+			check("history saves per character", saved.island_history["Player-1-00000001"] ~= nil)
+
+			local second, second_env = island_world()
+			with_character(second_env)
+			second_env.GetServerTime = function() return 1000300 end
+			second_env.EverlookSaved = second_env.EverlookSaved or {}
+			second_env.EverlookSaved.island_history = saved.island_history
+			second.module.set("island", "enabled", true)
+			local notices = second.island.view().notices
+			local texts = {}
+			for _, notice in ipairs(notices) do texts[#texts + 1] = notice.text end
+			check("a reload brings back the plain history rows", table.concat(texts, ",") == "Kept row,Has action")
+			check("a restored row keeps its detail, money and unread state",
+				notices[1].detail == "Some detail" and notices[1].money == 500 and notices[1].unread == true)
+			check("a restored row has no actions and no toast", #notices[2].actions == 0 and #second.island.view().toasts == 0)
+		end
+		do
+			local addon, env, _, _, _, _, frames = island_world()
+			local island_frame
+			local shown = true
+			env.UIParent = env.UIParent or {}
+			env.UIParent.GetTop = function() return 1080 end
+			env.UIWidgetTopCenterContainerFrame = { IsShown = function() return shown end, GetBottom = function() return 1000 end }
+			addon.module.set("island", "enabled", true)
+			for _, candidate in ipairs(frames) do if candidate.name == "EverlookIsland" then island_frame = candidate end end
+			check("the pill drops below a showing top widget", island_frame.point[5] == -88)
+			addon.module.set("island", "avoid_top_widgets", false)
+			check("the option puts it back at its own distance", island_frame.point[5] == -12)
+			addon.module.set("island", "avoid_top_widgets", true)
+			shown = false
+			addon.module.set("island", "position_top", 16)
+			check("a hidden widget leaves the placement alone", island_frame.point[5] == -16)
+		end
+		do
+			local addon, env = island_world()
+			addon.module.set("island", "enabled", true)
+			check("dismiss with no toast does nothing", env.everlook_island_dismiss() == nil and addon.island.dismiss_top() == false)
+			addon.island.notify({ source = "Test", key = "older", text = "Older" })
+			addon.island.notify({ source = "Test", key = "newer", text = "Newer" })
+			env.everlook_island_dismiss()
+			local remaining = {}
+			for _, notice in ipairs(addon.island.view().notices) do remaining[#remaining + 1] = notice.text end
+			check("the dismiss key removes the newest toast first", table.concat(remaining, ",") == "Older")
+			-- The game warns when a header is declared twice, in one file or across addons.
+			local seen, once = {}, true
+			for _, file in ipairs({ "Everlook_Island/Bindings.xml", "Everlook_IslandShare/Bindings.xml", "Everlook_RadialMenu/Bindings.xml" }) do
+				for header in read_source(file):gmatch('header="([%w_]+)"') do
+					if seen[header] then once = false end
+					seen[header] = true
+				end
+			end
+			check("every binding header is declared once, and each has a name to show", once and next(seen) ~= nil
+				and (function()
+					local names = read_source("Everlook_Island/island.lua") .. read_source("Everlook_IslandShare/island_share.lua") .. read_source("Everlook_RadialMenu/radial_menu.lua")
+					for header in pairs(seen) do if not names:find("BINDING_HEADER_" .. header .. " =", 1, true) then return false end end
+					return true
+				end)())
+			check("the binding file names the dismiss action", read_source("Everlook_Island/Bindings.xml"):find("EVERLOOK_ISLAND_DISMISS", 1, true) ~= nil)
+		end
+		do
+			local addon, env, event = island_world()
+			local waiting = false
+			env.HasNewMail = function() return waiting end
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "feed_mail", true)
+			waiting = true
+			event("UPDATE_PENDING_MAIL")
+			check("new mail starts with the plain detail", notice_key(addon, "mail:new").detail == "Unread mail is waiting")
+			local headers = { { money = 15000, has_item = 1 }, { money = 0, has_item = 0 }, { money = 0, has_item = 2 } }
+			env.GetInboxNumItems = function() return #headers end
+			env.GetInboxHeaderInfo = function(index)
+				local row = headers[index]
+				return nil, nil, "Sender", "Subject", row.money, 0, 30, row.has_item
+			end
+			event("MAIL_INBOX_UPDATE")
+			local notice = notice_key(addon, "mail:new")
+			check("opening the mailbox says what is waiting", notice.detail == "3 messages, 2 with attachments, 1g 50s")
+			check("that update does not toast again", #addon.island.view().toasts == 0 or notice.presentation == "inbox")
+			env.GetInboxNumItems = function() return 0 end
+			event("MAIL_INBOX_UPDATE")
+			check("an empty mailbox keeps the last summary", notice_key(addon, "mail:new").detail == "3 messages, 2 with attachments, 1g 50s")
+		end
+		do
+			local addon, _, event = island_world()
+			addon.module.set("island", "enabled", true)
+			event("PARTY_INVITE_REQUEST", "Thrall", false, false, false)
+			check("an invite stays quiet while the feed is off", notice_key(addon, "party-invite") == nil)
+			addon.module.set("island", "feed_invites", true)
+			event("PARTY_INVITE_REQUEST", "Thrall", false, false, false)
+			local notice = notice_key(addon, "party-invite")
+			check("an invite shows the name and points to the popup", notice and notice.text == "Thrall invited you to a group"
+				and notice.detail == "Answer in the invitation popup" and #notice.actions == 0)
+			event("PARTY_INVITE_REQUEST", "Jaina", false, true, false)
+			check("a finder invite names the role", notice_key(addon, "party-invite").detail == "Looking for a healer")
+			event("PARTY_INVITE_CANCEL")
+			check("a cancelled invite goes away", notice_key(addon, "party-invite") == nil)
+			addon.island.apply_preset("Quiet")
+			check("the Quiet preset turns invites off", addon.module.get("island", "feed_invites") == false)
+		end
+		do
+			local addon, env, _, state, _, tickers = island_world()
+			env.InCombatLockdown = function() return false end
+			local auras = {
+				{ spellId = 1, name = "Flask", duration = 3600, expirationTime = 100 + 40 },
+				{ spellId = 2, name = "Short buff", duration = 30, expirationTime = 100 + 20 },
+				{ spellId = 3, name = "Well Fed", duration = 900, expirationTime = 100 + 200 },
+			}
+			env.C_UnitAuras = { GetAuraDataByIndex = function(_, index) return auras[index] end }
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "feed_buffs", true)
+			check("a buff already inside the window stays quiet", #addon.island.view().notices == 0)
+			state.time = state.time + 150
+			tickers[1].callback()
+			local notice = notice_key(addon, "buff:3:300")
+			check("a long buff warns once it is under a minute from the end",
+				notice and notice.text == "Well Fed is about to run out" and notice.severity == "warning" and notice.spell_id == 3)
+			check("a short buff never warns", notice_key(addon, "buff:2:120") == nil)
+			local count = #addon.island.view().notices
+			state.time = state.time + 6
+			tickers[1].callback()
+			check("the same buff does not warn twice", #addon.island.view().notices == count)
+			auras[3] = nil
+			state.time = state.time + 6
+			tickers[1].callback()
+			check("the warning goes away when the buff does", notice_key(addon, "buff:3:300") == nil)
+			env.InCombatLockdown = function() return true end
+			auras[1] = { spellId = 4, name = "Elixir", duration = 600, expirationTime = state.time + 10 }
+			state.time = state.time + 6
+			tickers[1].callback()
+			check("combat skips the buff scan", notice_key(addon, "buff:4:" .. math.floor(state.time + 4)) == nil)
+		end
+		do
+			local addon, env, _, state, _, _, frames = quest_world()
+			local objectives = {}
+			for index = 1, 6 do objectives[index] = { text = "Objective " .. index, numFulfilled = 0, numRequired = 3, finished = false } end
+			state.quests[2].objectives = objectives
+			addon.module.set("island", "quest_context", true)
+			env.everlook_island_key("down")
+			local texts = {}
+			for _, frame in ipairs(frames) do
+				for _, region in ipairs(frame.regions or {}) do
+					if type(region.text) == "string" and region.shown ~= false then texts[#texts + 1] = region.text end
+				end
+			end
+			local joined = "\n" .. table.concat(texts, "\n") .. "\n"
+			check("the open quest lists four objectives", joined:find("Objective 4", 1, true) and not joined:find("Objective 5", 1, true))
+			check("the rest fold into one line", joined:find("+2 more objectives", 1, true) ~= nil)
+		end
+		do
+			local addon, env, _, _, _, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			env.everlook_island_key("down")
+			local marks = {}
+			for _, frame in ipairs(frames) do
+				for _, region in ipairs(frame.regions or {}) do
+					if region.shown ~= false and (region.path == "Interface\\Icons\\inv_misc_coin_01" or region.atlas == "SpellIcon-256x256-RepairAll") then
+						marks[#marks + 1] = region
+					end
+				end
+			end
+			check("the open summary marks money and durability", #marks >= 2)
+		end
+		do
+			local addon, _, event, state, _, tickers = island_world()
+			local stats = addon.island_quests.stats
+			addon.module.set("island", "enabled", true)
+			local paints = stats.paint
+			for _ = 1, 10 do state.time = state.time + 1; tickers[1].callback() end
+			check("ten idle seconds repaint a closed pill zero times", stats.paint == paints)
+			local scans = stats.quest_scan
+			check("the counters are plain numbers for /dump", type(scans) == "number" and type(stats.aim) == "number" and type(stats.feed_tick) == "number")
+		end
+		do
+			local addon = island_world()
+			local read = addon.island_notice.read
+			local record = read({ text = "Hello", kind = "mail", severity = "warning" }, 4)
+			check("a plain payload reads into a record with defaults",
+				record and record.source == "everlook" and record.duration == 4 and record.icon == "mail" and record.presentation == "toast")
+			local bad, reason = read({ text = "  " }, 4)
+			check("blank text is refused with its reason", bad == nil and reason == "invalid_text")
+			bad, reason = read({ text = "x", progress = 2 }, 4)
+			check("progress outside zero to one is refused", bad == nil and reason == "invalid_progress")
+			bad, reason = read({ text = "x", presentation = "status" }, 4)
+			check("a status needs a source", bad == nil and reason == "invalid_status_source")
+			check("an unknown icon falls back to the kind then generic",
+				addon.island_notice.icon_for("nope", "x") == "generic" and addon.island_notice.icon_for(nil, "durability") == "repair")
+		end
+		do
+			local addon, env, event, state = island_world()
+			local server = 1000000
+			env.GetServerTime = function() return server end
+			env.UnitGUID = function() return "Player-1-00000002" end
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "feed_experience", true)
+			local experience = addon.island_experience
+			event("PLAYER_ENTERING_WORLD")
+			local first = experience.report()
+			check("the experience report is reused within a second", rawequal(first, experience.report()))
+			state.xp = state.xp + 100
+			event("PLAYER_XP_UPDATE")
+			local second = experience.report()
+			check("a new gain makes a new report", not rawequal(first, second) and second.hour.total == 100)
+			server = server + 1
+			check("the next second makes a new report", not rawequal(second, experience.report()))
+		end
+		do
+			local addon, env, _, state, _, _, frames = island_world()
+			env.C_Container.GetContainerNumSlots = function(bag) return bag <= 1 and 20 or 0 end
+			addon.module.set("island", "enabled", true)
+			-- Their cells carry a ring that fills to the share.
+			env.everlook_island_key("down")
+			local shares = {}
+			for _, frame in ipairs(frames) do
+				if frame.cooldown and frame.shown == true and frame.paused then
+					shares[#shares + 1] = (env.GetTime() - frame.cooldown.start) / frame.cooldown.duration
+				end
+			end
+			table.sort(shares)
+			local function near(a, b) return a and math.abs(a - b) < 1e-9 end
+			check("two rings show, one for gear and one for bags", #shares == 2)
+			check("durability's ring fills to its percentage", near(shares[2], 0.5))
+			check("the bags ring fills to the free share", near(shares[1], 8 / 40))
+		end
+		do
+			local addon = island_world()
+			local inbox, toasts = addon.island_inbox, addon.island_toasts
+			local list = {
+				{ id = 1, text = "old routine", unread = false, updated_at = 1 },
+				{ id = 2, text = "warning", severity = "warning", unread = false, updated_at = 2 },
+				{ id = 3, text = "decision", persist = true, unread = false, updated_at = 3 },
+				{ id = 4, text = "new routine", unread = true, updated_at = 4 },
+			}
+			check("the inbox counts unread notices", inbox.unread(list) == 1)
+			inbox.evict(list, 3)
+			check("a full inbox drops the oldest routine notice first", #list == 3 and list[1].id == 2)
+			inbox.evict(list, 2)
+			check("then the unread routine one before warnings and decisions", #list == 2 and list[1].id == 2 and list[2].id == 3)
+			local merged = inbox.restore({ { id = 5, key = "k", source = "S", updated_at = 9 } }, {
+				{ id = 6, key = "k", source = "S", updated_at = 1 }, { id = 7, updated_at = 5 }, { id = 8, updated_at = 5 } })
+			local ids = {}
+			for _, entry in ipairs(merged) do ids[#ids + 1] = entry.id end
+			check("a cleared notice replaced by its producer stays gone and the rest merge in time order",
+				table.concat(ids, ",") == "7,8,5")
+			local queue = { { severity = "info" }, { severity = "warning" }, { severity = "warning" }, { severity = "error" } }
+			check("the highest priority waits at the front, ties to the earliest", toasts.next_index(queue) == 4)
+			table.remove(queue, 4)
+			check("a tie keeps the earlier notice", toasts.next_index(queue) == 2)
+			check("a newcomer replaces the first lower-priority waiting notice", toasts.evict_index(queue, { severity = "error" }) == 1)
+			check("an equal newcomer replaces nothing", toasts.evict_index({ { severity = "warning" } }, { severity = "warning" }) == nil)
+		end
+		do
+			local addon, env = island_world()
+			local applied, centers = 0, {}
+			env.NineSliceUtil = {
+				GetLayout = function(name) return name == "TooltipDefaultLayout" and {} or nil end,
+				ApplyLayoutByName = function(container, name)
+					applied = applied + 1
+					container.Center = { SetVertexColor = function(self, ...) self.color = { ... } end }
+					centers[#centers + 1] = container.Center
+				end,
+			}
+			addon.module.set("island", "enabled", true)
+			check("the island borrows the game's tooltip border when it exists", applied >= 3 and centers[1].color ~= nil)
+			addon.module.set("island", "opacity", 84)
+			check("the opacity option tints the native fill", centers[1].color[4] == 0.84)
+		end
+		do
+			local addon, _, _, state, _, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			local function face() for _, f in ipairs(frames) do if f.name == "EverlookIslandFace" then return f end end end
+			-- The text on the pill that shows now: a region of a visible frame under the face.
+			local layout_tests = dofile(root .. "/tests/lib/layout.lua")
+			local function shown(text)
+				layout_tests.settle(frames)
+				for _, frame in ipairs(frames) do
+					local visible, walker = true, frame
+					while walker do
+						if walker.shown == false or (walker.alpha or 1) == 0 then visible = false end
+						walker = walker.parent
+					end
+					for _, region in ipairs(frame.regions or {}) do
+						if visible and region.text == text and region.shown ~= false then return region end
+					end
+				end
+			end
+			local function near(color, red, green, blue) return color and math.abs(color[1] - red / 255) < 0.01 and math.abs(color[2] - green / 255) < 0.01 and math.abs(color[3] - blue / 255) < 0.01 end
+			check("the closed pill is the level chip by default in these tests", face().width == 64 and shown("Level 12") == nil and shown("12") ~= nil)
+			addon.module.set("island", "closed_xp", true)
+			check("the experience percent widens the pill", face().width > 64 and shown("45%") ~= nil)
+			check("on the level chip too the percent is purple and the level white", near(shown("45%").color, 173, 118, 239) and near(shown("12").color, 245, 247, 250))
+			addon.module.set("island", "closed_clock", true)
+			check("the clock joins it", shown("14:05") ~= nil)
+			state.bags = { [0] = 1, [1] = 1 }
+			addon.island.pull()
+			addon.module.set("island", "low_slots", 5)
+			check("low bags warn on the pill without a setting, in the warning color", shown("Bags 2") ~= nil and shown("Bags 2").color[1] > shown("Bags 2").color[3])
+			addon.module.set("island", "closed_xp", false)
+			addon.module.set("island", "closed_clock", false)
+			state.bags = { [0] = 6, [1] = 8 }
+			addon.island.pull()
+			addon.module.set("island", "low_slots", 1)
+			check("with every extra off and nothing wrong it is the level chip again", face().width == 64)
+		end
+		do
+			local addon, env, _, _, _, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			env.everlook_island_key("down")
+			local function label(text)
+				for _, frame in ipairs(frames) do
+					for _, region in ipairs(frame.regions or {}) do
+						if region.text == text and region.shown ~= false then return region end
+					end
+				end
+			end
+			local measure = dofile(root .. "/tests/lib/layout.lua").new()
+			local function cell(text) local found = label(text); return found and measure.rectangle(found.parent) end
+			check("the open summary has a Status heading", label("STATUS") ~= nil)
+			local money, gear, bags = cell("Money"), cell("Gear"), cell("Bags")
+			local status = measure.rectangle(label("STATUS"))
+			local island
+			for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then island = measure.rectangle(frame) end end
+			-- Worked from the scale by hand: edge 12, a 20 high level row, 16 to Status, 14 high Status, 8 to the cells.
+			check("the Status heading is a section gap below the level row", status.top - island.top == 12 + 20 + 16)
+			-- With no quest the island is 432 wide and stacked: 408 inside the edges,
+			-- one gutter of 24, so two columns of 192. Cells fill a row left to right, so money and gear
+			-- share the first row and bags start the second.
+			check("the island is narrow with no quest, and its cells share one width and the summary's left edge",
+				addon.island.view().width == 432 and money.width == 192 and gear.width == 192 and bags.width == 192
+				and money.left - island.left == 12 and bags.left - island.left == 12)
+			check("gear shares money's row, to its right, and bags start the row below",
+				gear.top == money.top and gear.left - island.left == 12 + 192 + 24 and bags.top == money.top + 32 + 8)
+			check("the cells begin one step below the Status heading", money.top == status.top + 14 + 8)
+			local name, figure = measure.rectangle(label("Gear")), measure.rectangle(label("50%"))
+			check("a value sits under its name on the cell's left edge", name.left == figure.left and figure.top - name.top == 14 + 4)
+			check("the summary ends one edge below the last row",
+				addon.island.view().summary_height == (bags.top - island.top) + 32 + 12)
+			local clock, percent = label("14:05"), label("45%")
+			check("the clock moved to the header beside the percent, which is purple as on the pill",
+				clock ~= nil and percent ~= nil and cell("Time") == nil and math.abs(percent.color[1] - 173 / 255) < 0.01
+				and measure.rectangle(clock).right < measure.rectangle(percent).left)
+		end
+		do
+			local addon, env, _, state, _, _, frames = quest_world()
+			state.quests[2].objectives = {
+				{ text = "Collect things", numFulfilled = 1, numRequired = 6, finished = false },
+				{ text = "Talk to someone", finished = false },
+			}
+			addon.module.set("island", "quest_context", true)
+			env.everlook_island_key("down")
+			-- A ring on each objective, in the pane: one filled to its count, and an empty one for the objective with none.
+			local function in_expanded(frame)
+				while frame do
+					if frame.name == "EverlookIslandExpanded" then return true end
+					frame = frame.parent
+				end
+				return false
+			end
+			local fills, bars = {}, 0
+			for _, frame in ipairs(frames) do
+				if frame.cooldown and frame.shown == true and frame.width == 14 and in_expanded(frame) then
+					fills[#fills + 1] = (env.GetTime() - frame.cooldown.start) / frame.cooldown.duration
+				end
+				if frame.value and frame.shown == true and frame.height == 3 and frame.width and frame.width > 100 then bars = bars + 1 end
+			end
+			table.sort(fills)
+			check("a countable objective gets a ring that fills to its progress, the other an empty one, and no bar",
+				#fills == 2 and math.abs(fills[2] - 1 / 6) < 1e-9 and fills[1] < 0.001 and bars == 0)
+		end
+		do
+			local addon = island_world()
+			local metrics = addon.island_scroll.metrics
+			check("a list that fits has no scroll bar", metrics(100, 100, 0) == nil and metrics(100, 40, 0) == nil)
+			local top, bottom = metrics(100, 300, 0), metrics(100, 300, 200)
+			check("the thumb is a third of the track for a list three times as long", top.thumb == 33 and top.travel == 67 and top.at == 0)
+			check("scrolled to the end the thumb rests at the bottom of the track", bottom.at == 67)
+			check("a very long list keeps a thumb you can grab", metrics(100, 100000, 0).thumb == 24)
+		end
+		do
+			local addon, env, _, state, _, _, frames = quest_world()
+			state.quests[2].objectives = {
+				{ text = "0/1 Stoneanvil's Rifle", numFulfilled = 0, numRequired = 1, finished = false },
+				{ text = "Wolves slain", numFulfilled = 2, numRequired = 5, finished = false },
+			}
+			addon.module.set("island", "quest_context", true)
+			env.everlook_island_key("down")
+			local texts = {}
+			for _, frame in ipairs(frames) do
+				for _, region in ipairs(frame.regions or {}) do
+					if type(region.text) == "string" and region.shown ~= false then texts[#texts + 1] = region.text end
+				end
+			end
+			local joined = "\n" .. table.concat(texts, "\n") .. "\n"
+			check("an objective that already shows its count does not repeat it", joined:find("\n0/1 Stoneanvil's Rifle\n", 1, true) ~= nil)
+			check("one that does not gets the count added", joined:find("\nWolves slain  2/5\n", 1, true) ~= nil)
+		end
+		do
+			local addon, env, _, _, _, _, frames = quest_world()
+			local shown = {}
+			env.GameTooltip = {
+				SetOwner = function() end, Show = function() end, Hide = function() end,
+				SetText = function(_, text) shown[#shown + 1] = text end,
+			}
+			addon.module.set("island", "quest_context", true)
+			addon.module.set("island", "hover_preview", false)
+			local island_frame
+			for _, candidate in ipairs(frames) do if candidate.name == "EverlookIsland" then island_frame = candidate end end
+			island_frame.scripts.OnEnter(island_frame)
+			local while_closed = #shown
+			island_frame.scripts.OnLeave(island_frame)
+			env.everlook_island_key("down")
+			island_frame.scripts.OnEnter(island_frame)
+			check("the closed pill tooltips the quest and the open island does not", while_closed == 1 and #shown == 1)
+		end
+		do
+			local addon, env, event, state = island_world()
+			local server = 2000000
+			env.GetServerTime = function() return server end
+			env.UnitGUID = function() return "Player-1-00000003" end
+			env.GetXPExhaustion = function() return 0 end
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "feed_experience", true)
+			local experience = addon.island_experience
+			event("PLAYER_ENTERING_WORLD")
+			state.xp = state.xp + 120
+			event("PLAYER_XP_UPDATE")
+			local data = experience.table()
+			check("the experience table starts with a total row for hour and day", data and data.rows[1][1] == "Total"
+				and data.rows[1][2] == "120" and data.rows[1][3] == "120")
+			check("an unlabeled gain shows as Other", data.rows[2] and data.rows[2][1] == "Other" and data.rows[2][2] == "120")
+			check("slices with nothing in them stay out", #data.rows == 2)
+			check("the footer carries rested and pace", type(data.footer) == "string" and data.footer:find("rested", 1, true) ~= nil)
+		end
+		do
+			local addon, env, _, state, _, _, frames = quest_world()
+			table.insert(state.quests, 1, { isHeader = true, title = "Elwynn Forest" })
+			addon.module.set("island", "quest_context", true)
+			addon.module.set("island", "quest_plan", true)
+			env.everlook_island_key("down")
+			local texts = {}
+			for _, frame in ipairs(frames) do
+				for _, region in ipairs(frame.regions or {}) do
+					if type(region.text) == "string" and region.shown ~= false then texts[#texts + 1] = (region.text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")) end
+				end
+			end
+			local joined = "\n" .. table.concat(texts, "\n") .. "\n"
+			check("the route lists three quests after the current one",
+				joined:find("\n1. Suitable farther\n", 1, true) and joined:find("\n2. Nearby dangerous\n", 1, true)
+				and joined:find("\n3. Across the sea\n", 1, true) and not joined:find("4. ", 1, true))
+			check("each says where it is: the zone from the log and the distance", joined:find("\nElwynn Forest, ~800 yd\n", 1, true) ~= nil)
+			check("a row stays at two lines and leaves its reasoning to the tooltip", joined:find("Why:", 1, true) == nil)
+			local tips = {}
+			env.GameTooltip = { SetOwner = function() end, SetText = function(_, text) tips[#tips + 1] = text end, Show = function() end, Hide = function() end }
+			for _, frame in ipairs(frames) do
+				if frame.scripts and frame.scripts.OnEnter then frame.scripts.OnEnter(frame) end
+			end
+			local tooltips = table.concat(tips, "\n")
+			check("the tooltip says why it was chosen", tooltips:find("Why: closest to you; level 18, 6 above you", 1, true) ~= nil
+				and tooltips:find("Why: level 12, close to yours", 1, true) ~= nil)
+		end
+		do
+			local addon, _, _, _, _, _, frames = quest_world()
+			addon.module.set("island", "quest_context", true)
+			local function label(text)
+				for _, frame in ipairs(frames) do
+					for _, region in ipairs(frame.regions or {}) do
+						if region.text == text and region.shown ~= false then return region end
+					end
+				end
+			end
+			local level = label("12")
+			check("the quest capsule carries the level after its distance, in white", level ~= nil and math.abs(level.color[1] - 245 / 255) < 0.01 and label("45%") == nil)
+			local held_width = addon.island.view().width
+			addon.module.set("island", "closed_xp", true)
+			local percent = label("45%")
+			check("and the experience percent in the bar's purple when the pill shows it", percent ~= nil and math.abs(percent.color[1] - 173 / 255) < 0.01)
+			check("the capsule holds its width when a part is added", addon.island.view().width == held_width)
+		end
+		do
+			local addon, _, _, _, _, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			local function accents()
+				local found = {}
+				for _, frame in ipairs(frames) do
+					for _, region in ipairs(frame.regions or {}) do
+						if region.width == 3 and region.shown == true and region.color and region.color[4] == 1 and region.height and region.height >= 4 then
+							found[#found + 1] = region.color
+						end
+					end
+				end
+				return found
+			end
+			addon.island.notify({ source = "Test", key = "plain", text = "Plain" })
+			check("an info toast has no severity bar", #accents() == 0)
+			addon.island.notify({ source = "Test", key = "careful", text = "Careful", severity = "warning" })
+			local bars = accents()
+			check("a warning toast has a bar in the warning colour", #bars == 1 and bars[1][1] == 1 and bars[1][2] == 0.62)
+		end
+		do
+			local addon, env, event, state, _, _, frames = island_world()
+			env.GetServerTime = function() return 3000000 end
+			env.UnitGUID = function() return "Player-1-00000004" end
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "feed_experience", true)
+			event("PLAYER_ENTERING_WORLD")
+			state.xp = state.xp + 90
+			event("PLAYER_XP_UPDATE")
+			env.everlook_island_key("down")
+			local function text_of(match)
+				for _, frame in ipairs(frames) do
+					for _, region in ipairs(frame.regions or {}) do
+						if type(region.text) == "string" and region.text:find(match, 1, true) and region.shown ~= false then return region.text end
+					end
+				end
+			end
+			local function heading_button()
+				for _, frame in ipairs(frames) do
+					for _, region in ipairs(frame.regions or {}) do
+						if (region.text == "Show sources" or region.text == "Hide sources") and region.shown ~= false then return region.parent.parent end
+					end
+				end
+			end
+			check("experience starts folded to its Total row, with a button to show the sources", text_of("EXPERIENCE") and not text_of("> EXPERIENCE") and text_of("Show sources") and text_of("Total") and not text_of("Other"))
+			local toggle = heading_button()
+			toggle.scripts.OnClick(toggle)
+			check("the button opens the slices and offers to hide them", text_of("Hide sources") and text_of("Other"))
+			toggle = heading_button()
+			toggle.scripts.OnClick(toggle)
+			check("and another folds them again", not text_of("Other") and text_of("Show sources"))
+		end
+		do
+			local addon, env, _, _, _, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			local function has(text)
+				for _, frame in ipairs(frames) do
+					for _, region in ipairs(frame.regions or {}) do
+						if region.text == text and region.shown ~= false then return true end
+					end
+				end
+				return false
+			end
+			addon.island.notify({ source = "everlook.buffs", key = "own", text = "Own warning", severity = "warning" })
+			check("an Everlook warning toast names its severity and not its source", has("Warning") and not has("Warning, Everlook"))
+			addon.island.notify({ source = "OtherAddon", key = "foreign", text = "Their warning", severity = "warning" })
+			check("another addon's toast names its source", has("Warning, OtherAddon"))
+		end
+		do
+			local addon, _, _, _, _, _, frames = quest_world()
+			addon.module.set("island", "quest_context", true)
+			addon.module.set("island", "closed_xp", true)
+			local function badge_point()
+				for _, frame in ipairs(frames) do
+					for _, region in ipairs(frame.regions or {}) do
+						if region.text == "45%" and region.shown ~= false then return region.point end
+					end
+				end
+			end
+			local quiet_offset = badge_point()[4]
+			addon.island.notify({ source = "Test", key = "unread", text = "Something new" })
+			check("an unread count moves the capsule badge left to clear it", badge_point()[4] < quiet_offset)
+			local measure = dofile(root .. "/tests/lib/layout.lua").new()
+			local function region_for(text)
+				for _, frame in ipairs(frames) do
+					for _, region in ipairs(frame.regions or {}) do
+						if region.text == text and region.shown ~= false then return region end
+					end
+				end
+			end
+			local capsule, count = measure.rectangle(region_for("45%").parent), measure.rectangle(region_for("1"))
+			local badge = measure.rectangle(region_for("45%"))
+			check("the unread count sits on the same 12 inset as everything else, and the badge keeps 8 clear of it",
+				capsule.right - count.right == 12 and count.left - badge.right == 8)
+			local ring = measure.rectangle(region_for("~800 yd"))
+			check("a label's box is a whole number of pixels wide, so what hangs from it lands on whole pixels",
+				ring.left == math.floor(ring.left) and ring.width == math.floor(ring.width) and badge.width == math.floor(badge.width))
+		end
+		do
+			local addon, env, _, state, afters, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			addon.island.notify({ source = "Test", key = "hovered", text = "Stay", duration = 4,
+				actions = { { id = "go", label = "Go", type = "callback", on_click = function() end } } })
+			local card
+			for _, frame in ipairs(frames) do if frame.bound_entry and frame.scripts.OnMouseUp then card = frame end end
+			check("a toast with buttons keeps its left clicks", card and card.pass_through ~= nil and #card.pass_through == 0)
+			local quiet
+			for _, frame in ipairs(frames) do if frame.action_id == "go" and frame.quiet then quiet = frame end end
+			local function fill_red() return quiet.quiet.fill.pieces[5].color[1] end
+			check("an action button is Stormwind blue: a thin gold outline over a bright blue fill, with near white words",
+				quiet and math.abs(quiet.label.color[1] - 235 / 255) < 0.01 and math.abs(fill_red() - 44 / 255) < 0.01
+				and quiet.quiet.edge.pieces[5].color[4] == 0.9 and quiet.quiet.edge.pieces[5].color[1] > quiet.quiet.edge.pieces[5].color[3]
+				and quiet.quiet.fill.pieces[5].color[3] > quiet.quiet.fill.pieces[5].color[1] * 2 and quiet.quiet.fill.pieces[5].color[3] > 0.8)
+			quiet.scripts.OnEnter(quiet)
+			check("it lights under the pointer and its words turn white", quiet.label.color[1] == 1 and math.abs(fill_red() - 52 / 255) < 0.01)
+			quiet.scripts.OnMouseDown(quiet)
+			check("and darkens while pressed", math.abs(fill_red() - 32 / 255) < 0.01)
+			quiet.scripts.OnLeave(quiet)
+			check("and rests again when the pointer leaves", math.abs(quiet.label.color[1] - 235 / 255) < 0.01 and math.abs(fill_red() - 44 / 255) < 0.01)
+			state.time = state.time + 3
+			card.scripts.OnEnter(card)
+			for _, after in ipairs(afters) do if not after.done then after.done = true; after.callback() end end
+			check("a hovered toast does not close when its clock runs out", #addon.island.view().toasts == 1)
+			state.time = state.time + 60
+			card.scripts.OnLeave(card)
+			local restarted
+			for _, after in ipairs(afters) do if not after.done then restarted = after.delay end end
+			check("leaving it restarts the full time", restarted == 4)
+		end
+		do
+			local addon, env, event, state, _, _, frames = island_world()
+			env.C_Container.GetContainerNumSlots = function(bag) return bag <= 1 and 20 or 0 end
+			addon.module.set("island", "enabled", true)
+			env.everlook_island_key("down")
+			local function text_of(match)
+				for _, frame in ipairs(frames) do
+					for _, region in ipairs(frame.regions or {}) do
+						if type(region.text) == "string" and region.text:find(match, 1, true) and region.shown ~= false then return region.text end
+					end
+				end
+			end
+			local function swipes()
+				local colors = {}
+				for _, frame in ipairs(frames) do
+					if frame.swipe_color and frame.shown == true then colors[#colors + 1] = frame.swipe_color end
+				end
+				return colors
+			end
+			check("a healthy figure is plain white, not green: colour is for attention",
+				text_of("50%") == "50%" and not text_of("|cff80e6a6"))
+			check("bags read as free of the total", text_of("8 free") == "8 free of 40")
+			for _, color in ipairs(swipes()) do check("a healthy ring is the quiet grey, dimmer than the caption beside it", color[1] < 0.6) end
+			state.slots[1] = { 10, 50 }
+			event("UPDATE_INVENTORY_DURABILITY")
+			local function tone_of(text)
+				for _, frame in ipairs(frames) do
+					for _, region in ipairs(frame.regions or {}) do
+						if region.text == text and region.shown ~= false then return region.color end
+					end
+				end
+			end
+			local amber = tone_of("20%")
+			check("a low figure takes the warning amber", amber ~= nil and amber[1] == 1 and math.abs(amber[2] - 0.62) < 0.01)
+			local warned = false
+			for _, color in ipairs(swipes()) do if color[1] == 1 and math.abs(color[2] - 0.62) < 0.01 and math.abs(color[3] - 0.25) < 0.01 then warned = true end end
+			check("and so does its ring", warned)
+			state.slots[1] = { 2, 50 }
+			event("UPDATE_INVENTORY_DURABILITY")
+			local red = tone_of("4%")
+			check("a dire one takes the error red", red ~= nil and red[1] == 1 and math.abs(red[2] - 0.5) < 0.01)
+		end
+		do
+			local addon, env, _, _, _, _, frames = island_world()
+			env.C_Container.GetContainerNumSlots = function(bag) return bag <= 1 and 20 or 0 end
+			addon.module.set("island", "enabled", true)
+			env.everlook_island_key("down")
+			local function rings()
+				local count = 0
+				for _, frame in ipairs(frames) do
+					if frame.cooldown and frame.shown == true then count = count + 1 end
+				end
+				return count
+			end
+			check("gear and bags each carry a ring", rings() == 2)
+		end
+		do
+			local addon = island_world()
+			local layout = addon.island_capsule.layout
+			local function measure(text) return #text * 7 end
+			local with_progress = layout({ text = "Flight to Stormwind", progress = 0.4 }, measure, 280)
+			check("a status capsule shows its progress as a percent in purple, not as a bar",
+				with_progress.row.badge == "40%" and with_progress.row.title == "Flight to Stormwind" and #with_progress.row.labels == 0)
+			local with_trailing = layout({ text = "Flight", trailing = "soon", progress = 0.4 }, measure, 280)
+			check("a trailing mark of its own is a label and keeps the percent away", with_trailing.row.labels[1] == "soon" and with_trailing.row.badge == nil)
+			check("with no progress there is nothing to show", layout({ text = "Flight" }, measure, 280).row.badge == nil)
+			-- The width a capsule asks for is worked out from its words with the row's own spacing:
+			-- 12 inset, the title, 12, then the trailing parts, then 12 more. With a mark the title starts at 34.
+			local plain = layout({ text = "Flight" }, measure, 280)
+			local marked = layout({ text = "Flight", icon = "flight" }, measure, 280)
+			local counted = layout({ text = "Flight", progress = 0.4 }, measure, 280)
+			check("a capsule's width is its title plus the row's insets, and a mark adds its room, 64 at the least",
+				plain.width == 66 and marked.width == 88 and counted.width == 100)
+			check("a capsule is at most 280 wide unless it asks to hold a width, and its width is even", layout({ text = string.rep("x", 100) }, measure, 400).width == 280
+				and layout({ text = "x", min_width = 320 }, measure, 400).width == 320 and layout({ text = "xxxxxxx" }, measure, 400).width % 2 == 0)
+			check("a held width is kept clear of the unread count's room", layout({ text = "x", min_width = 320 }, measure, 400, 20).width == 340)
+			local signature = addon.island_capsule.signature
+			check("a capsule's shape is what parts it has, so a new distance does not change it",
+				signature({ text = "a", labels = { "~5 yd" } }) == signature({ text = "b", labels = { "~6 yd" } })
+				and signature({ text = "a", labels = { "~5 yd" } }) ~= signature({ text = "a", labels = { "~5 yd", "12" } })
+				and signature({ text = "a" }) ~= signature({ text = "a", ring = { fraction = 0.5 } }))
+		end
+		do
+			local addon = island_world()
+			check("the edge bars are gone as options", not pcall(addon.module.set, "island", "rim_top", "experience")
+				and not pcall(addon.module.set, "island", "rim_bottom", "quest"))
+			check("and so is their module", addon.island_rim == nil)
+		end
+		do
+			local addon, env, _, _, _, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			local function marks()
+				local found = 0
+				for _, frame in ipairs(frames) do
+					for _, region in ipairs(frame.regions or {}) do
+						if region.path == "Interface\\Icons\\XP_Icon" and region.shown == true then found = found + 1 end
+					end
+				end
+				return found
+			end
+			check("the closed pill has no corner mark", marks() == 0)
+			env.everlook_island_key("down")
+			check("the open island has none either, so nothing sits on the level text", marks() == 0)
+		end
+		do
+			local addon, _, _, state, afters, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			local island_frame
+			for _, candidate in ipairs(frames) do if candidate.name == "EverlookIsland" then island_frame = candidate end end
+			local over = true
+			island_frame.IsMouseOver = function() return over end
+			island_frame.scripts.OnEnter(island_frame)
+			check("hovering opens the island", addon.island.view().mode == "open")
+			island_frame.scripts.OnLeave(island_frame)
+			local function fire_pending()
+				for _, after in ipairs(afters) do
+					if not after.done and after.delay == 0.1 then after.done = true; after.callback(); return true end
+				end
+			end
+			fire_pending()
+			check("moving onto a control inside the island does not close it", addon.island.view().mode == "open")
+			fire_pending()
+			check("and it keeps checking while the pointer stays inside", addon.island.view().mode == "open")
+			over = false
+			fire_pending()
+			check("it closes once the pointer is really outside", addon.island.view().mode == "closed")
+		end
+		do
+			local addon, env, event, state, _, _, frames = quest_world()
+			env.QuestMapFrame_OpenToQuestDetails = function() end
+			env.GetXPExhaustion = function() return 0 end
+			env.GetServerTime = function() return 4000000 end
+			env.UnitGUID = function() return "Player-1-00000005" end
+			addon.module.set("island", "quest_context", true)
+			addon.module.set("island", "quest_plan", true)
+			addon.module.set("island", "feed_quest_ready", true)
+			addon.module.set("island", "feed_experience", true)
+			for index = 1, 4 do
+				addon.island.notify({ source = "Test", key = "row" .. index, text = "Row " .. index, persist = index == 1,
+					actions = { { id = "act", label = "Act", type = "callback", on_click = function() end } } })
+			end
+			state.xp = state.xp + 100
+			event("PLAYER_XP_UPDATE")
+			env.everlook_island_key("down")
+			local clicked, failed = 0, {}
+			local list = {}
+			for _, frame in ipairs(frames) do
+				if frame.scripts.OnClick and frame.shown ~= false then list[#list + 1] = frame end
+			end
+			for _, frame in ipairs(list) do
+				for _, button in ipairs({ "LeftButton", "RightButton" }) do
+					local ok, err = pcall(frame.scripts.OnClick, frame, button)
+					clicked = clicked + 1
+					if not ok then failed[#failed + 1] = tostring(frame.name or "?") .. ": " .. tostring(err) end
+				end
+			end
+			check("there are buttons to click in a full island", #list >= 8)
+			check("every button in a full island answers both clicks without an error", #failed == 0)
+			if #failed > 0 then print(table.concat(failed, "\n")) end
+		end
+		do
+			local addon, _, _, state, _, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			local island_frame
+			for _, candidate in ipairs(frames) do if candidate.name == "EverlookIsland" then island_frame = candidate end end
+			island_frame.scripts.OnClick(island_frame)
+			check("a click pins the island open", addon.island.view().pinned == true)
+			local cell
+			for _, frame in ipairs(frames) do
+				for _, region in ipairs(frame.regions or {}) do
+					if region.text == "Money" then cell = region.parent end
+				end
+			end
+			state.time = state.time + 1
+			cell.scripts.OnClick(cell)
+			check("a click on a gauge cell does what a click beside it does", addon.island.view().pinned == false)
+		end
+		do
+			local addon, _, _, _, _, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			local api = addon.island
+			local function button(label)
+				for _, frame in ipairs(frames) do
+					if frame.action_id and frame.label and frame.label.text == label and frame.shown ~= false then return frame end
+				end
+			end
+			local handle = api.notify({ source = "Test", text = "Plain" })
+			check("a notice made without a key can still be updated", api.update(handle, { text = "Changed", detail = "More" }) == handle)
+			local view = addon.island.view()
+			check("an update changes the notice in place", #view.notices == 1 and view.notices[1].text == "Changed" and view.notices[1].detail == "More")
+			local clicks = 0
+			check("set_actions puts buttons on a showing notice", api.set_actions(handle, {
+				{ id = "go", label = "Go", type = "callback", on_click = function() clicks = clicks + 1 end } }) == handle)
+			check("the buttons appear and answer clicks", button("Go") ~= nil and (function()
+				local go = button("Go"); go.scripts.OnClick(go, "LeftButton"); return clicks == 1 end)())
+			check("a notice with buttons now defaults to the buttons interaction", addon.island.view().notices[1].interaction == "buttons")
+			check("set_action_enabled greys a button out", api.set_action_enabled(handle, "go", false) == true
+				and addon.island.view().notices[1].actions[1].enabled == false)
+			local go = button("Go")
+			go.scripts.OnClick(go, "LeftButton")
+			check("a disabled button does not run", clicks == 1)
+			check("and turning it on again lets it run", api.set_action_enabled(handle, "go", true) == true and (function()
+				local again = button("Go"); again.scripts.OnClick(again, "LeftButton"); return clicks == 2 end)())
+			check("setting the same state again reports no change", api.set_action_enabled(handle, "go", true) == false)
+			check("an empty list clears the buttons", api.set_actions(handle, {}) == handle
+				and #addon.island.view().notices[1].actions == 0 and addon.island.view().notices[1].interaction == nil)
+			local _, reason = api.update(handle, { key = "other" })
+			check("the key cannot be changed", reason == "invalid_update")
+			_, reason = api.update(handle, { source = "Elsewhere" })
+			check("nor the source", reason == "invalid_update")
+			_, reason = api.update(9999, { text = "Nobody" })
+			check("an unknown handle is named", reason == "unknown_handle")
+			_, reason = api.update(handle, { text = "  " })
+			check("an update goes through the same checks as a new notice", reason == "invalid_text")
+			_, reason = api.set_action_enabled(handle, "missing", false)
+			check("an unknown action is named", reason == "unknown_action")
+			api.set_actions(handle, { { id = "go", label = "Go", type = "callback", on_click = function() end } })
+			_, reason = api.set_action_enabled(handle, "go", "no")
+			check("the enabled state must be a boolean", reason == "invalid_enabled")
+		end
+		do
+			local addon, env, _, state = quest_world()
+			local positions = { [21] = { 0.1, 0.1 }, [22] = { 0.9, 0.9 }, [23] = { 0.12, 0.1 }, [24] = { 0.5, 0.5 } }
+			env.C_Map = env.C_Map or {}
+			env.C_Map.GetBestMapForUnit = function() return 37 end
+			env.C_Map.GetWorldPosFromMapPos = function(_, point) return 0, { x = point.x * 1000, y = point.y * 1000 } end
+			env.C_QuestLog.GetNextWaypoint = function(quest_id)
+				local at = positions[quest_id]
+				return 37, at[1], at[2]
+			end
+			addon.module.set("island", "quest_context", true)
+			addon.module.set("island", "quest_plan", true)
+			local quests = addon.island_quests
+			local view = quests.view()
+			check("with no pin the island shows the best guess", view.reason == "Suggested" and view.current.id == 23)
+			local route, from_pin = quests.route(view)
+			check("with no pin the route follows the player's location", from_pin == false and #route == 3 and route[1].id == 22)
+			addon.island.pin_quest(22)
+			view = quests.view()
+			check("a pinned quest is always the one shown", view.reason == "Pinned" and view.current.id == 22)
+			route, from_pin = quests.route(view)
+			local ids = {}
+			for _, record in ipairs(route) do ids[#ids + 1] = record.id end
+			check("with a pin the route builds out from the pinned quest", from_pin == true and table.concat(ids, ",") == "24,23,21")
+			check("each stop says how far it is from the pin", route[1].from_pin and math.floor(route[1].from_pin) == 565
+				and quests.why(route[1]):find("yd from your pinned quest", 1, true) ~= nil)
+			addon.island.pin_quest(nil)
+			_, from_pin = quests.route(quests.view())
+			check("releasing the pin returns the route to the player's location", from_pin == false)
+		end
+		do
+			local addon, env, event, state, _, _, frames = quest_world()
+			addon.module.set("island", "quest_context", true)
+			addon.module.set("island", "quest_plan", true)
+			local function suggestion() return notice_key(addon, "pin-suggest") end
+			local function button(label)
+				for _, frame in ipairs(frames) do
+					if frame.action_id and frame.label and frame.label.text == label and frame.shown ~= false then return frame end
+				end
+			end
+			check("pin suggestions start on", addon.module.get("island", "feed_pin_suggest") == true)
+			check("nothing is suggested before anything happens", suggestion() == nil)
+			table.insert(state.quests, { questID = 25, title = "A fresh errand", level = 12, distance = 5000,
+				objectives = { { text = "Fetch", numFulfilled = 0, numRequired = 3, finished = false } } })
+			state.time = state.time + 100
+			event("QUEST_ACCEPTED", 25)
+			event("QUEST_LOG_UPDATE")
+			check("accepting a quest offers to pin it", suggestion() and suggestion().text == "Pin A fresh errand?"
+				and suggestion().detail:find("New quest", 1, true) ~= nil and #suggestion().actions == 2)
+			button("Pin").scripts.OnClick(button("Pin"), "LeftButton")
+			check("the Pin button pins that quest", addon.island_quests.pinned_id() == 25)
+			check("and clears the offer", suggestion() == nil)
+			state.quests[1].objectives[1].numFulfilled = 3
+			state.time = state.time + 5
+			event("QUEST_LOG_UPDATE")
+			check("a second offer inside a minute waits", suggestion() == nil)
+			state.time = state.time + 120
+			state.quests[2].objectives[1].numFulfilled = 4
+			event("QUEST_LOG_UPDATE")
+			check("progress on a quest that is not pinned offers to pin it later",
+				suggestion() and suggestion().detail:find("making progress", 1, true) ~= nil)
+			state.time = state.time + 120
+			table.remove(state.quests, #state.quests)
+			event("QUEST_LOG_UPDATE")
+			check("finishing the pinned quest offers the next best one",
+				suggestion() and suggestion().detail:find("Your pinned quest is done", 1, true) ~= nil and addon.island_quests.pinned_id() == nil)
+		end
+		do
+			local addon, _, _, _, _, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			addon.island.notify({ source = "Test", key = "two", text = "Two choices", duration = 4, interaction = "buttons",
+				actions = { { id = "yes", label = "Yes", type = "callback", on_click = function() end },
+					{ id = "later", label = "Not now", type = "callback", on_click = function() end } } })
+			local yes, later
+			for _, frame in ipairs(frames) do
+				if frame.action_id == "yes" and frame.quiet then yes = frame end
+				if frame.action_id == "later" and frame.quiet then later = frame end
+			end
+			check("the first of two actions is the blue one to press, and the other is bright silver",
+				yes and later and yes.quiet.style == "accent" and later.quiet.style == "silver"
+				and math.abs(yes.quiet.fill.pieces[5].color[1] - 44 / 255) < 0.01 and math.abs(later.quiet.fill.pieces[5].color[1] - 196 / 255) < 0.01)
+		end
+		-- Where the game can draw its gold tooltip border, the first button has it, scaled to fit.
+		do
+			local addon, env, _, _, _, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			env.NineSliceUtil = {
+				GetLayout = function() return {} end,
+				ApplyLayoutByName = function(frame)
+					frame.TopLeftCorner = { GetHeight = function() return 33 end }
+					frame.Center = { Hide = function(self) self.hidden = true end }
+				end,
+			}
+			addon.island.notify({ source = "Test", key = "gold", text = "Two choices", duration = 4, interaction = "buttons",
+				actions = { { id = "yes", label = "Yes", type = "callback", on_click = function() end },
+					{ id = "later", label = "Not now", type = "callback", on_click = function() end } } })
+			local yes, later
+			for _, frame in ipairs(frames) do
+				if frame.action_id == "yes" and frame.quiet then yes = frame end
+				if frame.action_id == "later" and frame.quiet then later = frame end
+			end
+			local border_of = function(button) return button.quiet.border end
+			check("the first button has the game's border over its fill, scaled to fit the button, and its middle left out",
+				yes and border_of(yes) and border_of(yes).shown ~= false and border_of(yes).Center.hidden == true
+				and math.abs(border_of(yes).scale - 22 / (33 * 2 + 2)) < 1e-9)
+			check("the silver one has none, and its own thin line is kept", later and border_of(later).shown == false)
+			check("the thin gold line steps aside under the game's border",
+				yes.quiet.edge.pieces[5].color[4] == 0 and later.quiet.edge.pieces[5].color[4] == 0.9)
+		end
+	end
+	do
+		-- What the game does that the fake frames do not. The fakes keep their state in plain fields (.mouse,
+		-- .point, .scripts and the like) that a real frame does not have, so production code that reads one of
+		-- them works in the tests and silently does nothing in the game.
+		local island_world = lib.island_world
+		local layout = dofile(root .. "/tests/lib/layout.lua")
+
+		do
+			local listing = io.popen("cd " .. root .. " && ls Everlook*/*.lua")
+			local fields = { "mouse", "point", "points", "clicks", "scripts", "regions", "animation_groups", "pass_through", "attributes", "scroll_child", "scroll_offset" }
+			local offences = {}
+			for path in listing:lines() do
+				local handle = assert(io.open(root .. "/" .. path, "r"))
+				local number = 0
+				for line in handle:lines() do
+					number = number + 1
+					local code = line:gsub("%-%-.*$", ""):gsub('"[^"]*"', '""')
+					for _, field in ipairs(fields) do
+						if code:find("[%w_%)%]]%." .. field .. "%f[^%w_]") then offences[#offences + 1] = path .. ":" .. number .. " ." .. field end
+					end
+				end
+				handle:close()
+			end
+			listing:close()
+			check("no addon code reads a field only the test frames have" .. (#offences > 0 and (": " .. table.concat(offences, ", ")) or ""), #offences == 0)
+		end
+
+		do
+			local addon, _, _, _, _, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			local resting
+			for _, frame in ipairs(frames) do if frame.name == "EverlookIslandResting" then resting = frame end end
+			local kinds = {}
+			for _, group in ipairs(resting and resting.animation_groups or {}) do
+				for _, animation in ipairs(group.animations) do kinds[#kinds + 1] = animation.kind end
+			end
+			local alpha = false
+			for _, kind in ipairs(kinds) do alpha = alpha or kind == "Alpha" end
+			check("the pill's body has a clock for its motion and no alpha animation that would fade it", #kinds > 0 and not alpha)
+		end
+
+		do
+			local addon, env, _, _, _, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			env.Everlook.island.notify({ source = "Test", key = "right", text = "Right click me", duration = 4,
+				actions = { { id = "go", label = "Go", type = "callback", on_click = function() end } } })
+			layout.settle(frames)
+			local card
+			for _, frame in ipairs(frames) do if frame.bound_entry and frame.scripts.OnMouseUp then card = frame end end
+			check("a toast takes a right click to dismiss itself", card ~= nil and card.clicks ~= nil)
+			local dismissed
+			if card then
+				card.scripts.OnMouseUp(card, "RightButton")
+				dismissed = #addon.island.view().toasts == 0 or addon.island.view().toasts[1].phase == "exiting"
+			end
+			check("and the right click dismisses it", dismissed == true)
+		end
+
+		do
+			-- A frame has no `shown` field. The pill's arrows turn only while their capsule is on screen.
+			local addon, env, _, _, _, _, frames = island_world()
+			addon.module.set("island", "enabled", true)
+			addon.module.set("island", "reduced_motion", true)
+			local calls = 0
+			env.Everlook.island.notify({ source = "A", key = "a", presentation = "status", text = "x", capsule = { arrow = function() calls = calls + 1; return 0 end } })
+			layout.settle(frames)
+			env.Everlook.island.notify({ source = "B", key = "b", presentation = "status", text = "y", capsule = { text = "y" } })
+			layout.settle(frames)
+			local driver
+			for _, frame in ipairs(frames) do
+				if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookIslandFace" then driver = frame end
+			end
+			calls = 0
+			driver.scripts.OnUpdate(driver, 0.2)
+			check("a capsule that has left the pill is not asked for its arrow", driver ~= nil and calls == 0)
+		end
+	end
+	do
+		-- Where the mouse goes. The fake frames know their strata, level, rectangle and whether they take the
+		-- mouse, so a test can ask what is under a point the way the game does, and find a button that
+		-- something else covers or clips.
+		local island_world, quest_world = lib.island_world, lib.quest_world
+		local layout = dofile(root .. "/tests/lib/layout.lua")
+
+		local function inside(frame, ancestor)
+			while frame do
+				if frame == ancestor then return true end
+				frame = frame.parent
+			end
+			return false
+		end
+
+		local function shown(frame)
+			while frame do
+				if frame.shown == false then return false end
+				frame = frame.parent
+			end
+			return true
+		end
+
+		-- Every button that is on screen and takes clicks.
+		local function pressable(frames)
+			local list = {}
+			for _, frame in ipairs(frames) do
+				if frame.kind == "Button" and frame.mouse == true and frame.scripts.OnClick and shown(frame) then
+					local rect = layout.new().rectangle(frame)
+					if rect.width > 0 and rect.height > 0 then list[#list + 1] = frame end
+				end
+			end
+			return list
+		end
+
+		-- The buttons the mouse would not reach at their middle.
+		local function unreachable(frames, buttons)
+			local lost = {}
+			for _, button in ipairs(buttons) do
+				local x, y = layout.center(button)
+				local top = layout.hit(frames, x, y)
+				if top ~= button and not inside(top, button) then lost[#lost + 1] = button end
+			end
+			return lost
+		end
+
+		local function open_world(how)
+			local addon, env, _, _, afters, _, frames = quest_world()
+			addon.module.set("island", "quest_context", true)
+			addon.module.set("island", "quest_plan", true)
+			addon.module.set("island", "reduced_motion", how.reduced)
+			-- A notice changes the capsule, and its ease is still playing when the island opens.
+			env.Everlook.island.notify({ source = "Test", key = "one", text = "A notice", detail = "with detail",
+				actions = { { id = "go", label = "Go", type = "callback", on_click = function() end },
+					{ id = "later", label = "Later", type = "callback", on_click = function() end } } })
+			local island_frame
+			for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then island_frame = frame end end
+			if how.click then
+				island_frame.IsMouseOver = function() return true end
+				island_frame.scripts.OnClick(island_frame, "LeftButton")
+			elseif how.pointer then
+				island_frame.IsMouseOver = function() return true end
+				island_frame.scripts.OnEnter(island_frame)
+			else
+				env.everlook_island_key("down")
+			end
+			layout.settle(frames)
+			return addon, env, frames, afters
+		end
+
+		do
+			-- A frame that takes the mouse and does nothing with it is a dead spot on the island.
+			local _, _, frames = open_world({ reduced = true, click = true })
+			local idle = {}
+			for _, frame in ipairs(frames) do
+				if frame.kind == "Button" and frame.mouse == true and shown(frame) and not frame.scripts.OnClick and not frame.scripts.OnMouseDown and not frame.scripts.OnMouseUp then
+					local rect = layout.new().rectangle(frame)
+					if rect.width > 0 and rect.height > 0 then idle[#idle + 1] = (frame.name or "button") .. " " .. rect.width .. "x" .. rect.height end
+				end
+			end
+			check("every button that takes the mouse on the open island does something with a click" .. (#idle > 0 and (": " .. table.concat(idle, ", ")) or ""), #idle == 0)
+		end
+
+		do
+			-- The buttons now outrank the island, so a pane that takes the mouse has to do what the island would have.
+			local addon, _, frames = open_world({ reduced = true, click = true })
+			local tested = 0
+			local all_do = true
+			for _, frame in ipairs(frames) do
+				if frame.scroll_child and frame.mouse == true and shown(frame) then
+					tested = tested + 1
+					local before = addon.island.view().pinned
+					local script = frame.scripts.OnMouseUp
+					if script then script(frame, "LeftButton") end
+					if addon.island.view().pinned == before then all_do = false end
+					if script then script(frame, "LeftButton") end
+				end
+			end
+			check("a click on empty space in a pane that takes the mouse toggles the pin, as the island does (" .. tested .. " panes)", tested >= 2 and all_do)
+		end
+
+		for _, how in ipairs({ { name = "by key", reduced = true }, { name = "by key, with motion", reduced = false },
+			{ name = "by clicking", reduced = true, click = true }, { name = "by clicking, with motion", reduced = false, click = true },
+			{ name = "by hovering", reduced = true, pointer = true }, { name = "by hovering, with motion", reduced = false, pointer = true } }) do
+			local addon, _, frames = open_world(how)
+			local view = addon.island.view()
+			check("the island opened " .. how.name .. " is open and as large as its panes", view.mode == "open" and view.shell.width == view.width and view.shell.height == view.height)
+			local buttons = pressable(frames)
+			local lost = unreachable(frames, buttons)
+			check("every button in the island opened " .. how.name .. " gets the mouse where it sits (" .. #buttons .. " checked, " .. #lost .. " lost)", #buttons > 5 and #lost == 0)
+		end
+
+		do
+			local _, env, frames = open_world({ reduced = true })
+			local buttons = pressable(frames)
+			local island_frame
+			for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then island_frame = frame end end
+			local cover = env.CreateFrame("Frame", nil, nil)
+			cover:SetFrameStrata("HIGH")
+			cover:SetFrameLevel(90)
+			cover:SetAllPoints(island_frame)
+			cover:EnableMouse(true)
+			check("a mouse-enabled frame laid over the buttons takes the mouse from them", #unreachable(frames, buttons) == #buttons)
+			cover:EnableMouse(false)
+			check("and with its mouse off the buttons have it back", #unreachable(frames, buttons) == 0)
+		end
+	end
 end
