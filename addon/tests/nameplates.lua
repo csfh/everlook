@@ -150,18 +150,6 @@ return function(root, check, island_world)
 	plates.remove("counter")
 	settle()
 
-	-- Anyone who had quest marks on keeps them, with the layout they chose, when the nameplate view arrives.
-	env.EverlookDB.qol = { quest_nameplates = { enabled = true, layout = "name_left", width = 30, align_name = false } }
-	check("the saved quest mark settings are carried to the nameplate view", plates.migrate_saved() == true
-		and env.EverlookDB.qol.nameplates.enabled == true and env.EverlookDB.qol.nameplates.layout == "name_left"
-		and env.EverlookDB.qol.nameplates.width == 30 and env.EverlookDB.qol.nameplates.align_name == false)
-	check("and they are read as the nameplate view's own", addon.module.get("nameplates", "layout") == "name_left" and addon.module.enabled("nameplates"))
-	env.EverlookDB.qol = { quest_nameplates = { enabled = true, layout = "bar_left" }, nameplates = { enabled = false } }
-	check("a view that already has settings is left as it is", plates.migrate_saved() == false and env.EverlookDB.qol.nameplates.enabled == false)
-	env.EverlookDB.qol = { quest_nameplates = { enabled = false, layout = "bar_left" } }
-	check("and quest marks that were off bring nothing", plates.migrate_saved() == false and env.EverlookDB.qol.nameplates == nil)
-	env.EverlookDB.qol = { npc_titles = { enabled = true } }
-	check("anyone who had NPC titles on gets the nameplate view on too", plates.migrate_saved() == true and env.EverlookDB.qol.nameplates.enabled == true)
 	env.EverlookDB.qol = { nameplates = { enabled = true } }
 
 	-- A friendly player shown by name only can be given a bar, and the game's own setting is put back.

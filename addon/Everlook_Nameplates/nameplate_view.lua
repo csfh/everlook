@@ -301,27 +301,6 @@ function plates.refresh_unit(unit)
 	if type(unit) == "string" then show(unit) end
 end
 
--- Quest marks used to place themselves, and NPC titles drew their own line. Anyone who had either on gets the
--- nameplate view on, with the layout the marks had, before the module's defaults are filled in, so neither goes
--- away when this addon arrives.
-function plates.migrate_saved()
-	local saved = EverlookDB and EverlookDB.qol
-	if type(saved) ~= "table" then return false end
-	local old, new, titles = saved.quest_nameplates, saved.nameplates, saved.npc_titles
-	if new ~= nil then return false end
-	local marks = type(old) == "table" and old.enabled == true
-	local lines = type(titles) == "table" and titles.enabled == true
-	if not (marks or lines) then return false end
-	saved.nameplates = { enabled = true }
-	if marks then
-		for _, key in ipairs({ "layout", "width", "align_name" }) do
-			if old[key] ~= nil then saved.nameplates[key] = old[key] end
-		end
-	end
-	return true
-end
-EventUtil.ContinueOnAddOnLoaded(addon_name, plates.migrate_saved)
-
 -- Game settings this view changes: a friendly player is drawn with only a name when the game's setting says so,
 -- which leaves no health bar to lay anything out against, and plates overlap in a crowd unless the game is told
 -- to stack them. What each setting was is kept, and put back when it is no longer wanted, so turning an option or
