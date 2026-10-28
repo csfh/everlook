@@ -1,7 +1,7 @@
 local addon_name = ...
 local Everlook = Everlook
 local module = Everlook.module
-local id = "coordinates"
+local id = "minimap_coordinates"
 local ticker
 local label
 

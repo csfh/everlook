@@ -692,7 +692,7 @@ end
 local function read_coords()
 	readout.coords_text = nil
 	local coordinates = Everlook.coordinates
-	if not module.enabled("coordinates") or not coordinates or not coordinates.player_text then
+	if not module.enabled("minimap_coordinates") or not coordinates or not coordinates.player_text then
 		return
 	end
 	local text = coordinates.player_text()

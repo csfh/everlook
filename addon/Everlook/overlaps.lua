@@ -11,7 +11,7 @@ local KNOWN = {
 	quest_nameplates = { "Plater", "Platynator", "Kui_Nameplates", "TidyPlates_ThreatPlates", "ElvUI" },
 	chat_layout = { "Prat-3.0", "Chatter", "Glass", "ElvUI" },
 	compact_chat = { "Prat-3.0", "Chatter", "Glass", "ElvUI" },
-	coordinates = { "ElvUI", "TomTom" },
+	minimap_coordinates = { "ElvUI", "TomTom" },
 }
 
 local told = {}

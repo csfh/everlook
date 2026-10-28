@@ -4323,7 +4323,7 @@ return function(root, check)
 		state.bags[0], state.bags[1] = 1, 0
 		event("BAG_UPDATE_DELAYED")
 		check("low bag slots create a toast", last_toast_text(addon) == "Only 1 free slot")
-		addon.module.set("coordinates", "enabled", true)
+		addon.module.set("minimap_coordinates", "enabled", true)
 		event("PLAYER_ENTERING_WORLD")
 		env.everlook_smart_island_key("down")
 		check("coordinates join the open bar only when that module is on", addon.smart_island.view().coords == "50.0, 25.0")
@@ -4340,7 +4340,7 @@ return function(root, check)
 			check("the position cell shares money's row, to its right",
 				position_box.top == money_box.top and position_box.left == money_box.right + 24)
 		end
-		addon.module.set("coordinates", "enabled", false)
+		addon.module.set("minimap_coordinates", "enabled", false)
 		event("PLAYER_ENTERING_WORLD")
 		check("clearing coordinates removes them from the island", addon.smart_island.view().coords == nil)
 		env.InCombatLockdown = function() return true end

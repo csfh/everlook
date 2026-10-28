@@ -144,8 +144,8 @@ return function(root, check)
 	check("coordinates are blank when the position has no numbers", addon.coordinates.player_text() == "")
 	play.C_Map = nil
 	play.Minimap = {}
-	addon.module.set("coordinates", "enabled", true)
-	addon.module.set("coordinates", "enabled", false)
+	addon.module.set("minimap_coordinates", "enabled", true)
+	addon.module.set("minimap_coordinates", "enabled", false)
 	check("turning coordinates off stops the ticker", play.tickers[#play.tickers].cancelled)
 
 	-- Quest levels: the level goes on the quest log list after the game has drawn it, and nothing of the game's is replaced.

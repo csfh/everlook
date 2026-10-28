@@ -20,7 +20,7 @@ return function(root, check)
 
 	local addon, said = load({ Bagnon = true, Plater = true }, { bags = true, nameplates = false })
 	check("the addons loaded beside a module are named", table.concat(addon.overlaps.for_module("bags"), ",") == "Bagnon")
-	check("a module with no overlapping addon loaded has none", #addon.overlaps.for_module("coordinates") == 0 and #addon.overlaps.for_module("unknown") == 0)
+	check("a module with no overlapping addon loaded has none", #addon.overlaps.for_module("minimap_coordinates") == 0 and #addon.overlaps.for_module("unknown") == 0)
 	addon.overlaps.warn({ id = "bags", name = "Bags" })
 	check("a module that is on is told about the addon beside it, once", #said == 1 and said[1]:find("Bags and Bagnon", 1, true))
 	addon.overlaps.warn({ id = "bags", name = "Bags" })
