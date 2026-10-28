@@ -3,7 +3,7 @@ local Everlook = Everlook
 local module = Everlook.module
 local id = "chat_layout"
 
-Everlook.chat_tweaks = {}
+Everlook.chat_layout = {}
 
 local button_names = {
 	"ChatFrameMenuButton", "ChatFrameChannelButton", "ChatFrameToggleVoiceDeafenButton",
@@ -81,7 +81,7 @@ local filter_events = {
 }
 local filters_on = false
 
-function Everlook.chat_tweaks.stamp(message)
+function Everlook.chat_layout.stamp(message)
 	if not module.enabled(id) or not module.get(id, "timestamps") then
 		return message
 	end
@@ -109,7 +109,7 @@ local function stamp_filter(_, _, message, ...)
 	if issecretvalue and issecretvalue(message) then
 		return false
 	end
-	local stamped = Everlook.chat_tweaks.stamp(message)
+	local stamped = Everlook.chat_layout.stamp(message)
 	if stamped == message then
 		return false
 	end

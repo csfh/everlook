@@ -89,7 +89,7 @@ return function(root, check)
 	end
 
 	local addon, play, fire = load({
-		"world", "module", "tooltips", "useful_tooltips", "chat_tweaks", "coordinates", "quest_levels", "cinematic_skip", "camera", "ground_effects", "mail",
+		"world", "module", "tooltips", "useful_tooltips", "chat_layout", "coordinates", "quest_levels", "cinematic_skip", "camera", "ground_effects", "mail",
 	})
 	play.TooltipDataProcessor = {
 		AddTooltipPostCall = function(kind, callback)
@@ -449,7 +449,7 @@ return function(root, check)
 	play.CHAT_FRAMES = {}
 	addon.module.set("chat_layout", "enabled", true)
 	addon.module.set("chat_layout", "timestamps", true)
-	check("a plain chat line gains a timestamp", addon.chat_tweaks.stamp("Hello") == "09:05 Hello")
+	check("a plain chat line gains a timestamp", addon.chat_layout.stamp("Hello") == "09:05 Hello")
 	-- Same rule as ChatFrameUtil.ProcessMessageEventFilters: a truthy first
 	-- return drops the line, and a new message replaces the arguments that follow.
 	local function shown_line(filter, message, author, extra)
@@ -468,10 +468,10 @@ return function(root, check)
 		return value == "secret"
 	end
 	local secret_text, secret_author = shown_line(filters.CHAT_MSG_SAY, "secret", "Thrall")
-	check("secret chat text stays in place", secret_text == "secret" and secret_author == "Thrall" and addon.chat_tweaks.stamp("secret") == "secret")
+	check("secret chat text stays in place", secret_text == "secret" and secret_author == "Thrall" and addon.chat_layout.stamp("secret") == "secret")
 	play.issecretvalue = nil
 	addon.module.set("chat_layout", "timestamps", false)
-	check("turning timestamps off removes the prefix", addon.chat_tweaks.stamp("Hello") == "Hello" and filters.CHAT_MSG_SAY == nil)
+	check("turning timestamps off removes the prefix", addon.chat_layout.stamp("Hello") == "Hello" and filters.CHAT_MSG_SAY == nil)
 	local util_filters = {}
 	play.ChatFrameUtil = {
 		AddMessageEventFilter = function(event, callback)
