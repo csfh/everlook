@@ -48,7 +48,7 @@ Everlook.module.extend("smart_island", {
 	id = "reactions", addon = addon_name, order = 30,
 	options = {
 		react_level = { name = "Flash on level up", default = true, description = "Flashes the island in gold when you level up. It needs Show reactions, and it stays off while Do not disturb is on.", presets = { Quiet = false, Standard = true, Informative = true } },
-		react_kill = { name = "Flash on a kill", default = false, description = "Flashes the island in the accent color when a kill gives you experience. A kill that gives none, such as a grey one, does not flash, because this client gives no other sign of a kill. It needs Show reactions and the experience feed's addon, and a long fight flashes at most four times a second.", presets = { Quiet = false, Standard = false, Informative = false } },
+		react_kill = { name = "Flash on a kill", default = false, description = "Flashes the island in the accent color when a kill gives you experience. A kill that gives none, such as a gray one, does not flash, because this client gives no other sign of a kill. It needs Show reactions and the experience feed's addon, and a long fight flashes at most four times a second.", presets = { Quiet = false, Standard = false, Informative = false } },
 		react_loot = { name = "Flash on loot", default = false, description = "Flashes the island in green when you loot something. Other players' loot does not flash. It needs Show reactions.", presets = { Quiet = false, Standard = false, Informative = false } },
 	},
 	sections = { { name = "Notices", keys = { "react_level", "react_kill", "react_loot" }, before = "reduced_motion" } },

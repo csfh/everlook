@@ -27,7 +27,7 @@ end
 Everlook.module.extend("smart_island", {
 	id = "invites", addon = addon_name, order = 70,
 	options = {
-		feed_invites = { name = "Group invites", default = false, description = "Shows a toast when someone invites you to a group, with the role when it is a finder invite. Accept or decline in the game's own invitation popup. The notice goes away when the invitation is cancelled.", presets = { Quiet = false, Standard = true, Informative = true } },
+		feed_invites = { name = "Group invites", default = false, description = "Shows a toast when someone invites you to a group, with the role when it is a finder invite. Accept or decline in the game's own invitation popup. The notice goes away when the invitation is canceled.", presets = { Quiet = false, Standard = true, Informative = true } },
 	},
 	sections = { { name = "Notices", keys = { "feed_invites" } } },
 	events = { "PARTY_INVITE_REQUEST", "PARTY_INVITE_CANCEL" },
