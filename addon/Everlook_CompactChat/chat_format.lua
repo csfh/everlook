@@ -1,7 +1,7 @@
 local addon_name = ...
 local Everlook = Everlook
 local module = Everlook.module
-local id = "chat_format"
+local id = "compact_chat"
 
 -- Blizzard builds a chat line as format(CHAT_<TYPE>_GET .. message, sender).
 -- Replacing those strings sets the prefix without ever reading the message,

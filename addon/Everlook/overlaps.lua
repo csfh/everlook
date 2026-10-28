@@ -10,7 +10,7 @@ local KNOWN = {
 	nameplates = { "Plater", "Platynator", "Kui_Nameplates", "TidyPlates_ThreatPlates", "ElvUI" },
 	quest_nameplates = { "Plater", "Platynator", "Kui_Nameplates", "TidyPlates_ThreatPlates", "ElvUI" },
 	chat_layout = { "Prat-3.0", "Chatter", "Glass", "ElvUI" },
-	chat_format = { "Prat-3.0", "Chatter", "Glass", "ElvUI" },
+	compact_chat = { "Prat-3.0", "Chatter", "Glass", "ElvUI" },
 	coordinates = { "ElvUI", "TomTom" },
 }
 
