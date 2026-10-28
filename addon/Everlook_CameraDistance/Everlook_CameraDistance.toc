@@ -6,4 +6,4 @@
 ## Group: Everlook
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
 
-camera.lua
+camera_distance.lua

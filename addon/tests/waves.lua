@@ -89,7 +89,7 @@ return function(root, check)
 	end
 
 	local addon, play, fire = load({
-		"world", "module", "tooltips", "useful_tooltips", "chat_layout", "coordinates", "quest_levels", "cinematic_skip", "camera", "ground_effects", "take_mail",
+		"world", "module", "tooltips", "useful_tooltips", "chat_layout", "coordinates", "quest_levels", "cinematic_skip", "camera_distance", "ground_effects", "take_mail",
 	})
 	play.TooltipDataProcessor = {
 		AddTooltipPostCall = function(kind, callback)
@@ -275,7 +275,7 @@ return function(root, check)
 	addon.module.set("camera_distance", "distance", 3)
 	-- A reload in the middle: a new session with the same saved variables, and the game still holding the number set here.
 	do
-		local reloaded, reloaded_env = load({ "world", "module", "camera" })
+		local reloaded, reloaded_env = load({ "world", "module", "camera_distance" })
 		reloaded_env.EverlookDB.qol = play.EverlookDB.qol
 		reloaded_env.EverlookDB.cameraBefore = play.EverlookDB.cameraBefore
 		reloaded_env.GetCVar = play.GetCVar
