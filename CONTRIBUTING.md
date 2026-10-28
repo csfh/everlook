@@ -1,6 +1,6 @@
 # Contributing
 
-By sending a pull request or otherwise contributing to the Everlook addon, you agree to the [CLA](CLA.md). Your contribution becomes the property of Christoffer Hallas.
+By sending a pull request or otherwise contributing to Everlook, you agree to the [CLA](CLA.md). Your contribution becomes the property of Christoffer Hallas.
 
 If you cannot make that assignment, do not contribute. If this is work for an employer, get permission first.
 
@@ -12,4 +12,4 @@ A pull request that touches mail, trade, repair, selling, buying, accepting or t
 
 A report is answered with one of four things: a question when something needed to reproduce it is missing, a confirmation, a fix in `main`, or a closing note that gives the reason. A fix names the person who reported it in a `Reported-by: <name>` line in the commit body, and the release notes thank everyone named that way. Fixes go to `main` as soon as they are ready, so a contributor does not rewrite what is already done there. Check recent commits before starting work on a report.
 
-The Everlook addon is licensed under the [MIT License](LICENSE).
+Everlook is licensed under the [MIT License](LICENSE).
