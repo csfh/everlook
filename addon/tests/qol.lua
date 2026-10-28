@@ -1393,15 +1393,15 @@ return function(root, check)
 			header_font:SetFontObject(typography_env["ObjectiveTrackerFont" .. (size + 2)])
 		end }
 		typography.module.set("fonts", "enabled", true)
-		typography.module.set("quest_tracker", "text_size", 18)
-		typography.module.set("quest_tracker", "enabled", true)
+		typography.module.set("tracker_text_size", "text_size", 18)
+		typography.module.set("tracker_text_size", "enabled", true)
 		local path, line_size = line_text:GetFont()
 		local _, header_size = header_text:GetFont()
 		check("Expressway tracker text follows the chosen objective and header sizes", line_size == 18 and header_size == 20 and path:find("expressway.ttf", 1, true))
 		typography_event("PLAYER_ENTERING_WORLD")
 		local _, refreshed = line_text:GetFont()
 		check("Expressway refresh keeps tracker font inheritance", refreshed == 18 and line_text.path == nil)
-		typography.module.set("quest_tracker", "enabled", false)
+		typography.module.set("tracker_text_size", "enabled", false)
 		local _, restored = line_text:GetFont()
 		check("tracker restoration reaches Expressway text regions", restored == 12)
 	end
@@ -1488,45 +1488,45 @@ return function(root, check)
 	end
 	tracker_env.ObjectiveTrackerFrame = tracker
 	check("the quest tracker keeps its text size while the module is off",
-		tracker.line == 12 and tracker.header == 14 and tracker.text_size == 12 and tracker_addon.module.get("quest_tracker", "text_size") == 16)
-	tracker_addon.module.set("quest_tracker", "text_size", 18)
+		tracker.line == 12 and tracker.header == 14 and tracker.text_size == 12 and tracker_addon.module.get("tracker_text_size", "text_size") == 16)
+	tracker_addon.module.set("tracker_text_size", "text_size", 18)
 	check("the tracker size does nothing while the module is off", tracker.line == 12 and tracker.header == 14)
-	tracker_addon.module.set("quest_tracker", "enabled", true)
+	tracker_addon.module.set("tracker_text_size", "enabled", true)
 	check("enabling the quest tracker enlarges text without changing Edit Mode", tracker.text_size == 12 and tracker.line == 18 and tracker.header == 20 and not tracker.dirtied)
-	tracker_addon.module.set("quest_tracker", "text_size", 30)
-	check("quest tracker text size stays inside the tracker range", tracker_addon.module.get("quest_tracker", "text_size") == 20 and tracker.line == 20 and tracker.header == 22)
-	tracker_addon.module.set("quest_tracker", "enabled", false)
+	tracker_addon.module.set("tracker_text_size", "text_size", 30)
+	check("quest tracker text size stays inside the tracker range", tracker_addon.module.get("tracker_text_size", "text_size") == 20 and tracker.line == 20 and tracker.header == 22)
+	tracker_addon.module.set("tracker_text_size", "enabled", false)
 	check("turning the quest tracker off restores the previous text size", tracker.text_size == 12 and tracker.line == 12 and tracker.header == 14)
 	tracker.text_size = 13
 	tracker:UpdateSystemSettingTextSize()
 	check("edit mode owns the tracker size while the module is off", tracker.line == 13 and tracker.header == 15)
 	tracker_env.ObjectiveTrackerFrame = nil
-	tracker_addon.module.set("quest_tracker", "enabled", true)
+	tracker_addon.module.set("tracker_text_size", "enabled", true)
 	check("a missing quest tracker is skipped", tracker.line == 13)
 	tracker_env.ObjectiveTrackerFrame = tracker
 	tracker.initialized = false
-	tracker_addon.module.set("quest_tracker", "enabled", true)
+	tracker_addon.module.set("tracker_text_size", "enabled", true)
 	check("an uninitialized quest tracker is left alone", tracker.line == 13)
 	tracker:UpdateSystem(14)
 	check("the quest tracker applies its size after late initialization", tracker.line == 20 and tracker.header == 22)
 	tracker:UpdateSystem(15)
 	check("a tracker layout refresh preserves the enabled objective size", tracker.line == 20)
 	tracker_env.InCombatLockdown = function() return true end
-	tracker_addon.module.set("quest_tracker", "enabled", false)
+	tracker_addon.module.set("tracker_text_size", "enabled", false)
 	check("tracker restoration waits until combat ends", tracker.line == 20)
 	tracker_env.InCombatLockdown = function() return false end
 	tracker_event("PLAYER_REGEN_ENABLED")
 	check("disabling the tracker restores the current layout size after combat", tracker.line == 15 and tracker.header == 17)
-	tracker_addon.module.set("quest_tracker", "enabled", true)
+	tracker_addon.module.set("tracker_text_size", "enabled", true)
 	tracker.in_blizzard = true
 	tracker_env.ObjectiveTrackerManager:SetTextSize(17)
 	tracker.in_blizzard = false
-	tracker_addon.module.set("quest_tracker", "enabled", false)
+	tracker_addon.module.set("tracker_text_size", "enabled", false)
 	check("disabling tracker sizing preserves a later external text size", tracker.line == 17 and tracker.header == 19 and tracker.text_size == 15 and not tracker.dirtied)
 	tracker.line, tracker.header = 24, 26
-	tracker_addon.module.set("quest_tracker", "enabled", true)
+	tracker_addon.module.set("tracker_text_size", "enabled", true)
 	check("an external tracker size that cannot be restored is left alone", tracker.line == 24 and tracker.header == 26)
-	tracker_addon.module.set("quest_tracker", "enabled", false)
+	tracker_addon.module.set("tracker_text_size", "enabled", false)
 	check("the quest tracker size never goes through Blizzard's SetTextSize, whose layout would run tainted", tracker.from_addon == 0)
 
 	local posts, lines = {}, {}
@@ -1963,7 +1963,7 @@ return function(root, check)
 	check("settings clamp font size to supported range", addon2.module.get("fonts", "size_offset") == 8)
 	check("a slider that counts things shows its number", sliders.Everlook_QoL_smart_island_toast_count.format(3) == "3")
 	check("every text size is in points", sliders.Everlook_QoL_fonts_size_offset.format(3) == "3 pt" and sliders.Everlook_QoL_unit_names_extra.format(4) == "4 pt"
-		and sliders.Everlook_QoL_quest_text_size_text_size.format(16) == "16 pt" and sliders.Everlook_QoL_quest_tracker_text_size.format(16) == "16 pt")
+		and sliders.Everlook_QoL_quest_text_size_text_size.format(16) == "16 pt" and sliders.Everlook_QoL_tracker_text_size_text_size.format(16) == "16 pt")
 	check("the Island's position is in pixels", sliders.Everlook_QoL_smart_island_position_x.format(-103) == "-103 px" and sliders.Everlook_QoL_smart_island_position_top.format(12) == "12 px")
 	check("a slider with a unit shows it after the number", sliders.Everlook_QoL_smart_island_size.format(105) == "105%" and sliders.Everlook_QoL_chat_layout_fade_seconds.format(120) == "120 s")
 	check("a label shows the step the value will be stored on", sliders.Everlook_QoL_smart_island_size.format(97) == "95%" and sliders.Everlook_QoL_smart_island_size.format(98) == "100%")
