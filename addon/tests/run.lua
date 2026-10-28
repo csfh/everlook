@@ -4,9 +4,10 @@ if root == "" then
 end
 
 local source = dofile(root .. "/tests/suite.lua")(root)
-local failed = 0
+local failed, checked = 0, 0
 
 local function check(name, condition)
+	checked = checked + 1
 	if condition then
 		return
 	end
@@ -96,4 +97,4 @@ if failed > 0 then
 	print(failed .. " failed")
 	os.exit(1)
 end
-print("ok")
+print("ok (" .. checked .. " checks)")
