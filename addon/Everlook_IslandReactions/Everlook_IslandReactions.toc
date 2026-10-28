@@ -7,4 +7,4 @@
 ## Group: Everlook
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
 
-island_react.lua
+island_reactions.lua

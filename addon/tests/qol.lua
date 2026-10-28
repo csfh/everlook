@@ -193,7 +193,7 @@ return function(root, check)
 			frames[#frames + 1] = frame
 			return frame
 		end
-		for _, file in ipairs({ "world", "module", "tooltips", "blizzard_settings", "quest_text_size", "flight_time", "friend_conveniences", "useful_tooltips", "auto_loot", "quest_automation", "auto_repair", "sell_junk", "open_containers", "fonts", "hide_clutter", "auto_responses", "chat_layout", "coordinates", "quest_levels", "reward_marks", "cinematic_skip", "camera", "swing_timers", "unit_frame_names", "nameplates_kinds", "nameplates", "nameplate_titles", "quest_nameplates", "tracker_text_size", "mail", "tooltip_cursor", "compact_chat", "radial_menu_wheel", "radial_menu", "island_capsule", "island_row", "island_grid", "island_section", "island_blocks", "island_reaction", "island_summary", "island_quests", "island_actions", "island_vitals", "island_history", "island_surface", "island_scroll", "island_notice", "island_inbox", "island_toasts", "island_constants", "smart_island", "island_feed_kit", "island_share", "island_quest_notices", "island_loot", "island_hearth", "island_reputation", "island_professions", "island_mail", "island_invites", "island_buffs", "island_recap", "island_experience", "island_react", "island_warnings", "action_shortcuts", "bags_layout", "bags_item_level", "bags_junk", "bags_categories", "bags_pins", "bags_assign", "bags_alts", "bags_recent", "bags_folds", "bags_headers", "bags_chips", "bags_search", "bags_marker", "bags", "action_bar_slots_layouts", "action_bar_slots" }) do
+		for _, file in ipairs({ "world", "module", "tooltips", "blizzard_settings", "quest_text_size", "flight_time", "friend_conveniences", "useful_tooltips", "auto_loot", "quest_automation", "auto_repair", "sell_junk", "open_containers", "fonts", "hide_clutter", "auto_responses", "chat_layout", "coordinates", "quest_levels", "reward_marks", "cinematic_skip", "camera", "swing_timers", "unit_frame_names", "nameplates_kinds", "nameplates", "nameplate_titles", "quest_nameplates", "tracker_text_size", "mail", "tooltip_cursor", "compact_chat", "radial_menu_wheel", "radial_menu", "island_capsule", "island_row", "island_grid", "island_section", "island_blocks", "island_reaction", "island_summary", "island_quests", "island_actions", "island_vitals", "island_history", "island_surface", "island_scroll", "island_notice", "island_inbox", "island_toasts", "island_constants", "smart_island", "island_feed_kit", "island_share", "island_quest_notices", "island_loot", "island_hearth", "island_reputation", "island_professions", "island_mail", "island_invites", "island_buffs", "island_recap", "island_experience", "island_reactions", "island_warnings", "action_shortcuts", "bags_layout", "bags_item_level", "bags_junk", "bags_categories", "bags_pins", "bags_assign", "bags_alts", "bags_recent", "bags_folds", "bags_headers", "bags_chips", "bags_search", "bags_marker", "bags", "action_bar_slots_layouts", "action_bar_slots" }) do
 			if not left_out[file] then
 				local chunk = assert(loadfile(source(file)))
 				setfenv(chunk, env)
@@ -6246,7 +6246,7 @@ return function(root, check)
 	end
 	assert(loadfile(root .. "/tests/island_seam.lua"))()(root, check, island_world, quest_world, secret_stat)
 	assert(loadfile(root .. "/tests/island_sections.lua"))()(root, check, island_world, quest_world)
-	assert(loadfile(root .. "/tests/island_reactions.lua"))()(root, check, island_world, quest_world)
+	assert(loadfile(root .. "/tests/island_reaction.lua"))()(root, check, island_world, quest_world)
 	assert(loadfile(root .. "/tests/island_capsule_states.lua"))()(root, check, island_world, quest_world)
 	assert(loadfile(root .. "/tests/island_capsule_api.lua"))()(root, check, island_world)
 	assert(loadfile(root .. "/tests/island_resting.lua"))()(root, check, island_world)
@@ -6254,7 +6254,7 @@ return function(root, check)
 	assert(loadfile(root .. "/tests/island_mouse.lua"))()(root, check, island_world, quest_world)
 	assert(loadfile(root .. "/tests/nameplates.lua"))()(root, check, island_world)
 	assert(loadfile(root .. "/tests/quest_nameplates.lua"))()(root, check, island_world)
-	assert(loadfile(root .. "/tests/island_react_addon.lua"))()(root, check, island_world)
+	assert(loadfile(root .. "/tests/island_reactions.lua"))()(root, check, island_world)
 	assert(loadfile(root .. "/tests/island_share.lua"))()(root, check, load_qol)
 assert(loadfile(root .. "/tests/sell_junk_marked.lua"))()(root, check, load_qol)
 
