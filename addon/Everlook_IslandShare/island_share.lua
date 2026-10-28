@@ -15,7 +15,7 @@ local WIRE_KIND = { unit = true, item = true, object = true, quest = true, spell
 local ISLAND_KIND = { unit = "info", item = "loot", object = "info", quest = "quest", spell = "info" }
 
 BINDING_HEADER_EVERLOOK_ISLAND_SHARE = "Everlook Island share"
-BINDING_NAME_EVERLOOK_SHARE = "Share what you are pointing at"
+BINDING_NAME_EVERLOOK_ISLAND_SHARE = "Share what you are pointing at"
 
 local last_kind, last_name, last_at
 
@@ -272,7 +272,7 @@ function share.click()
 	share.present(nil, subject)
 end
 
-function everlook_share_click()
+function everlook_island_share_click()
 	share.click()
 end
 

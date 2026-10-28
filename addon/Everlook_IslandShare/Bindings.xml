@@ -1,5 +1,5 @@
 <Bindings>
-	<Binding name="EVERLOOK_SHARE" header="EVERLOOK_ISLAND_SHARE" category="Everlook" default="ALT-BUTTON2">
-		everlook_share_click()
+	<Binding name="EVERLOOK_ISLAND_SHARE" header="EVERLOOK_ISLAND_SHARE" category="Everlook" default="ALT-BUTTON2">
+		everlook_island_share_click()
 	</Binding>
 </Bindings>
