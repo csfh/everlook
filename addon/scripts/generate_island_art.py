@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Generate Everlook's original, tintable Island surface textures."""
+"""Generate the Island's textures in Everlook_Island/assets: run `python3 scripts/generate_island_art.py` from addon/.
+
+They are original geometry, authored for Everlook, with no third-party art. Each is an uncompressed 32-bit TGA
+with a top-left origin, white so the game can tint it, and alpha supersampled four by four.
+"""
 
 import math
 from pathlib import Path
@@ -27,7 +31,8 @@ def arrow(x, y):
 
 
 def ring(x, y):
-    # A circle 62 wide with its middle cut out, 8 thick, for the progress rings.
+    # A circle 62 wide with its middle cut out, 8 thick: the track of every progress ring, and the swipe texture of
+    # the cooldown frame that fills it, held at a percentage as the game holds its own honor ring.
     distance = math.hypot(x - 32, y - 32)
     return 1.0 if 23 <= distance <= 31 else 0.0
 
@@ -41,8 +46,11 @@ def ring_small(x, y):
 
 def main():
     assets = Path(__file__).resolve().parents[1] / "Everlook_Island" / "assets"
+    # A quarter circle. Mirrored, it gives the four corners, and the straight pieces between them stretch, so the
+    # radius stays the same as a card grows.
     tga(assets / "island_corner.tga", 32,
         lambda x, y: float(math.hypot(32 - x, 32 - y) <= 32))
+    # Opaque white, for the tinted bar of a notice's progress.
     tga(assets / "island_white.tga", 2, lambda x, y: 1)
     tga(assets / "island_arrow.tga", 32, arrow)
     tga(assets / "island_ring.tga", 64, ring)
