@@ -22,7 +22,9 @@ just test      # every check: test-addon, test-harness and test-www
 just prepush   # before a push that releases the addon
 ```
 
-`just` lists every recipe. `just sync` reads `EVERLOOK_ADDONS_DIR` from the environment or `.env.local`, and moves a real folder that is in the way to a backup first. The rules for the code are in `AGENTS.md` and `addon/AGENTS.md`, and the rules for tests in `addon/tests/README.md`.
+`just` lists every recipe. `just sync` reads `EVERLOOK_ADDONS_DIR` from the environment or `.env.local`, and moves a real folder that is in the way to a backup first. The rules for the code and its tests are in `AGENTS.md`.
+
+In `harness/`, `cargo run -- run scenarios/island_mouse.lua` runs one scenario and prints its checks, `cargo run -- render scenarios/island_gallery.lua out.html` draws a scenario's `harness.snapshot(name)` states into one HTML file, `cargo run -- serve scenarios/island_mouse.lua` shows the same live (hover, click, wheel, step the clock), and `cargo run -- gen-api <wow-ui-source>` rebuilds `api/widgets.json` and `api/fonts.json`.
 
 ## Release
 
