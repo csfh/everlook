@@ -63,4 +63,60 @@ return function(root, check, lib)
 	env7.CHAT_FRAMES = { "ChatFrame1", "ChatFrame3" }
 	addon7.module.set("chat_layout", "enabled", true)
 	check("a button or window this client does not have is skipped", not env7.ChatFrameMenuButton.shown and env7.ChatFrame1.time == 30)
+
+	do
+		-- Timestamps, through the chat filters of both the old globals and ChatFrameUtil.
+		local addon, play, fire = lib.load_files({ "world", "module", "chat_layout" })
+		play.GetGameTime = function()
+			return 9, 5
+		end
+		local filters = {}
+		play.ChatFrame_AddMessageEventFilter = function(event, callback)
+			filters[event] = callback
+		end
+		play.ChatFrame_RemoveMessageEventFilter = function(event)
+			filters[event] = nil
+		end
+		play.CHAT_FRAMES = {}
+		addon.module.set("chat_layout", "enabled", true)
+		addon.module.set("chat_layout", "timestamps", true)
+		check("a plain chat line gains a timestamp", addon.chat_layout.stamp("Hello") == "09:05 Hello")
+		-- Same rule as ChatFrameUtil.ProcessMessageEventFilters: a truthy first
+		-- return drops the line, and a new message replaces the arguments that follow.
+		local function shown_line(filter, message, author, extra)
+			local discard, new_message, new_author, new_extra = filter(nil, "CHAT_MSG_SAY", message, author, extra)
+			if discard then
+				return nil
+			end
+			if new_message then
+				return new_message, new_author, new_extra
+			end
+			return message, author, extra
+		end
+		local text, author, channel = shown_line(filters.CHAT_MSG_SAY, "Hello", "Thrall", "1")
+		check("a timestamped line stays in chat with its sender", text == "09:05 Hello" and author == "Thrall" and channel == "1")
+		play.issecretvalue = function(value)
+			return value == "secret"
+		end
+		local secret_text, secret_author = shown_line(filters.CHAT_MSG_SAY, "secret", "Thrall")
+		check("secret chat text stays in place", secret_text == "secret" and secret_author == "Thrall" and addon.chat_layout.stamp("secret") == "secret")
+		play.issecretvalue = nil
+		addon.module.set("chat_layout", "timestamps", false)
+		check("turning timestamps off removes the prefix", addon.chat_layout.stamp("Hello") == "Hello" and filters.CHAT_MSG_SAY == nil)
+		local util_filters = {}
+		play.ChatFrameUtil = {
+			AddMessageEventFilter = function(event, callback)
+				util_filters[event] = callback
+			end,
+			RemoveMessageEventFilter = function(event)
+				util_filters[event] = nil
+			end,
+		}
+		addon.module.set("chat_layout", "timestamps", true)
+		text, author = shown_line(util_filters.CHAT_MSG_SAY, "Hello", "Thrall", "1")
+		check("timestamps register on ChatFrameUtil and keep the sender", text == "09:05 Hello" and author == "Thrall" and filters.CHAT_MSG_SAY == nil)
+		addon.module.set("chat_layout", "timestamps", false)
+		check("turning timestamps off removes the ChatFrameUtil filter", util_filters.CHAT_MSG_SAY == nil)
+		play.ChatFrameUtil = nil
+	end
 end

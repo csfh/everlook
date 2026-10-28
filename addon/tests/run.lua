@@ -87,7 +87,7 @@ end
 
 local kept = {
 	"trace", "sched", "optimize", "settings_build", "module", "action_shortcuts", "swing_timers", "quest_automation", "auto_loot", "friend_conveniences", "auto_repair", "sell_junk", "open_containers", "nameplate_titles", "unit_frame_names", "tooltip_cursor", "compact_chat", "flight_time", "fonts", "quest_text_size", "tracker_text_size", "useful_tooltips", "hide_clutter", "auto_responses", "chat_layout", "minimap", "settings", "radial_menu", "island", "island_actions", "island_seam", "island_sections", "island_reaction", "island_capsule_states", "island_capsule_api", "island_resting", "island_realclient", "island_mouse", "nameplates", "quest_nameplates", "island_reactions", "island_share", "sell_junk_marked", "bags", "blizzard_settings",
-	"action_bar_slots", "waves", "tooltips", "combat", "install", "errors", "title_fit", "overlaps",
+	"action_bar_slots", "minimap_coordinates", "quest_levels", "cinematic_skip", "camera_distance", "ground_effects", "take_mail", "tooltips", "combat", "install", "errors", "title_fit", "overlaps",
 	"quest_decide", "reward_marks", "island_contrast",
 }
 for _, name in ipairs(kept) do

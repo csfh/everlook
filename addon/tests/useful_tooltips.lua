@@ -24,4 +24,39 @@ return function(root, check, lib)
 	addon2.module.set("useful_tooltips", "enabled", false)
 	clear(tip); posts[1](tip, { id = 1 })
 	check("disabled tooltip hooks add no lines", #lines == 6)
+
+	do
+		-- On the game's tooltip processor, with the lighter stand-ins of load_files.
+		local addon, play, fire = lib.load_files({ "world", "module", "tooltips", "useful_tooltips" })
+		play.TooltipDataProcessor = {
+			AddTooltipPostCall = function(kind, callback)
+				play.tooltip_calls = play.tooltip_calls or {}
+				play.tooltip_calls[kind] = callback
+			end,
+		}
+		play.Enum = { TooltipDataType = { Item = 0, Unit = 2 } }
+		play.Enum = { TooltipDataType = { Item = 0, Unit = 2 }, GossipOption = { Vendor = 1, Gossip = 2, Taxi = 3, Trainer = 4, Binder = 5 } }
+		-- Tooltips install on enable, after the processor exists. Reload the module's apply by setting enabled.
+		addon.module.set("useful_tooltips", "enabled", true)
+		local lines = {}
+		local tooltip = {
+			AddLine = function(_, text)
+				lines[#lines + 1] = text
+			end,
+			HasScript = function()
+				return true
+			end,
+			HookScript = function() end,
+		}
+		play.tooltip_calls[0](tooltip, { id = 20 })
+		local joined = table.concat(lines, "|")
+		check("the item tooltip shows the item id", joined:find("Item ID: 20", 1, true) ~= nil)
+		lines = {}
+		play.issecretvalue = function(value)
+			return value == "secret"
+		end
+		play.tooltip_calls[0](tooltip, { id = "secret" })
+		check("a secret tooltip id adds no line", #lines == 0)
+		play.issecretvalue = nil
+	end
 end

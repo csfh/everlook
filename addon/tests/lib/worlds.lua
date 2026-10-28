@@ -214,6 +214,96 @@ return function(root)
 	end
 	lib.load_all = load_all
 
+	-- Only the files given, on lighter stand-ins than load_all's, with tickers kept on env.tickers.
+	local function load_files(files)
+		local addon = {}
+		local frames, callbacks, tickers = {}, {}, {}
+		local env = setmetatable({}, { __index = _G })
+		env._G = env
+		env.tickers = tickers
+		function addon.say(text)
+			addon.said = text
+		end
+		env.EventUtil = {
+			ContinueOnAddOnLoaded = function(_, callback)
+				callbacks[#callbacks + 1] = callback
+			end,
+			ContinueOnPlayerLogin = function() end,
+		}
+		env.IsShiftKeyDown = function()
+			return false
+		end
+		env.C_Timer = {
+			After = function(_, callback)
+				callback()
+			end,
+			NewTicker = function(_, callback)
+				local ticker = {
+					callback = callback,
+					Cancel = function(self)
+						self.cancelled = true
+					end,
+				}
+				tickers[#tickers + 1] = ticker
+				return ticker
+			end,
+		}
+		env.CreateFrame = function()
+			local frame = { events = {}, scripts = {} }
+			function frame:RegisterEvent(event)
+				self.events[event] = true
+			end
+			function frame:UnregisterEvent(event)
+				self.events[event] = nil
+			end
+			function frame:SetScript(name, callback)
+				self.scripts[name] = callback
+			end
+			function frame:SetSize() end
+			function frame:SetPoint() end
+			function frame:Hide()
+				self.hidden = true
+			end
+			function frame:Show()
+				self.hidden = false
+			end
+			function frame:CreateFontString()
+				return {
+					SetPoint = function() end,
+					SetText = function(self, text)
+						self.text = text
+					end,
+					Hide = function(self)
+						self.hidden = true
+					end,
+					Show = function(self)
+						self.hidden = false
+					end,
+				}
+			end
+			frames[#frames + 1] = frame
+			return frame
+		end
+		for index = 1, #files do
+			local chunk = assert(loadfile(source(files[index])))
+			setfenv(chunk, env)
+			chunk("Everlook", addon)
+		end
+		for index = 1, #callbacks do
+			callbacks[index]()
+		end
+		local function fire(name, ...)
+			for index = 1, #frames do
+				local frame = frames[index]
+				if frame.events[name] and frame.scripts.OnEvent then
+					frame.scripts.OnEvent(frame, name, ...)
+				end
+			end
+		end
+		return addon, env, fire
+	end
+	lib.load_files = load_files
+
 	local function island_world()
 		local addon, env, event, hooks, tickers, frames = load_all()
 		local afters, state = {}, {
