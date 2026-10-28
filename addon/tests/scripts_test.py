@@ -321,6 +321,20 @@ class LayoutTest(unittest.TestCase):
                 with self.subTest(addon=folder.name):
                     self.assertEqual(found and found.group(1), expected)
 
+    def test_every_test_file_is_named_for_a_shipped_file_and_runs(self):
+        # A test file is named for the core file, module, module part or Island extension it tests,
+        # and run.lua runs every one of them.
+        shipped = {path.stem for folder in self.folders() for path in folder.glob("*.lua")}
+        tests = sorted(path.stem for path in (ADDON / "tests").glob("*.lua") if path.name != "run.lua")
+        for stem in tests:
+            with self.subTest(test=stem):
+                self.assertIn(stem, shipped)
+        runner = (ADDON / "tests" / "run.lua").read_text()
+        start = runner.index("local suites = {")
+        listed = re.findall(r'"([a-z_]+)"', runner[start:runner.index("}", start)])
+        self.assertEqual(listed, sorted(listed), "run.lua lists its suites in order")
+        self.assertEqual(listed, tests)
+
     NAMEPLATE_PROVIDERS = {"QuestNameplates", "NameplateTitles"}
 
     def test_modules_depend_on_everlook_and_sit_in_its_group(self):
