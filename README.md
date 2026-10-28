@@ -1,25 +1,52 @@
 # Everlook
 
-Quality-of-life addons for World of Warcraft, and the small site that lists them.
+Quality-of-life addons for World of Warcraft, and the small site that lists them. Everlook tweaks the default interface. Each module starts off, and you turn on the ones you want from the Everlook settings page. It collects no data.
+
+## Install
+
+Download the latest release from https://github.com/csfh/everlook/releases/latest and unpack its folders into `Interface/AddOns`.
+
+## Layout
 
 ```
-addon/    The addons: the Everlook core and its Everlook_<Name> modules, with their tests and release scripts
+addon/    The Everlook core and its Everlook_<Name> modules, with their tests and release scripts
 harness/  A Rust host that runs the addon files with the game's frame, mouse and clock rules. It never ships
-www/      Static site (Vite) for Cloudflare Pages. Output is www/dist
+www/      The static site (Vite) for Cloudflare Pages
 ```
 
-Everlook tweaks the default interface. Each module starts off, and you turn on the ones you want from the Everlook settings page. It collects no data.
-
-## Addon
+## Develop
 
 ```sh
-just test-addon     # Lua suite, folder and luac checks, and the scripts' tests
-just test-harness   # the addon files on the harness (harness/, Rust)
+just sync      # link the addon folders into the game's AddOns folder
+just test      # every check: test-addon, test-harness and test-www
+just prepush   # before a push that releases the addon
 ```
 
-`just sync` links the addon folders into the game; it reads `EVERLOOK_ADDONS_DIR` from the environment or `.env.local`. See `addon/README.md` and `addon/RELEASING.md`.
+`just` lists every recipe. `just sync` reads `EVERLOOK_ADDONS_DIR` from the environment or `.env.local`, and moves a real folder that is in the way to a backup first. The rules for the code are in `AGENTS.md` and `addon/AGENTS.md`, and the rules for tests in `addon/tests/README.md`.
 
-Releases are GitHub Releases tagged `addon-v<version>`. A push to `main` that changes `addon/**` runs the addon tests and, when the commits ask for one, publishes that release. A commit outside `addon/` never releases.
+## Release
+
+A push to `main` runs the checks and, when its commits ask for one, publishes a GitHub Release tagged `addon-v<version>`: a tarball, a zip and their checksums, from `addon/scripts/pack.sh`. The commit types decide it, as `AGENTS.md` lists, and a commit outside `addon/` never releases. The version in `addon/Everlook/Everlook.toc`, written `## Version: x.y.z`, is what ships when that line changes by hand; `addon/tests/folders_test.py` fails on any other form. Do not tag a release yourself.
+
+CI has never played the build, so before that push:
+
+1. `just prepush`. It runs the addon checks and the harness, then fails if a commit subject since `origin/main` is over 100 characters, because the release notes are made from subjects.
+2. `just sync`, then log in on the current client with the modules the push touches turned on.
+3. Walk the smoke list. Skip anything the push did not touch, and say which were skipped.
+4. Watch the Lua error display (`/console scriptErrors 1` if it is off) and the Everlook Debug page.
+
+The smoke list:
+
+- Login and `/reload` give no Lua error.
+- `/everlook` and `/el` open settings, and every module page opens. Either with extra words still only toggles that page.
+- The island shows level and the quest, opens on hover, closes, and a notice appears (a vendor visit or mail).
+- Bags open, close, and search (if Bags is on).
+- Quest dialog: accept and turn in with quest automation on, and a PvP-flagging quest is left to the player.
+- An item tooltip and a creature tooltip show the Everlook id lines once.
+- With cinematic skip on: a cinematic and a movie close as they start, a cinematic during a vehicle ride keeps playing with you still in the vehicle, and no "blocked" message appears.
+- A full client restart, then login: nothing blank, no error.
+
+After the push, check the release page.
 
 ## Site
 
@@ -33,3 +60,9 @@ Cloudflare Pages:
 | Node.js | 22 |
 
 The page lists the modules from their TOC files at build time, so a new module shows up on the next build. These settings live in the Pages project, not in a Wrangler file. Nothing here creates a Cloudflare project or a custom domain.
+
+## License
+
+MIT. See [LICENSE](LICENSE). Copyright (c) 2026 Christoffer Hallas. The bundled fonts keep their own licenses, in `addon/Everlook_Fonts/assets/`.
+
+If you send a pull request or other contribution, you agree to the [CLA](CLA.md). [CONTRIBUTING.md](CONTRIBUTING.md) says how pull requests and reports are handled.

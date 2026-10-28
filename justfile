@@ -38,7 +38,7 @@ prepush: test-addon test-harness
         echo "${long}" >&2
         exit 1
     fi
-    echo "Checks passed. Now walk the smoke list in addon/RELEASING.md in the game before pushing."
+    echo "Checks passed. Now walk the smoke list in README.md in the game before pushing."
 
 # Link the addon folders into the game's AddOns folder, EVERLOOK_ADDONS_DIR
 sync:
