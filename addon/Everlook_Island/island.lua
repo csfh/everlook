@@ -5,11 +5,11 @@ local module = Everlook.module
 local id = "island"
 
 BINDING_HEADER_EVERLOOK_ISLAND = "Everlook Island"
-BINDING_NAME_EVERLOOK_SMART_ISLAND = "Open smart island"
-BINDING_NAME_EVERLOOK_SMART_ISLAND_DISMISS = "Dismiss top island notice"
+BINDING_NAME_EVERLOOK_ISLAND = "Open smart island"
+BINDING_NAME_EVERLOOK_ISLAND_DISMISS = "Dismiss top island notice"
 
 local island = {}
-Everlook.smart_island = island
+Everlook.island = island
 
 local frame, summary, closed_text, surface
 local inbox, inbox_content, footer, empty_text, unread_text
@@ -357,7 +357,7 @@ local function content_size(node, entry, width, compact, activity)
 	-- A row you have read steps back from one you have not.
 	if node.row then call(node.label, "SetTextColor", unpack(entry.unread and K.COLORS.primary or K.COLORS.secondary)) end
 	local primary_height = call(node.label, "GetStringHeight") or 14
-	local foreign_source = type(entry.source) == "string" and entry.source:find("^smart_island") == nil and entry.source:find("^everlook") == nil
+	local foreign_source = type(entry.source) == "string" and entry.source:find("^everlook") == nil
 	-- A toast from Everlook itself does not name its source. The inbox row does.
 	local source_label = (foreign_source or not compact) and (foreign_source and entry.source or "Everlook") or nil
 	local severity = ({ success = "Success", warning = "Warning", error = "Error" })[entry.severity]
@@ -2069,11 +2069,12 @@ function island.unregister_event(handle)
 	return true
 end
 
--- The supported interface for Everlook modules and other addons, with Everlook.module. It exists
--- once this addon has loaded, even while Smart island is off, and is missing when the player turns
--- the addon off in the addon list. Another addon lists `## OptionalDeps: Everlook_Island`, checks
--- `Everlook` and `Everlook.island` before using them, and calls with dot syntax. Other fields on
--- `Everlook` are internal. A call returns its result, or nil and a reason; "disabled" means Smart
+-- Everlook.island is this module's table. The calls below, and `api`, are the supported interface
+-- for Everlook modules and other addons, with Everlook.module; its other fields belong to the island
+-- and can change, as can every other field on `Everlook`. It exists once this addon has loaded,
+-- even while Smart island is off, and is missing when the player turns the addon off in the addon
+-- list. Another addon lists `## OptionalDeps: Everlook_Island`, checks `Everlook` and
+-- `Everlook.island` before using them, and calls with dot syntax. A call returns its result, or nil and a reason; "disabled" means Smart
 -- island is off, and nothing sent while it is off is kept or replayed. `api` below goes up only
 -- when something is added: section came with 1, react with 2, rank and the capsule's arrow, ring,
 -- labels, badge and min_width with 3.
@@ -2129,23 +2130,12 @@ end
 -- reload. Refusals: invalid_event, invalid_callback, unavailable. unregister_event(subscription)
 -- -> true or false. The arguments can be secret: check issecretvalue before comparing or
 -- formatting one.
-Everlook.island = {
-	notify = island.notify,
-	dismiss = island.dismiss,
-	update = island.update,
-	set_actions = island.set_actions,
-	set_action_enabled = island.set_action_enabled,
-	register_event = island.register_event,
-	unregister_event = island.unregister_event,
-	section = island.section,
-	react = island.react,
-	-- One physical pixel in the island's units.
-	hairline = function() return shell.hairline() end,
-	-- Lays the island out again, as a change of font size needs.
-	repaint = function() shell.signature = nil; if Everlook.island_summary then Everlook.island_summary.reset() end; if paint then paint() end end,
-	-- Raised only when something is added, so an addon can test for what it needs.
-	api = 3,
-}
+-- One physical pixel in the island's units.
+island.hairline = function() return shell.hairline() end
+-- Lays the island out again, as a change of font size needs.
+island.repaint = function() shell.signature = nil; if Everlook.island_summary then Everlook.island_summary.reset() end; if paint then paint() end end
+-- Raised only when something is added, so an addon can test for what it needs.
+island.api = 3
 
 local function hide()
 	quest_context.reset()
@@ -2372,7 +2362,7 @@ end
 
 local function ensure_frame()
 	if frame or not CreateFrame or not UIParent then return frame end
-	frame = CreateFrame("Button", "EverlookSmartIsland", UIParent)
+	frame = CreateFrame("Button", "EverlookIsland", UIParent)
 	if not frame then return nil end
 	frame.width, frame.height = K.CLOSED_W, K.CLOSED_H
 	call(frame, "SetFrameStrata", "HIGH")
@@ -2740,12 +2730,12 @@ function island.dismiss_top()
 	return false
 end
 
-function everlook_smart_island_dismiss()
+function everlook_island_dismiss()
 	island.dismiss_top()
 end
 
 -- Called by Bindings.xml. Same press-and-release shape as the radial menu key.
-function everlook_smart_island_key(keystate)
+function everlook_island_key(keystate)
 	if keystate == "down" then key_down() else key_up() end
 end
 
@@ -2784,12 +2774,12 @@ actions.use({
 })
 
 registered = module.register({
-	addon = addon_name, page = "smart_island", order = 10,
+	addon = addon_name, page = "island", order = 10,
 	id = id,
 	name = "Smart island",
 	description = "While this is on, a pill at the top of the screen shows a level chip when closed, unless a quest or a status capsule replaces that chip, and level, experience, gold, durability, bag slots, and the clock when open, with toasts underneath. Hover previews it, a click or a tap of the key pins it open, a second click or tap closes it, holding the key peeks, the key is set below or under Key Bindings, turning this off hides the pill and clears its notices except a card frozen in combat, and the quest tracker and action bars stay where they are.",
 	keybinding = K.ACTION,
-	extra_keybindings = { "EVERLOOK_SMART_ISLAND_DISMISS" },
+	extra_keybindings = { "EVERLOOK_ISLAND_DISMISS" },
 	options = {
 		size = { name = "Island size", default = 100, min = 80, max = 150, step = 5, unit = "%", description = "Scales the Island's text, surfaces, controls, and toasts together, from 80 to 150, in steps of 5. 100 is the normal size, the position sliders stay on their own options, and this number does nothing until Smart island is on." },
 		opacity = { name = "Island opacity", default = 96, min = 82, max = 100, step = 2, unit = "%", description = "How solid the Island's dark surface is. Lower it, down to 82%, to see more of the game behind the pill, toasts and open island. Text stays fully opaque, and 82% is the lowest at which every color of it still reads on the brightest ground. A lower value saved earlier reads as 82%." },

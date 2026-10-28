@@ -2,7 +2,7 @@ local Everlook = Everlook
 
 -- The Island's rounded surface: a tintable quarter circle supplies the corners
 -- and straight sections stretch without stretching the radius. Layers stay
--- allocated across repaints. smart_island.lua owns when and how big.
+-- allocated across repaints. island.lua owns when and how big.
 local surface = {}
 Everlook.island_surface = surface
 

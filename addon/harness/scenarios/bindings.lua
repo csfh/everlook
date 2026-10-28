@@ -33,10 +33,10 @@ end
 -- The island's key, held and released, opens and then pins or closes it.
 local island_key = harness.bindings("Everlook_Island")[1]
 local chunk = loadstring("local keystate = ...; " .. island_key.body)
-local before = Everlook.smart_island.view().pinned
+local before = Everlook.island.view().pinned
 chunk("down")
 harness.advance(0.2)
-harness.check("holding the island key opens it", Everlook.smart_island.view().mode == "open")
+harness.check("holding the island key opens it", Everlook.island.view().mode == "open")
 chunk("up")
 harness.advance(0.5)
-harness.check("a quick tap of it toggles the pin", Everlook.smart_island.view().pinned == not before)
+harness.check("a quick tap of it toggles the pin", Everlook.island.view().pinned == not before)

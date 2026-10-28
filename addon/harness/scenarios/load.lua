@@ -5,7 +5,7 @@ harness.load_addon("Everlook_Island")
 game.login()
 Everlook.module.set("island", "enabled", true)
 harness.advance(1)
-local island = harness.find("EverlookSmartIsland")
+local island = harness.find("EverlookIsland")
 harness.check("the island frame exists", island ~= nil)
 for _, e in ipairs(harness.errors()) do print("script error:", e) end
 for _, m in ipairs(harness.missing()) do print("missing method:", m) end

@@ -1,7 +1,7 @@
 local Everlook = Everlook
 
 -- Level, experience, money, durability and bag readings, and the words for those
--- figures. follow("refresh") copies them out through smart_island.pull before
+-- figures. follow("refresh") copies them out through island.pull before
 -- the extensions hear the signal, so a warning never paints a stale total.
 local vitals = {}
 Everlook.island_vitals = vitals
@@ -218,7 +218,7 @@ function vitals.snapshot()
 end
 
 local function publish()
-	local host = Everlook.smart_island
+	local host = Everlook.island
 	if host and host.pull then host.pull() end
 end
 
@@ -237,7 +237,7 @@ end
 local function level_notice()
 	if finite(snapshot.level) and finite(state.seen_level) and snapshot.level > state.seen_level then
 		Everlook.island.notify({
-			source = "smart_island", kind = "level", text = "Level " .. snapshot.level, severity = "success",
+			source = "everlook.island", kind = "level", text = "Level " .. snapshot.level, severity = "success",
 		})
 	end
 	if finite(snapshot.level) then

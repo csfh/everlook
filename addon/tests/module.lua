@@ -122,7 +122,7 @@ return function(root, check)
 	do
 		local registry, env, finish, fire = load_registry()
 		local host_applies, extension_applies, heard = {}, {}, {}
-		plain(registry, "host", "smart_island", 10, {
+		plain(registry, "host", "island", 10, {
 			options = { size = { name = "Size", default = 100, min = 80, max = 150 } },
 			sections = {
 				{ name = "Placement", keys = { "size" }, after = function(layout) layout[#layout + 1] = "host button" end },
@@ -183,7 +183,7 @@ return function(root, check)
 
 	do
 		local registry, _, finish = load_registry()
-		plain(registry, "host", "smart_island", 10, {
+		plain(registry, "host", "island", 10, {
 			options = { repair = { name = "Repair", default = true } },
 			sections = { { name = "Activity", keys = { "repair" } } },
 		})
@@ -234,7 +234,7 @@ return function(root, check)
 		local registry, env, finish, fire = load_registry()
 		env.EverlookDB.qol = { host = { enabled = true } }
 		local heard = {}
-		plain(registry, "host", "smart_island", 10)
+		plain(registry, "host", "island", 10)
 		finish("Everlook_host")
 		registry.extend("host", {
 			id = "loot", addon = "Everlook_loot", order = 10,

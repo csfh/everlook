@@ -19,7 +19,7 @@ local function dismiss(handle)
 end
 
 local function post_condition(kind, key, handle, text, severity, announce)
-	local live = Everlook.smart_island and Everlook.smart_island.notice_live and Everlook.smart_island.notice_live(handle)
+	local live = Everlook.island and Everlook.island.notice_live and Everlook.island.notice_live(handle)
 	if not announce and not live then return handle end
 	return Everlook.island.notify({
 		source = "everlook." .. kind, key = key, kind = kind, text = text, severity = severity, persist = true,

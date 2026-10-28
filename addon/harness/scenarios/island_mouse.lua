@@ -40,7 +40,7 @@ local function lost(buttons)
 	return found
 end
 
-local island = harness.find("EverlookSmartIsland")
+local island = harness.find("EverlookIsland")
 Everlook.island.notify({ source = "Test", key = "one", text = "A notice", detail = "with detail",
 	actions = { { id = "go", label = "Go", type = "callback", on_click = function() end },
 		{ id = "later", label = "Later", type = "callback", on_click = function() end } } })
@@ -49,7 +49,7 @@ local x, y = harness.center(island)
 harness.click(x, y)
 harness.advance(1)
 
-local view = Everlook.smart_island.view()
+local view = Everlook.island.view()
 print("mode", view.mode, "size", view.width, view.height)
 local buttons = pressable()
 local gone = lost(buttons)
@@ -84,11 +84,11 @@ if pin then
 	local px, py = harness.center(pin)
 	harness.move(px, py)
 	harness.advance(0.5)
-	harness.check("the pointer on the Pin button leaves the island open", Everlook.smart_island.view().mode == "open")
+	harness.check("the pointer on the Pin button leaves the island open", Everlook.island.view().mode == "open")
 	harness.check("and the Pin button is what has the mouse", harness.hit(px, py) == pin)
 	harness.click(px, py)
 	harness.advance(0.3)
-	harness.check("pressing it pins the quest", Everlook.smart_island.view().quests.pinned ~= nil)
+	harness.check("pressing it pins the quest", Everlook.island.view().quests.pinned ~= nil)
 end
 for _, e in ipairs(harness.errors()) do print("script error:", e) end
 
@@ -96,4 +96,4 @@ for _, e in ipairs(harness.errors()) do print("script error:", e) end
 local rect = harness.rect(island)
 harness.click(rect.left + rect.width / 2, rect.top + 8)
 harness.advance(0.3)
-harness.check("a click on the open island's header unpins it", Everlook.smart_island.view().pinned == false)
+harness.check("a click on the open island's header unpins it", Everlook.island.view().pinned == false)

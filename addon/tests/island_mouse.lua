@@ -53,7 +53,7 @@ return function(root, check, island_world, quest_world)
 			actions = { { id = "go", label = "Go", type = "callback", on_click = function() end },
 				{ id = "later", label = "Later", type = "callback", on_click = function() end } } })
 		local island_frame
-		for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then island_frame = frame end end
+		for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then island_frame = frame end end
 		if how.click then
 			island_frame.IsMouseOver = function() return true end
 			island_frame.scripts.OnClick(island_frame, "LeftButton")
@@ -61,7 +61,7 @@ return function(root, check, island_world, quest_world)
 			island_frame.IsMouseOver = function() return true end
 			island_frame.scripts.OnEnter(island_frame)
 		else
-			env.everlook_smart_island_key("down")
+			env.everlook_island_key("down")
 		end
 		layout.settle(frames)
 		return addon, env, frames, afters
@@ -88,10 +88,10 @@ return function(root, check, island_world, quest_world)
 		for _, frame in ipairs(frames) do
 			if frame.scroll_child and frame.mouse == true and shown(frame) then
 				tested = tested + 1
-				local before = addon.smart_island.view().pinned
+				local before = addon.island.view().pinned
 				local script = frame.scripts.OnMouseUp
 				if script then script(frame, "LeftButton") end
-				if addon.smart_island.view().pinned == before then all_do = false end
+				if addon.island.view().pinned == before then all_do = false end
 				if script then script(frame, "LeftButton") end
 			end
 		end
@@ -102,7 +102,7 @@ return function(root, check, island_world, quest_world)
 		{ name = "by clicking", reduced = true, click = true }, { name = "by clicking, with motion", reduced = false, click = true },
 		{ name = "by hovering", reduced = true, pointer = true }, { name = "by hovering, with motion", reduced = false, pointer = true } }) do
 		local addon, _, frames = open_world(how)
-		local view = addon.smart_island.view()
+		local view = addon.island.view()
 		check("the island opened " .. how.name .. " is open and as large as its panes", view.mode == "open" and view.shell.width == view.width and view.shell.height == view.height)
 		local buttons = pressable(frames)
 		local lost = unreachable(frames, buttons)
@@ -113,7 +113,7 @@ return function(root, check, island_world, quest_world)
 		local _, env, frames = open_world({ reduced = true })
 		local buttons = pressable(frames)
 		local island_frame
-		for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then island_frame = frame end end
+		for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then island_frame = frame end end
 		local cover = env.CreateFrame("Frame", nil, nil)
 		cover:SetFrameStrata("HIGH")
 		cover:SetFrameLevel(90)

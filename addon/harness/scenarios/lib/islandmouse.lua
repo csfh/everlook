@@ -5,7 +5,7 @@ local function call(object, method, ...)
 	local fn = object and object[method]
 	if type(fn) == "function" then return fn(object, ...) end
 end
-local island = { view = function() return Everlook.smart_island.view() end }
+local island = { view = function() return Everlook.island.view() end }
 
 -- island_mouse(argument): what the game says is under the pointer, for when a control does not answer, as
 -- the client's /islandmouse command once reported it. The pointer goes on the control within three seconds.
@@ -48,7 +48,7 @@ function island_mouse(argument)
 	local experiments = {
 		noclip = { apply = function() call(_G.EverlookIslandExpanded, "SetClipsChildren", false) end, restore = function() call(_G.EverlookIslandExpanded, "SetClipsChildren", true) end },
 		mouse = { apply = function() call(_G.EverlookIslandExpanded, "EnableMouse", true) end, restore = function() call(_G.EverlookIslandExpanded, "EnableMouse", false) end },
-		noroot = { apply = function() call(_G.EverlookSmartIsland, "EnableMouse", false) end, restore = function() call(_G.EverlookSmartIsland, "EnableMouse", true) end },
+		noroot = { apply = function() call(_G.EverlookIsland, "EnableMouse", false) end, restore = function() call(_G.EverlookIsland, "EnableMouse", true) end },
 		-- The panel and the island's own frame are both level 50. "raise" puts the panel one level above it.
 		raise = { apply = function() was_level = call(_G.EverlookIslandExpanded, "GetFrameLevel") or 51; call(_G.EverlookIslandExpanded, "SetFrameLevel", was_level + 1) end, restore = function() call(_G.EverlookIslandExpanded, "SetFrameLevel", was_level or 51) end },
 	}
@@ -71,7 +71,7 @@ function island_mouse(argument)
 		local foci = _G.GetMouseFoci and _G.GetMouseFoci() or { _G.GetMouseFocus and _G.GetMouseFocus() or nil }
 		if #foci == 0 then say("the pointer is over nothing") end
 		for index = 1, math.min(#foci, 4) do say("GETS THE MOUSE " .. index .. ": " .. describe(foci[index])) end
-		say("hit insets of the island: " .. str(try(_G.EverlookSmartIsland, "GetHitRectInsets")))
+		say("hit insets of the island: " .. str(try(_G.EverlookIsland, "GetHitRectInsets")))
 		-- Every mouse-enabled island frame whose area holds the pointer, wherever it ranks. The walk goes down the
 		-- island's own tree, so no frame of Blizzard's, restricted ones included, is ever measured.
 		say("the panel layer: " .. describe(_G.EverlookIslandExpanded))
@@ -82,7 +82,7 @@ function island_mouse(argument)
 				for _, child in ipairs({ try(node, "GetChildren") }) do visit(child, depth + 1) end
 			end
 		end
-		if _G.EverlookSmartIsland then visit(_G.EverlookSmartIsland, 0) end
+		if _G.EverlookIsland then visit(_G.EverlookIsland, 0) end
 		table.sort(held, function(left, right) return (try(left, "GetFrameLevel") or 0) > (try(right, "GetFrameLevel") or 0) end)
 		say(#held .. " island frames hold the pointer, highest level first")
 		for _, held_frame in ipairs(held) do say("INSIDE " .. describe(held_frame)) end

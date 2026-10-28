@@ -31,10 +31,10 @@ return function(root, check, island_world)
 			state.time = at
 			fire()
 			state.time = at + 0.06
-			for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookSmartIsland" then frame.scripts.OnUpdate(frame, 0.06) end end
+			for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookIsland" then frame.scripts.OnUpdate(frame, 0.06) end end
 			local seen = lit(frames, 173 / 255) > 0 or lit(frames, 128 / 255, 230 / 255) > 0 or lit(frames, 1, 210 / 255) > 0
 			state.time = at + 5
-			for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookSmartIsland" then frame.scripts.OnUpdate(frame, 5) end end
+			for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookIsland" then frame.scripts.OnUpdate(frame, 5) end end
 			return seen
 		end
 		check("a level up flashes by default", flashes(function() event("PLAYER_LEVEL_UP", 12) end, 500))

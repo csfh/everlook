@@ -1,7 +1,7 @@
 local Everlook = Everlook
 
 -- Reads one notification payload from a producer into a clean record, or says
--- why it cannot. smart_island.lua decides what to do with the record.
+-- why it cannot. island.lua decides what to do with the record.
 local notice = {}
 Everlook.island_notice = notice
 

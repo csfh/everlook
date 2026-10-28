@@ -8,7 +8,7 @@ return function(root, check, island_world, quest_world)
 		addon.module.set("island", "enabled", true)
 		addon.module.set("island", "reduced_motion", true)
 		local top
-		for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then top = frame end end
+		for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then top = frame end end
 		return addon, env, event, state, tickers, frames, top
 	end
 

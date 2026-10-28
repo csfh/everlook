@@ -10,7 +10,7 @@ Everlook.module.set("fonts", "enabled", true)
 Everlook.module.set("island", "enabled", true)
 harness.advance(1)
 if EverlookMinimapButton then EverlookMinimapButton:Hide() end
-local island = harness.find("EverlookSmartIsland")
+local island = harness.find("EverlookIsland")
 
 for _, scale in ipairs({ 0.64, 1.0, 1.2 }) do
 	UIParent:SetScale(scale)

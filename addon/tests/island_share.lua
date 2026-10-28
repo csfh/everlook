@@ -43,7 +43,7 @@ return function(_, check, load_qol)
 	end
 
 	local function latest(addon)
-		local notices = addon.smart_island.view().notices
+		local notices = addon.island.view().notices
 		return notices[#notices]
 	end
 
@@ -118,44 +118,44 @@ return function(_, check, load_qol)
 	env.GameTooltip.IsShown = function() return true end
 	env.GameTooltipTextLeft1.GetText = function() return "Settings" end
 	env.everlook_share_click()
-	check("an interface tooltip title stays quiet", #env.said == 0 and #env.sent == 0 and #addon.smart_island.view().notices == 0)
+	check("an interface tooltip title stays quiet", #env.said == 0 and #env.sent == 0 and #addon.island.view().notices == 0)
 
 	addon, env = ready()
 	env.issecretvalue = function(value) return value == "secret" end
 	env.UnitExists = function() return true end
 	env.UnitName = function() return "secret" end
 	env.everlook_share_click()
-	check("a secret name stays quiet", #env.said == 0 and #env.sent == 0 and #addon.smart_island.view().notices == 0)
+	check("a secret name stays quiet", #env.said == 0 and #env.sent == 0 and #addon.island.view().notices == 0)
 
 	addon, env = ready()
 	env.UnitExists = function(unit) return unit == "mouseover" end
 	env.UnitIsUnit = function(unit, other) return unit == "mouseover" and other == "player" end
 	env.UnitName = function() return "Mira" end
 	env.everlook_share_click()
-	check("clicking yourself stays quiet", #env.said == 0 and #env.sent == 0 and #addon.smart_island.view().notices == 0)
+	check("clicking yourself stays quiet", #env.said == 0 and #env.sent == 0 and #addon.island.view().notices == 0)
 
 	addon, env = ready()
 	env.everlook_share_click()
-	check("empty ground stays quiet", #env.said == 0 and #env.sent == 0 and #addon.smart_island.view().notices == 0)
+	check("empty ground stays quiet", #env.said == 0 and #env.sent == 0 and #addon.island.view().notices == 0)
 
 	addon, env = ready()
 	point_at_unit(env, "Hogger")
 	env.GetCurrentKeyBoardFocus = function() return {} end
 	env.everlook_share_click()
-	check("a keyboard focus stays quiet", #env.said == 0 and #env.sent == 0 and #addon.smart_island.view().notices == 0)
+	check("a keyboard focus stays quiet", #env.said == 0 and #env.sent == 0 and #addon.island.view().notices == 0)
 
 	addon, env = ready()
 	addon.module.set("island", "share_click", false)
 	point_at_unit(env, "Hogger")
 	env.everlook_share_click()
-	check("turning sharing off stays quiet", #env.said == 0 and #env.sent == 0 and #addon.smart_island.view().notices == 0)
+	check("turning sharing off stays quiet", #env.said == 0 and #env.sent == 0 and #addon.island.view().notices == 0)
 
 	addon, env, event = ready()
 	addon.module.set("island", "enabled", false)
 	point_at_unit(env, "Hogger")
 	env.everlook_share_click()
 	event("CHAT_MSG_ADDON", "Everlook", "1\tunit\tHogger", "PARTY", "Kor-Realm")
-	check("a disabled island shares and receives nothing", #env.said == 0 and #env.sent == 0 and #addon.smart_island.view().notices == 0)
+	check("a disabled island shares and receives nothing", #env.said == 0 and #env.sent == 0 and #addon.island.view().notices == 0)
 
 	addon, env = ready()
 	point_at_unit(env, "Hogger")
@@ -216,7 +216,7 @@ return function(_, check, load_qol)
 	event("CHAT_MSG_ADDON", "Everlook", "1\tunit\t|cff000000Hogger", "PARTY", "Kor")
 	event("CHAT_MSG_ADDON", "Everlook", "1\tmount\tHogger", "PARTY", "Kor")
 	event("CHAT_MSG_ADDON", "Everlook", "1\tunit\t", "PARTY", "Kor")
-	check("your own message and a malformed party message stay quiet", #addon.smart_island.view().notices == 0)
+	check("your own message and a malformed party message stay quiet", #addon.island.view().notices == 0)
 
 	addon, env, event = ready()
 	addon.module.set("island", "share_click", false)

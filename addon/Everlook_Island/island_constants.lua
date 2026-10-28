@@ -1,10 +1,10 @@
--- The fixed numbers, colours and texts of smart_island.lua, kept out of it so that file
+-- The fixed numbers, colours and texts of island.lua, kept out of it so that file
 -- stays well under Lua 5.1's 200 locals per chunk. Loaded after island_toasts.lua and
--- before smart_island.lua (TOC order is the wiring).
+-- before island.lua (TOC order is the wiring).
 local Everlook = Everlook
 local grid = Everlook.island_grid
 
-local ACTION = "EVERLOOK_SMART_ISLAND"
+local ACTION = "EVERLOOK_ISLAND"
 local HOLD = 0.2
 local LIST_MAX, STATUS_MAX = 30, 10 -- LIST_MAX sizes the pooled inbox rows; the inbox size option sets how many show.
 local CLOSED_W, CLOSED_H = 64, 36

@@ -66,7 +66,7 @@ local function ready()
 				if QuestMapFrame_OpenToQuestDetails then QuestMapFrame_OpenToQuestDetails(quest_id) end
 			end },
 			{ id = "pin", label = "Pin", type = "callback", on_click = function()
-				if Everlook.smart_island and Everlook.smart_island.pin_quest then Everlook.smart_island.pin_quest(quest_id) end
+				if Everlook.island and Everlook.island.pin_quest then Everlook.island.pin_quest(quest_id) end
 			end },
 		},
 	}) or state.ready_handle
@@ -122,7 +122,7 @@ local function next_quest()
 		presentation = announce and "toast" or "inbox",
 		actions = {
 			{ id = "pin", label = "Pin", type = "callback", on_click = function()
-				if Everlook.smart_island and Everlook.smart_island.pin_quest then Everlook.smart_island.pin_quest(quest_id) end
+				if Everlook.island and Everlook.island.pin_quest then Everlook.island.pin_quest(quest_id) end
 			end },
 			{ id = "skip", label = "Skip", type = "callback", on_click = function()
 				if quests.skip(quest_id) then quests.refresh(true) end
@@ -191,7 +191,7 @@ local function pin_suggestions()
 		text = "Pin " .. record.title .. "?", detail = PIN_REASONS[chosen.kind] .. ", " .. quests.where(record),
 		actions = {
 			{ id = "pin", label = "Pin", type = "callback", on_click = function(handle)
-				if Everlook.smart_island and Everlook.smart_island.pin_quest then Everlook.smart_island.pin_quest(quest_id) end
+				if Everlook.island and Everlook.island.pin_quest then Everlook.island.pin_quest(quest_id) end
 				if Everlook.island and Everlook.island.dismiss then Everlook.island.dismiss(handle) end
 			end },
 			{ id = "later", label = "Not now", type = "callback", on_click = function(handle)

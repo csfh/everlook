@@ -11,7 +11,7 @@ Everlook.module.set("island", "enabled", true)
 Everlook.module.set("island", "toast_count", 1)
 harness.advance(1)
 
-local function view() return Everlook.smart_island.view() end
+local function view() return Everlook.island.view() end
 local function texts(list)
 	local names = {}
 	for index, entry in ipairs(list) do names[index] = entry.text end

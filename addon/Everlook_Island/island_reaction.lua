@@ -3,7 +3,7 @@ local Everlook = Everlook
 -- A reaction is a brief tint and edge flash on the island's body. This file is
 -- the arithmetic only: which kinds there are, when a new one merges into the one
 -- already playing, how many may start a second, and how bright it is at a moment.
--- smart_island.lua turns the numbers into colours on its surfaces.
+-- island.lua turns the numbers into colours on its surfaces.
 local reaction = {}
 Everlook.island_reaction = reaction
 

@@ -23,5 +23,5 @@ island_notice.lua
 island_inbox.lua
 island_toasts.lua
 island_constants.lua
-smart_island.lua
+island.lua
 island_feed_kit.lua

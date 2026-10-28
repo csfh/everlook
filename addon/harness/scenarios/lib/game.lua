@@ -81,7 +81,7 @@ function GetLocale() return "enUS" end
 -- Takes a picture, after checking the island is in the state the picture is named for:
 -- "closed", "open" (by hovering or pinned) or "pinned".
 function game.snapshot(label, expected)
-	local view = Everlook.smart_island.view()
+	local view = Everlook.island.view()
 	local right = (expected == "closed" and view.mode == "closed")
 		or (expected == "open" and view.mode == "open")
 		or (expected == "pinned" and view.mode == "open" and view.pinned == true)

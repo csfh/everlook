@@ -39,20 +39,20 @@ return function(root, check, island_world)
 		rejected("on a toast", { source = "A", key = "k", text = "t", rank = "resting" })
 		rejected("without a capsule", { source = "A", key = "k", text = "t", presentation = "status", rank = "resting" })
 		local handle = api.notify({ source = "A", key = "k", text = "t", presentation = "status", rank = "resting", capsule = capsule_spec() })
-		check("with a capsule it is held", type(handle) == "number" and addon.smart_island.view().resting.source == "A")
+		check("with a capsule it is held", type(handle) == "number" and addon.island.view().resting.source == "A")
 	end
 
 	do
 		local addon, env, _, frames = world()
 		local api = env.Everlook.island
 		local shown = finder(frames)
-		local view = addon.smart_island.view()
+		local view = addon.island.view()
 		check("the level chip is the island's own resting status", view.resting and view.resting.source == "everlook_resting" and shown("12") ~= nil)
 		check("it is no status, history row, toast or unread notice", view.status == nil and #view.notices == 0 and #view.toasts == 0 and view.unread_count == 0)
 
 		local background = api.notify({ source = "A", key = "bg", text = "Quest", presentation = "status", rank = "background",
 			capsule = { text = "Quest", labels = { "~5 yd" } } })
-		check("a background status takes the capsule from the chip", shown("Quest") ~= nil and shown("12") == nil and addon.smart_island.view().resting ~= nil)
+		check("a background status takes the capsule from the chip", shown("Quest") ~= nil and shown("12") == nil and addon.island.view().resting ~= nil)
 		local status = api.notify({ source = "A", key = "s", text = "Trip", presentation = "status", capsule = { text = "Trip" } })
 		check("a status takes it from both", shown("Trip") ~= nil and shown("Quest") == nil)
 		api.dismiss(status)
@@ -61,9 +61,9 @@ return function(root, check, island_world)
 		check("and the chip when that goes", shown("12") ~= nil)
 
 		addon.module.set("island", "enabled", false)
-		check("turning the island off clears the chip", addon.smart_island.view().resting == nil)
+		check("turning the island off clears the chip", addon.island.view().resting == nil)
 		addon.module.set("island", "enabled", true)
-		check("and turning it on brings it back", addon.smart_island.view().resting ~= nil and addon.smart_island.view().resting.count == 1)
+		check("and turning it on brings it back", addon.island.view().resting ~= nil and addon.island.view().resting.count == 1)
 	end
 
 	do
@@ -71,12 +71,12 @@ return function(root, check, island_world)
 		local shown = finder(frames)
 		addon.module.set("island", "closed_xp", true)
 		check("the experience percent is a label on the chip", shown("45%") ~= nil)
-		check("with one resting status, however many times it changes", addon.smart_island.view().resting.count == 1)
+		check("with one resting status, however many times it changes", addon.island.view().resting.count == 1)
 		addon.module.set("island", "closed_clock", true)
 		state.bags = { [0] = 0, [1] = 0 }
-		addon.smart_island.pull()
+		addon.island.pull()
 		addon.module.set("island", "low_slots", 5)
-		check("gear and bags share one label, so the chip keeps within three", shown("Bags 0") ~= nil and addon.smart_island.view().resting.count == 1)
+		check("gear and bags share one label, so the chip keeps within three", shown("Bags 0") ~= nil and addon.island.view().resting.count == 1)
 		check("an empty bag is in the error color", math.abs(shown("Bags 0").color[2] - 128 / 255) < 0.01 and shown("Bags 0").color[1] > 0.99)
 	end
 
@@ -98,7 +98,7 @@ return function(root, check, island_world)
 		end
 		local resting_count = #level_regions()
 		local pill
-		for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then pill = frame end end
+		for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then pill = frame end end
 		pill.scripts.OnEnter(pill)
 		local travelling, lent = 0, 0
 		for _, entry in ipairs(level_regions()) do
@@ -128,7 +128,7 @@ return function(root, check, island_world)
 		addon.module.set("island", "closed_xp", true)
 		layout.settle(frames)
 		local pill
-		for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then pill = frame end end
+		for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then pill = frame end end
 		pill.scripts.OnEnter(pill)
 		local copy
 		for _, frame in ipairs(frames) do
@@ -151,7 +151,7 @@ return function(root, check, island_world)
 		api.notify({ source = "Other", key = "idle", text = "Standing by", presentation = "status", rank = "resting", capsule = { text = "Standing by" } })
 		layout.settle(frames)
 		local pill
-		for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then pill = frame end end
+		for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then pill = frame end end
 		pill.scripts.OnEnter(pill)
 		local copies, title = 0, nil
 		for _, frame in ipairs(frames) do
@@ -169,7 +169,7 @@ return function(root, check, island_world)
 		env.Everlook.island.section({ source = "Other", key = "lone", region = "pane_b", order = 100,
 			blocks = { { kind = "row", row = { title = "Alone in a row" } } } })
 		local pill
-		for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then pill = frame end end
+		for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then pill = frame end end
 		pill.scripts.OnEnter(pill)
 		layout.settle(frames)
 		local title

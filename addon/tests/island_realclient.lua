@@ -50,7 +50,7 @@ return function(root, check, island_world)
 		local dismissed
 		if card then
 			card.scripts.OnMouseUp(card, "RightButton")
-			dismissed = #addon.smart_island.view().toasts == 0 or addon.smart_island.view().toasts[1].phase == "exiting"
+			dismissed = #addon.island.view().toasts == 0 or addon.island.view().toasts[1].phase == "exiting"
 		end
 		check("and the right click dismisses it", dismissed == true)
 	end

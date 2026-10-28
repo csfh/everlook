@@ -9,7 +9,7 @@ if EverlookMinimapButton then EverlookMinimapButton:Hide() end
 Everlook.module.set("island", "enabled", true)
 harness.advance(1)
 
-local island = harness.find("EverlookSmartIsland")
+local island = harness.find("EverlookIsland")
 local function open()
 	local x, y = harness.center(island)
 	harness.click(x, y)
@@ -84,7 +84,7 @@ for index = 1, 4 do
 end
 harness.advance(2)
 local mine = 0
-for _, notice in ipairs(Everlook.smart_island.view().notices) do if tostring(notice.source):find("^Source ") then mine = mine + 1 end end
+for _, notice in ipairs(Everlook.island.view().notices) do if tostring(notice.source):find("^Source ") then mine = mine + 1 end end
 harness.check("four notices of this scenario are in the history (" .. mine .. " are)", mine == 4)
 open()
 game.snapshot("Open, four notices in the history", "pinned")

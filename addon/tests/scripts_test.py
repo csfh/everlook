@@ -319,7 +319,7 @@ class IslandLayoutHtmlTest(unittest.TestCase):
         import island_layout_html
 
         items = [
-            {"kind": "frame", "name": "EverlookSmartIsland", "x": 0, "y": 0, "w": 100, "h": 36, "alpha": 1, "cooldown": None, "swipe": None},
+            {"kind": "frame", "name": "EverlookIsland", "x": 0, "y": 0, "w": 100, "h": 36, "alpha": 1, "cooldown": None, "swipe": None},
             {"kind": "frame", "name": "EverlookIslandResting", "x": 0, "y": 0, "w": 100, "h": 36, "alpha": 1, "cooldown": None, "swipe": None},
             {"kind": "texture", "path": "Interface\\AddOns\\Everlook_Island\\assets\\island_corner.tga", "atlas": "", "x": 0, "y": 0, "w": 14, "h": 14, "color": None, "rotation": 0, "alpha": 1},
             {"kind": "text", "text": "|cffad76ef45%|r <b>", "x": 10, "y": 10, "w": 40, "h": 14, "font": "GameFontHighlightLarge", "color": [1, 1, 1, 1], "justify": "RIGHT", "alpha": 1},

@@ -9,8 +9,8 @@ if EverlookMinimapButton then EverlookMinimapButton:Hide() end
 Everlook.module.set("island", "enabled", true)
 harness.advance(1)
 
-local island = harness.find("EverlookSmartIsland")
-local function view() return Everlook.smart_island.view() end
+local island = harness.find("EverlookIsland")
+local function view() return Everlook.island.view() end
 
 local function frame_with_text(text, wanted)
 	local found
@@ -83,11 +83,11 @@ end
 do
 	Everlook.island.notify({ source = "Flows", key = "ease", presentation = "status", text = "Easing", capsule = { text = "Easing", icon = "flight" } })
 	harness.advance(0.05)
-	everlook_smart_island_key("down")
+	everlook_island_key("down")
 	harness.advance(1)
 	local v = view()
 	harness.check("opened by its key mid-ease it is as large as its panes", v.mode == "open" and v.shell.width == v.width and v.shell.height == v.height)
-	everlook_smart_island_key("up")
+	everlook_island_key("up")
 	harness.advance(1)
 end
 

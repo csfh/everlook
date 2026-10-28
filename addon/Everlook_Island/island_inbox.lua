@@ -2,7 +2,7 @@ local Everlook = Everlook
 
 -- The Island's retained history: which notice goes when the inbox is full, how
 -- many are unread, and how a cleared inbox merges back. All of it works on
--- plain arrays of notices, oldest first. smart_island.lua owns the list itself.
+-- plain arrays of notices, oldest first. island.lua owns the list itself.
 local inbox = {}
 Everlook.island_inbox = inbox
 

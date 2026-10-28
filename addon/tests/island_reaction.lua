@@ -101,18 +101,18 @@ return function(root, check, island_world, quest_world, secret_stat)
 		local resting
 		for _, frame in ipairs(frames) do if frame.name == "EverlookIslandResting" then resting = frame end end
 		local driver
-		for _, frame in ipairs(frames) do if frame.parent and frame.parent.name == "EverlookSmartIsland" and frame.name == nil and frame.scripts then driver = driver or frame end end
+		for _, frame in ipairs(frames) do if frame.parent and frame.parent.name == "EverlookIsland" and frame.name == nil and frame.scripts then driver = driver or frame end end
 		local accent = 173 / 255
 		check("nothing is lit before a reaction", lit(frames, accent) == 0)
 		state.time = 100
 		check("a kill reaction returns true", api.react("kill") == true)
 		state.time = 100.06
-		for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookSmartIsland" then frame.scripts.OnUpdate(frame, 0.06) end end
+		for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookIsland" then frame.scripts.OnUpdate(frame, 0.06) end end
 		check("it lights the body in the accent tone, and the edge strips with it", lit(frames, accent) >= 9)
 		state.time = 101
-		for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookSmartIsland" then frame.scripts.OnUpdate(frame, 1) end end
+		for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookIsland" then frame.scripts.OnUpdate(frame, 1) end end
 		local still_running
-		for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookSmartIsland" then still_running = true end end
+		for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookIsland" then still_running = true end end
 		check("when its time is up the light goes out and nothing keeps running", lit(frames, accent) == 0 and not still_running)
 
 		local _, unknown = api.react("fireworks")
@@ -147,10 +147,10 @@ return function(root, check, island_world, quest_world, secret_stat)
 		state.time = 300
 		api.notify({ source = "MyAddon", text = "Durability low", severity = "error" })
 		state.time = 300.06
-		for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookSmartIsland" then frame.scripts.OnUpdate(frame, 0.06) end end
+		for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookIsland" then frame.scripts.OnUpdate(frame, 0.06) end end
 		check("a new error flashes the edge in red without anyone asking", lit(frames, 1, 128 / 255) > 0)
 		state.time = 301
-		for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookSmartIsland" then frame.scripts.OnUpdate(frame, 1) end end
+		for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookIsland" then frame.scripts.OnUpdate(frame, 1) end end
 		check("it fades on its own", lit(frames, 1, 128 / 255) == 0)
 		state.time = 310
 		api.notify({ source = "MyAddon", text = "Routine", severity = "info" })
@@ -175,12 +175,12 @@ return function(root, check, island_world, quest_world, secret_stat)
 		state.time = 400
 		event("CHAT_MSG_COMBAT_XP_GAIN")
 		state.time = 400.06
-		for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookSmartIsland" then frame.scripts.OnUpdate(frame, 0.06) end end
+		for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookIsland" then frame.scripts.OnUpdate(frame, 0.06) end end
 		check("an event callback that returns only a reaction flashes the island and adds no notice",
-			lit(frames, 173 / 255) > 0 and #addon.smart_island.view().notices == 0)
+			lit(frames, 173 / 255) > 0 and #addon.island.view().notices == 0)
 		state.time = 410
 		event("PLAYER_LEVEL_UP")
-		check("a callback may return a reaction and a notice together", #addon.smart_island.view().notices == 1 and addon.smart_island.view().notices[1].text == "Level up")
+		check("a callback may return a reaction and a notice together", #addon.island.view().notices == 1 and addon.island.view().notices[1].text == "Level up")
 		event("UPDATE_EXHAUSTION")
 		check("a reaction that does not exist is reported to the error handler", #errors == 1 and errors[1]:find("invalid_reaction", 1, true) ~= nil)
 	end
@@ -195,7 +195,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 				addon.module.set("island", "enabled", true)
 				addon.module.set("island", "reduced_motion", false)
 				local top
-				for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then top = frame end end
+				for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then top = frame end end
 				if open_it then
 					addon.module.set("island", "reduced_motion", true)
 					top.scripts.OnClick(top, "LeftButton")
@@ -205,7 +205,7 @@ return function(root, check, island_world, quest_world, secret_stat)
 				state.time = 800
 				env.Everlook.island.react(kind)
 				state.time = 800.06
-				for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookSmartIsland" then frame.scripts.OnUpdate(frame, 0.06) end end
+				for _, frame in ipairs(frames) do if frame.scripts and frame.scripts.OnUpdate and frame.parent and frame.parent.name == "EverlookIsland" then frame.scripts.OnUpdate(frame, 0.06) end end
 				local handle = assert(io.open(dir .. "/" .. name .. ".json", "w"))
 				handle:write(layout.export(frames, top, env.GetTime()))
 				handle:close()

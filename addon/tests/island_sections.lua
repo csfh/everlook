@@ -13,7 +13,7 @@ return function(root, check, island_world, quest_world)
 	local function open(addon, frames)
 		addon.module.set("island", "reduced_motion", true)
 		local island_frame
-		for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then island_frame = frame end end
+		for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then island_frame = frame end end
 		island_frame.scripts.OnClick(island_frame, "LeftButton")
 		layout.settle(frames)
 		return island_frame
@@ -21,7 +21,7 @@ return function(root, check, island_world, quest_world)
 
 	-- The island's own header and status cells are sections too, so a count is of what a test added.
 	local function added(addon, base)
-		return addon.smart_island.view().sections - (base or 0)
+		return addon.island.view().sections - (base or 0)
 	end
 
 	local function find_text(frames, text)
@@ -42,13 +42,13 @@ return function(root, check, island_world, quest_world)
 	do
 		local addon, env = world()
 		local api = env.Everlook.island
-		check("the section call and a version are part of the public island, and its internals still are not",
-			type(api.section) == "function" and type(api.react) == "function" and api.api == 3 and api.view == nil)
+		check("the section call and a version are on the island's table",
+			type(api.section) == "function" and type(api.react) == "function" and api.api == 3)
 
 		local handle = api.section(spec())
 		check("a section returns a number handle", type(handle) == "number")
 		check("the same source and key updates the section and keeps its handle", api.section(spec({ title = "Raid" })) == handle
-			and addon.smart_island.view().sections == 3)
+			and addon.island.view().sections == 3)
 
 		local function rejected(label, bad, reason)
 			local result, why = api.section(bad)
@@ -104,13 +104,13 @@ return function(root, check, island_world, quest_world)
 		-- Updating and dismissing use the same two functions as a notice.
 		check("update replaces a section's blocks and keeps its handle",
 			api.update(handle, { blocks = { { kind = "text", text = "Phase two" } } }) == handle)
-		check("update keeps what it was not given", addon.island_section ~= nil and addon.smart_island.view().sections == 8)
+		check("update keeps what it was not given", addon.island_section ~= nil and addon.island.view().sections == 8)
 		local _, no_region = api.update(handle, { region = "pane_a" })
 		local _, no_source = api.update(handle, { source = "Else" })
 		local _, bad_field = api.update(handle, { blocks = { { kind = "chart" } } })
 		check("update refuses to move a section or rename its source, and checks the blocks",
 			no_region == "invalid_update" and no_source == "invalid_update" and bad_field == "invalid_block")
-		check("dismiss removes a section once", api.dismiss(handle) == true and api.dismiss(handle) == false and addon.smart_island.view().sections == 7)
+		check("dismiss removes a section once", api.dismiss(handle) == true and api.dismiss(handle) == false and addon.island.view().sections == 7)
 		local _, unknown = api.update(handle, { title = "Gone" })
 		check("a dismissed section's handle is unknown to update", unknown == "unknown_handle")
 
@@ -185,7 +185,7 @@ return function(root, check, island_world, quest_world)
 			local dir = os.getenv("ISLAND_LAYOUT_DIR")
 			if not dir then return end
 			local top
-			for _, frame in ipairs(frames_list) do if frame.name == "EverlookSmartIsland" then top = frame end end
+			for _, frame in ipairs(frames_list) do if frame.name == "EverlookIsland" then top = frame end end
 			local handle = assert(io.open(dir .. "/" .. name .. ".json", "w"))
 			handle:write(layout.export(frames_list, top, env_list.GetTime()))
 			handle:close()
@@ -241,7 +241,7 @@ return function(root, check, island_world, quest_world)
 		local failing = button_with("Boom")
 		if failing then failing.scripts.OnClick(failing) end
 		check("an error in a producer's callback goes to the error handler and does not stop the island",
-			failing ~= nil and #errors == 1 and errors[1]:find("callback failed", 1, true) ~= nil and addon.smart_island.view().mode == "open")
+			failing ~= nil and #errors == 1 and errors[1]:find("callback failed", 1, true) ~= nil and addon.island.view().mode == "open")
 	end
 
 	-- Pane A with no quest.
@@ -252,7 +252,7 @@ return function(root, check, island_world, quest_world)
 		open(addon, frames)
 		local measure = layout.new()
 		local island
-		for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then island = measure.rectangle(frame) end end
+		for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then island = measure.rectangle(frame) end end
 		check("a section in pane A opens two panes with no quest", island.width == 720)
 		check("with no quest, the first section's title is the pane's heading", find_text(frames, "RAID") ~= nil and find_text(frames, "QUESTS") == nil)
 	end
@@ -295,7 +295,7 @@ return function(root, check, island_world, quest_world)
 		local dir = os.getenv("ISLAND_LAYOUT_DIR")
 		if dir then
 			local top
-			for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then top = frame end end
+			for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then top = frame end end
 			local handle = assert(io.open(dir .. "/sections_both.json", "w"))
 			handle:write(layout.export(frames, top, env.GetTime()))
 			handle:close()
@@ -303,7 +303,7 @@ return function(root, check, island_world, quest_world)
 		-- A heading button's outline, not just its words, ends on the inset.
 		local measure = layout.new()
 		local island_rect
-		for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then island_rect = measure.rectangle(frame) end end
+		for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then island_rect = measure.rectangle(frame) end end
 		local pin_words, clear_words = find_text(frames, "Pin quest"), find_text(frames, "Clear history")
 		check("a heading button's outline ends on the pane's 12 inset, as the figures below it do",
 			pin_words and measure.rectangle(pin_words.parent).right == island_rect.left + 300 - 12
@@ -333,7 +333,7 @@ return function(root, check, island_world, quest_world)
 		local right_edge = measure.rectangle(find_text(frames, "20,000")).right
 		local problems = layout.lint(frames, { skip = function(frame) return frame.name == "EverlookIslandResting" end })
 		local island
-		for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then island = measure.rectangle(frame) end end
+		for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then island = measure.rectangle(frame) end end
 		check("a table sits inside its pane, its last column ending on the 12 inset, and overlaps nothing", #problems == 0 and right_edge == island.right - 12)
 		if #problems > 0 then print(table.concat(problems, "\n")) end
 		local toggle
@@ -356,13 +356,13 @@ return function(root, check, island_world, quest_world)
 			addon.module.set("island", "quest_context", true)
 			for index = 1, 8 do env.Everlook.island.notify({ source = "MyAddon", key = "n" .. index, text = "Notice " .. index, detail = "Something happened", persist = true }) end
 			open(addon, frames)
-			return addon.smart_island.view().scroll_height
+			return addon.island.view().scroll_height
 		end
 		local function alone()
 			local addon, env, _, _, _, _, frames = world()
 			for index = 1, 8 do env.Everlook.island.notify({ source = "MyAddon", key = "n" .. index, text = "Notice " .. index, detail = "Something happened", persist = true }) end
 			open(addon, frames)
-			return addon.smart_island.view().scroll_height
+			return addon.island.view().scroll_height
 		end
 		local beside, alone_height = with_history(), alone()
 		check("a long history asks for at most 200 beside the quests, and the panes take the quest column's height if it is taller",
@@ -386,7 +386,7 @@ return function(root, check, island_world, quest_world)
 		end
 		if os.getenv("ISLAND_LAYOUT_DIR") then
 			local top
-			for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then top = frame end end
+			for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then top = frame end end
 			local handle = assert(io.open(os.getenv("ISLAND_LAYOUT_DIR") .. "/card.json", "w"))
 			handle:write(layout.export(frames, top, env.GetTime()))
 			handle:close()
@@ -496,13 +496,13 @@ return function(root, check, island_world, quest_world)
 			end
 		end
 		check("the quests pane is headed Quests and holds the quest source's card and plan",
-			panel_text("QUESTS") ~= nil and panel_text("NEXT UP") ~= nil and addon.smart_island.view().width == 720)
+			panel_text("QUESTS") ~= nil and panel_text("NEXT UP") ~= nil and addon.island.view().width == 720)
 		-- Another addon's section lands under them, and the pane keeps its heading.
 		env.Everlook.island.section(spec({ region = "pane_a", key = "other", title = "Raid" }))
 		check("another addon's section in the same pane goes under the card and leaves the heading alone",
 			panel_text("QUESTS") ~= nil and panel_text("RAID") ~= nil)
 		local root_frame
-		for _, frame in ipairs(frames) do if frame.name == "EverlookSmartIsland" then root_frame = frame end end
+		for _, frame in ipairs(frames) do if frame.name == "EverlookIsland" then root_frame = frame end end
 		local placements = 0
 		local place = root_frame.SetPoint
 		function root_frame:SetPoint(...)
@@ -524,10 +524,10 @@ return function(root, check, island_world, quest_world)
 		addon.module.set("island", "enabled", false)
 		addon.module.set("island", "enabled", true)
 		open(addon, frames)
-		check("turning the island off and on again brings the card back", panel_text("NEXT UP") ~= nil and addon.smart_island.view().sections >= 4)
+		check("turning the island off and on again brings the card back", panel_text("NEXT UP") ~= nil and addon.island.view().sections >= 4)
 		state.quests, state.watched, state.selected = {}, {}, nil
 		event("QUEST_LOG_UPDATE")
 		check("with no quest to follow or suggest, the quest source's sections go and the island is one pane",
-			panel_text("NEXT UP") == nil and addon.smart_island.view().width == 432)
+			panel_text("NEXT UP") == nil and addon.island.view().width == 432)
 	end
 end

@@ -78,7 +78,7 @@ end
 report("with every module on and the island resting", cut_off())
 
 -- The island open and pinned shows its panes, tables and summary.
-local island = harness.find("EverlookSmartIsland")
+local island = harness.find("EverlookIsland")
 if island then
 	if EverlookMinimapButton then EverlookMinimapButton:Hide() end
 	local x, y = harness.center(island)
@@ -107,7 +107,7 @@ if Everlook.module.set then
 	harness.advance(1)
 	Everlook.module.set("island", "enabled", true)
 	harness.advance(2)
-	local again = harness.find("EverlookSmartIsland")
+	local again = harness.find("EverlookIsland")
 	if again then
 		local x, y = harness.center(again)
 		harness.click(x, y)

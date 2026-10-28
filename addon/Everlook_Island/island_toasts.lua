@@ -1,7 +1,7 @@
 local Everlook = Everlook
 
 -- Which notice gets a toast slot first. Warnings beat routine notices and
--- errors beat warnings. smart_island.lua owns the stack and its frames.
+-- errors beat warnings. island.lua owns the stack and its frames.
 local toasts = {}
 Everlook.island_toasts = toasts
 

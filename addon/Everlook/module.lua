@@ -35,7 +35,7 @@ local PAGES = {
 	{ id = "combat", label = "Combat" },
 	{ id = "screen", label = "Screen and camera" },
 	{ id = "loading", label = "Loading" },
-	{ id = "smart_island", label = "Smart island" },
+	{ id = "island", label = "Smart island" },
 	{ id = "radial_menu", label = "Radial menu" },
 }
 local page_labels = {}

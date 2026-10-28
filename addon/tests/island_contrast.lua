@@ -20,8 +20,8 @@ return function(root, check)
 		return (high + 0.05) / (low + 0.05)
 	end
 
-	-- The option's lowest value, read from the declaration in smart_island.lua, which is too large to load on its own.
-	local file = assert(io.open(source("smart_island"), "r"))
+	-- The option's lowest value, read from the declaration in island.lua, which is too large to load on its own.
+	local file = assert(io.open(source("island"), "r"))
 	local text = file:read("*a")
 	file:close()
 	local minimum = tonumber(text:match('opacity = { name = "Island opacity", default = %d+, min = (%d+)'))

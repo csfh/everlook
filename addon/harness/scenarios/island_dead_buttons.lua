@@ -2,11 +2,11 @@
 -- side, from what the client reported with /islandmouse (island open, pinned, pointer on a Pin button, panel layer at
 -- level 50, the same as the island's own frame):
 --
---   plain  : EverlookSmartIsland gets the mouse        (the Pin button, L54, holds the pointer and loses)
+--   plain  : EverlookIsland gets the mouse        (the Pin button, L54, holds the pointer and loses)
 --   noroot : the Pin button gets it                    (island's own mouse off)
 --   noclip : the Pin button gets it                    (panel stops clipping)
 --   raise  : the Pin button gets it, now at L55        (panel one level up; its buttons rose with it)
---   mouse  : EverlookSmartIsland gets the mouse again  (panel takes the mouse itself)
+--   mouse  : EverlookIsland gets the mouse again  (panel takes the mouse itself)
 --
 -- The rule that fits all five (docs/engine-facts.md, row 19): a clipping frame's subtree is ordered as one unit at the
 -- clipping frame's level, and a frame outside it at the same level wins if it is an ancestor.
@@ -22,16 +22,16 @@ Everlook.module.set("island", "quest_context", true)
 Everlook.module.set("island", "quest_plan", true)
 harness.advance(1)
 
-local island = harness.find("EverlookSmartIsland")
+local island = harness.find("EverlookIsland")
 local panel = harness.find("EverlookIslandExpanded")
 local rect = harness.rect(island)
 harness.click(rect.left + rect.width / 2, rect.top + 8)
 harness.advance(1)
-if not Everlook.smart_island.view().pinned then
+if not Everlook.island.view().pinned then
 	harness.click(rect.left + rect.width / 2, rect.top + 8)
 	harness.advance(1)
 end
-assert(Everlook.smart_island.view().pinned, "the island is pinned for these tests")
+assert(Everlook.island.view().pinned, "the island is pinned for these tests")
 
 local function button_with_text(text)
 	for _, frame in ipairs(harness.frames()) do
@@ -55,7 +55,7 @@ local function tail(name) return name and tostring(name):match("([^.]+)$") end
 local function kind_of(name)
 	if name == nil or not tostring(name):find("Everlook", 1, true) then return "none" end
 	local last = tail(name)
-	if last == "EverlookSmartIsland" then return "root" end
+	if last == "EverlookIsland" then return "root" end
 	if last == "EverlookIslandExpanded" then return "panel" end
 	return "pin"
 end
@@ -85,7 +85,7 @@ harness.check("and raising the panel raised the Pin button with it, to the L55 t
 harness.move(x, y)
 harness.click(x, y)
 harness.advance(0.3)
-harness.check("failure: pressing Pin pins nothing, and the press lands on the island, which unpins itself", Everlook.smart_island.view().quests.pinned == nil and Everlook.smart_island.view().pinned == false)
+harness.check("failure: pressing Pin pins nothing, and the press lands on the island, which unpins itself", Everlook.island.view().quests.pinned == nil and Everlook.island.view().pinned == false)
 harness.click(rect.left + rect.width / 2, rect.top + 8)
 harness.advance(0.5)
 
@@ -102,13 +102,13 @@ panel:SetFrameLevel(shipped_level)
 -- 2. The success: the panel at the level it now keeps, one above the island.
 do
 	harness.check("the panel keeps a level one above the island's (" .. shipped_level .. ")", shipped_level == island:GetFrameLevel() + 1)
-	harness.check("the island is pinned again for the success checks", Everlook.smart_island.view().pinned == true)
+	harness.check("the island is pinned again for the success checks", Everlook.island.view().pinned == true)
 	local got, level = report_for("")
 	harness.check("success: the Pin button gets the mouse (" .. got .. ")", got == "pin")
 	harness.move(x, y)
 	harness.click(x, y)
 	harness.advance(0.3)
-	harness.check("success: pressing it pins the quest and leaves the island pinned", Everlook.smart_island.view().quests.pinned ~= nil and Everlook.smart_island.view().pinned == true)
+	harness.check("success: pressing it pins the quest and leaves the island pinned", Everlook.island.view().quests.pinned ~= nil and Everlook.island.view().pinned == true)
 	local release = button_with_text("Release pin")
 	if release then local rx, ry = harness.center(release); harness.click(rx, ry); harness.advance(0.3) end
 
@@ -120,11 +120,11 @@ do
 	end
 	harness.check("a pane takes clicks and has a handler for them", pane ~= nil)
 	if pane then
-		local before = Everlook.smart_island.view().pinned
+		local before = Everlook.island.view().pinned
 		local pr = harness.rect(pane)
 		harness.click(pr.left + pr.width - 6, pr.top + pr.height - 6)
 		harness.advance(0.3)
-		harness.check("a click on empty space in a pane toggles the pin, as the island does", Everlook.smart_island.view().pinned == (not before))
+		harness.check("a click on empty space in a pane toggles the pin, as the island does", Everlook.island.view().pinned == (not before))
 	end
 end
 harness.rules({})
@@ -134,7 +134,7 @@ for _, e in ipairs(harness.errors()) do print("script error:", e) end
 -- crosses into a control; holding still must not keep repainting, and moving along the list must not close the island.
 do
 	local stats = Everlook.island_stats
-	local function open_state() return Everlook.smart_island.view().mode == "open" end
+	local function open_state() return Everlook.island.view().mode == "open" end
 	harness.move(5, 5)
 	harness.advance(0.5)
 	local r = harness.rect(island)

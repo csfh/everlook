@@ -28,7 +28,7 @@ harness.check("the toast was accepted (" .. tostring(why) .. ")", toast ~= nil)
 harness.advance(1)
 game.snapshot("A toast with two actions", "closed")
 
-local island = harness.find("EverlookSmartIsland")
+local island = harness.find("EverlookIsland")
 local x, y = harness.center(island)
 harness.click(x, y)
 harness.advance(1)

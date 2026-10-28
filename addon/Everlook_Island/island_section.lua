@@ -56,7 +56,7 @@ end
 
 -- Our own addons may take the first slots of a pane. Anyone else starts below them.
 function section.builtin(source)
-	return type(source) == "string" and (source:find("^everlook") ~= nil or source:find("^smart_island") ~= nil)
+	return type(source) == "string" and source:find("^everlook") ~= nil
 end
 
 local function read_action(action)
