@@ -23,6 +23,8 @@ TOC_VERSION = re.compile(r"^(## Version: )(\S+)", re.MULTILINE)
 ZERO_SHA = "0" * 40
 VERSION_FILE = "Everlook/Everlook.toc"
 TAG_PREFIX = "addon-v"
+# What a release counts, from the root addon/: the addon folders, and not the tests that sit beside them.
+RELEASE_PATHS = (".", ":(exclude)tests")
 
 
 LEVELS = ("patch", "minor", "major")
@@ -93,11 +95,11 @@ def commit_known(root: Path, sha: str) -> bool:
 
 
 def commits_touching(root: Path, before: str, after: str) -> list[tuple[str, str]]:
-    """Subject and body of each commit in before..after that touches the root folder.
+    """Subject and body of each commit in before..after that touches what a release ships.
 
-    The root is addon/, so the harness and the site beside it never count.
+    The root is addon/, so the harness, the scripts and the site beside it never count, and nor does addon/tests.
     """
-    out = git(root, "log", "--format=%s%x1f%b%x1e", f"{before}..{after}", "--", ".")
+    out = git(root, "log", "--format=%s%x1f%b%x1e", f"{before}..{after}", "--", *RELEASE_PATHS)
     commits = []
     for record in out.split("\x1e"):
         if record.strip():
@@ -120,9 +122,9 @@ def release_notes(root: Path, since: str) -> str:
     ref falls back to the latest commit, so a first release still has notes.
     """
     if since in ("", ZERO_SHA):
-        out = git(root, "log", "-1", "--format=%h%x1f%s%x1f%b%x1e", "--", ".")
+        out = git(root, "log", "-1", "--format=%h%x1f%s%x1f%b%x1e", "--", *RELEASE_PATHS)
     else:
-        out = git(root, "log", f"--format=%h%x1f%s%x1f%b%x1e", f"{since}..HEAD", "--", ".")
+        out = git(root, "log", f"--format=%h%x1f%s%x1f%b%x1e", f"{since}..HEAD", "--", *RELEASE_PATHS)
     grouped: dict[str, list[str]] = {level: [] for level, _ in NOTE_SECTIONS}
     thanks: dict[str, str] = {}
     for record in out.split("\x1e"):

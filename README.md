@@ -9,18 +9,17 @@ Download the latest release from https://github.com/csfh/everlook/releases/lates
 ## Layout
 
 ```
-addon/    The Everlook core and its Everlook_<Name> modules: the folders a release ships
+addon/    The Everlook core and its Everlook_<Name> modules (the folders a release ships), and their tests
 harness/  A Rust host that runs the addon files with the game's frame, mouse and clock rules. It never ships
 www/      The static site (Vite) for Cloudflare Pages
-scripts/  Sync, pack, release and the island's art
-tests/    The addon's Lua suite, the folder and luac checks, and the scripts' tests
+scripts/  Sync, pack, release and the island's art, each with its test
 ```
 
 ## Develop
 
 ```sh
 just sync      # link the addon folders into the game's AddOns folder
-just test      # every check: test-addon, test-harness and test-www
+just test      # every check: test-addon, test-scripts, test-harness and test-www
 just prepush   # before a push that releases the addon
 ```
 
@@ -30,11 +29,11 @@ In `harness/`, `cargo run -- run scenarios/island_mouse.lua` runs one scenario a
 
 ## Release
 
-A push to `main` runs the checks and, when its commits ask for one, publishes a GitHub Release tagged `addon-v<version>`: a tarball, a zip and their checksums, from `scripts/pack.sh`. The commit types decide it, as `AGENTS.md` lists, and a commit outside `addon/` never releases. The version in `addon/Everlook/Everlook.toc`, written `## Version: x.y.z`, is what ships when that line changes by hand; `tests/folders_test.py` fails on any other form. Do not tag a release yourself.
+A push to `main` runs the checks and, when its commits ask for one, publishes a GitHub Release tagged `addon-v<version>`: a tarball, a zip and their checksums, from `scripts/pack.sh`. The commit types decide it, as `AGENTS.md` lists, and a commit outside `addon/` never releases. The version in `addon/Everlook/Everlook.toc`, written `## Version: x.y.z`, is what ships when that line changes by hand; `addon/tests/folders_test.py` fails on any other form. Do not tag a release yourself.
 
 CI has never played the build, so before that push:
 
-1. `just prepush`. It runs the addon checks and the harness, then fails if a commit subject since `origin/main` is over 100 characters, because the release notes are made from subjects.
+1. `just prepush`. It runs the addon and script checks and the harness, then fails if a commit subject since `origin/main` is over 100 characters, because the release notes are made from subjects.
 2. `just sync`, then log in on the current client with the modules the push touches turned on.
 3. Walk the smoke list. Skip anything the push did not touch, and say which were skipped.
 4. Watch the Lua error display (`/console scriptErrors 1` if it is off) and the Everlook Debug page.

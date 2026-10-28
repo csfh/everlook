@@ -1,11 +1,11 @@
--- Runs every suite against the addon folders in addon/, or in the folder given as the first argument, such as an
+-- Runs every suite against the addon folders beside tests/, or in the folder given as the first argument, such as an
 -- unpacked release.
-local repository = arg and arg[0] and arg[0]:match("(.+)[/\\]tests[/\\]run%.lua$") or "."
-if repository == "" then
-	repository = "."
+local addon = arg and arg[0] and arg[0]:match("(.+)[/\\]tests[/\\]run%.lua$") or "."
+if addon == "" then
+	addon = "."
 end
-local tests = repository .. "/tests"
-local root = arg and arg[1] or repository .. "/addon"
+local tests = addon .. "/tests"
+local root = arg and arg[1] or addon
 assert(io.open(root .. "/Everlook/Everlook.toc", "r"), "No addon at " .. root .. ": run.lua needs a folder that holds Everlook/"):close()
 
 local lib = dofile(tests .. "/lib/worlds.lua")(tests, root)

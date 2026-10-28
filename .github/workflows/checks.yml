@@ -27,6 +27,7 @@ jobs:
       - name: Install Lua 5.1
         run: sudo apt-get update && sudo apt-get install -y lua5.1
       - run: just test-addon
+      - run: just test-scripts
 
   harness:
     runs-on: ubuntu-latest

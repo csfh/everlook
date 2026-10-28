@@ -6,14 +6,18 @@ set dotenv-filename := ".env.local"
 default:
     @just --list --unsorted
 
-# Every check: the addon, the harness and the site
-test: test-addon test-harness test-www
+# Every check: the addon, the scripts, the harness and the site
+test: test-addon test-scripts test-harness test-www
 
-# Everything in tests/: the Lua suite, the folder and luac checks, and the scripts' tests
+# The addon's tests in addon/tests: the Lua suite, and the folder and luac checks
 test-addon:
-    lua5.1 tests/run.lua
-    python3 -m unittest discover --quiet --start-directory tests --pattern '*_test.py'
-    bash tests/push_release_commit_test.sh
+    lua5.1 addon/tests/run.lua
+    python3 -m unittest discover --quiet --start-directory addon/tests --pattern '*_test.py'
+
+# Each script's test, beside it in scripts/
+test-scripts:
+    python3 -m unittest discover --quiet --start-directory scripts --pattern '*_test.py'
+    bash scripts/push_release_commit_test.sh
 
 # Every harness scenario, run against addon/
 [working-directory('harness')]
@@ -27,7 +31,7 @@ test-www:
     npm run build
 
 # Before a push that releases the addon. Release notes are made from commit subjects, so one over 100 characters fails.
-prepush: test-addon test-harness
+prepush: test-addon test-scripts test-harness
     #!/usr/bin/env bash
     set -euo pipefail
     long="$(git log --format='%h %s' origin/main..HEAD | awk 'length($0) - 8 > 100')"

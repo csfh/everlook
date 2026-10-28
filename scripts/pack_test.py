@@ -11,8 +11,8 @@ import unittest
 import zipfile
 from pathlib import Path
 
-REPOSITORY = Path(__file__).resolve().parents[1]
-SCRIPTS = REPOSITORY / "scripts"
+SCRIPTS = Path(__file__).resolve().parent
+REPOSITORY = SCRIPTS.parent
 ADDON = REPOSITORY / "addon"
 
 
@@ -119,7 +119,7 @@ class ReleaseArchiveTest(unittest.TestCase):
                     match = re.match(r"^([\w./\\-]+\.(?:lua|xml))\s*$", line)
                     if match:
                         self.assertTrue((unpacked / folder / match.group(1).replace("\\", "/")).is_file(), f"{folder} lists {match.group(1)}")
-            suite = subprocess.run(["lua5.1", "tests/run.lua", str(unpacked)], cwd=REPOSITORY, capture_output=True, text=True)
+            suite = subprocess.run(["lua5.1", "addon/tests/run.lua", str(unpacked)], cwd=REPOSITORY, capture_output=True, text=True)
             self.assertEqual(suite.returncode, 0, suite.stdout + suite.stderr)
 
 

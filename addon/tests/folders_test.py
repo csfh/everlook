@@ -5,10 +5,9 @@ import sys
 import unittest
 
 
-REPOSITORY = Path(__file__).resolve().parents[1]
-ADDON = REPOSITORY / "addon"
-TESTS = REPOSITORY / "tests"
-sys.path.insert(0, str(REPOSITORY / "scripts"))
+TESTS = Path(__file__).resolve().parent
+ADDON = TESTS.parent
+sys.path.insert(0, str(ADDON.parent / "scripts"))
 import auto_release  # noqa: E402
 
 

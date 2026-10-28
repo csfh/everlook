@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 import subprocess
-import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-import auto_release  # noqa: E402
+import auto_release
 
 VERSION_FILE = "Everlook/Everlook.toc"
 TAG = "addon-v"
@@ -139,6 +137,12 @@ class Planning(unittest.TestCase):
         self.assertEqual(auto_release.plan_release(addon, before, after, VERSION_FILE), (None, False))
         inside = self.commit("addon/src.txt", "two\n", "fix: real")
         self.assertEqual(auto_release.plan_release(addon, after, inside, VERSION_FILE), ("patch", True))
+
+    def test_a_commit_to_the_addon_tests_does_not_release_it(self) -> None:
+        # The addon's tests live in addon/tests, beside the folders a release ships, and are not shipped.
+        (self.repo / "tests").mkdir()
+        after = self.commit("tests/run.lua", "two\n", "fix: a check")
+        self.assertEqual(self.plan(after), (None, False))
 
     def test_only_the_version_line_the_bump_writes_counts_as_a_hand_set_version(self) -> None:
         self.assertTrue(auto_release.version_field_changed("-## Version: 1.0.0\n+## Version: 1.1.0\n"))
