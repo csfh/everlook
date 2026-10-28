@@ -4,11 +4,13 @@ on:
   pull_request:
     paths:
       - 'addon/**'
+      - 'harness/**'
       - '.github/workflows/harness-tests.yml'
   push:
     branches: [main]
     paths:
       - 'addon/**'
+      - 'harness/**'
       - '.github/workflows/harness-tests.yml'
   workflow_dispatch:
 
@@ -31,5 +33,5 @@ jobs:
         with:
           toolchain: stable
       - name: Test
-        working-directory: addon/harness
+        working-directory: harness
         run: cargo test --locked

@@ -22,8 +22,6 @@ SEMVER = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 TOC_VERSION = re.compile(r"^(## Version: )(\S+)", re.MULTILINE)
 ZERO_SHA = "0" * 40
 VERSION_FILE = "Everlook/Everlook.toc"
-# The harness is a test tool that lives here; its commits never release the addon.
-ADDON_PATHS = [".", ":(exclude)harness"]
 TAG_PREFIX = "addon-v"
 
 
@@ -94,13 +92,12 @@ def commit_known(root: Path, sha: str) -> bool:
     ).returncode == 0
 
 
-def commits_touching(
-    root: Path, before: str, after: str, paths: list[str]
-) -> list[tuple[str, str]]:
-    """Subject and body of each commit in before..after that touches the paths."""
-    out = git(
-        root, "log", "--format=%s%x1f%b%x1e", f"{before}..{after}", "--", *paths
-    )
+def commits_touching(root: Path, before: str, after: str) -> list[tuple[str, str]]:
+    """Subject and body of each commit in before..after that touches the root folder.
+
+    The root is addon/, so the harness and the site beside it never count.
+    """
+    out = git(root, "log", "--format=%s%x1f%b%x1e", f"{before}..{after}", "--", ".")
     commits = []
     for record in out.split("\x1e"):
         if record.strip():
@@ -123,9 +120,9 @@ def release_notes(root: Path, since: str) -> str:
     ref falls back to the latest commit, so a first release still has notes.
     """
     if since in ("", ZERO_SHA):
-        out = git(root, "log", "-1", "--format=%h%x1f%s%x1f%b%x1e", "--", *ADDON_PATHS)
+        out = git(root, "log", "-1", "--format=%h%x1f%s%x1f%b%x1e", "--", ".")
     else:
-        out = git(root, "log", f"--format=%h%x1f%s%x1f%b%x1e", f"{since}..HEAD", "--", *ADDON_PATHS)
+        out = git(root, "log", f"--format=%h%x1f%s%x1f%b%x1e", f"{since}..HEAD", "--", ".")
     grouped: dict[str, list[str]] = {level: [] for level, _ in NOTE_SECTIONS}
     thanks: dict[str, str] = {}
     for record in out.split("\x1e"):
@@ -189,7 +186,6 @@ def plan_release(
     before: str,
     after: str,
     version_file: str,
-    paths: list[str],
     tag_prefix: str | None = None,
 ) -> tuple[str | None, bool]:
     """Return (bump level, whether to release).
@@ -206,7 +202,7 @@ def plan_release(
     base = release_base(root, tag_prefix, version_file, after)
     if base is None and before in ("", ZERO_SHA):
         return "patch", True
-    commits = commits_touching(root, base or before, after, paths)
+    commits = commits_touching(root, base or before, after)
     ours = [(s, b) for s, b in commits if not RELEASE_SUBJECT.match(s)]
     if not ours:
         return None, False
@@ -260,7 +256,7 @@ def current_addon_version(root: Path) -> str:
 
 
 def maybe_bump(root: Path, before: str, after: str) -> tuple[str, bool, bool, str | None]:
-    level, release = plan_release(root, before, after, VERSION_FILE, ADDON_PATHS, TAG_PREFIX)
+    level, release = plan_release(root, before, after, VERSION_FILE, TAG_PREFIX)
     if level is not None:
         return bump_addon(root, level), True, True, level
     return current_addon_version(root), False, release, None

@@ -67,7 +67,7 @@ class Planning(unittest.TestCase):
         return git(self.repo, "rev-parse", "HEAD").strip()
 
     def plan(self, after: str, before: str | None = None, tag: str | None = None):
-        return auto_release.plan_release(self.repo, before or self.before, after, VERSION_FILE, ["."], tag)
+        return auto_release.plan_release(self.repo, before or self.before, after, VERSION_FILE, tag)
 
     def test_feat_is_minor(self) -> None:
         self.assertEqual(self.plan(self.commit("src.txt", "two\n", "feat: change")), ("minor", True))
@@ -102,11 +102,11 @@ class Planning(unittest.TestCase):
 
     def test_first_push_is_a_patch_release(self) -> None:
         after = self.commit("src.txt", "two\n", "docs: comment")
-        self.assertEqual(auto_release.plan_release(self.repo, "0" * 40, after, VERSION_FILE, ["."]), ("patch", True))
+        self.assertEqual(auto_release.plan_release(self.repo, "0" * 40, after, VERSION_FILE), ("patch", True))
 
     def test_a_before_the_runner_never_fetched_reads_as_a_first_push(self) -> None:
         after = self.commit("src.txt", "two\n", "docs: comment")
-        self.assertEqual(auto_release.plan_release(self.repo, "f" * 40, after, VERSION_FILE, ["."]), ("patch", True))
+        self.assertEqual(auto_release.plan_release(self.repo, "f" * 40, after, VERSION_FILE), ("patch", True))
 
     def test_a_failed_earlier_push_still_counts_after_the_last_tag(self) -> None:
         git(self.repo, "tag", TAG + "0.4.1")
@@ -124,12 +124,19 @@ class Planning(unittest.TestCase):
         git(self.repo, "tag", TAG + "0.4.1", self.before)
         self.commit("src.txt", "two\n", "docs: comment")
         after = self.commit("src.txt", "three\n", "fix: real")
-        self.assertEqual(auto_release.plan_release(self.repo, "0" * 40, after, VERSION_FILE, ["."], TAG), ("patch", True))
+        self.assertEqual(auto_release.plan_release(self.repo, "0" * 40, after, VERSION_FILE, TAG), ("patch", True))
 
-    def test_a_harness_commit_does_not_release_the_addon(self) -> None:
+    def test_a_commit_beside_the_addon_folder_does_not_release_it(self) -> None:
+        # The release reads addon/ as its root, so the harness and the site beside it never count.
+        addon = self.repo / "addon"
+        (addon / "Everlook").mkdir(parents=True)
+        (addon / VERSION_FILE).write_text("## Version: 0.4.1\n")
         (self.repo / "harness").mkdir()
+        before = self.commit("addon/src.txt", "one\n", "chore: move the addon")
         after = self.commit("harness/runtime.rs", "two\n", "fix: model a frame rule")
-        self.assertEqual(auto_release.plan_release(self.repo, self.before, after, VERSION_FILE, auto_release.ADDON_PATHS), (None, False))
+        self.assertEqual(auto_release.plan_release(addon, before, after, VERSION_FILE), (None, False))
+        inside = self.commit("addon/src.txt", "two\n", "fix: real")
+        self.assertEqual(auto_release.plan_release(addon, after, inside, VERSION_FILE), ("patch", True))
 
     def test_only_the_version_line_the_bump_writes_counts_as_a_hand_set_version(self) -> None:
         self.assertTrue(auto_release.version_field_changed("-## Version: 1.0.0\n+## Version: 1.1.0\n"))

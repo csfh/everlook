@@ -6,8 +6,6 @@ Lua 5.1 only. No Ace, LibStub, or embeds. Each folder here named `Everlook` or `
 
 Optional modules register with `Everlook.module.register` from `Everlook/module.lua`, and each defaults to disabled. Settings live in `EverlookSaved.modules`. `Everlook/settings.lua` builds the native Everlook Settings page at login, after every module addon has registered. Its subpages in the left list come from the page list in `module.lua` (Quests, Vendors, Loot and mail, Social, Chat, Tooltips, Map, Action bars, Bags, Nameplates, Text and names, Combat, Screen and camera, Loading, Island, Radial menu), plus Performance and Debug, which turns the taint log off. A module names its page and its place on it. The bundled Expressway and Manrope fonts keep their licences in `Everlook_Fonts/assets/`, and `fonts.txt` there says where each came from.
 
-`harness/` is not an addon: it is the Rust host that runs these files with the game's frame, mouse and clock rules (`harness/README.md`). It never ships, and a commit that touches only `harness/` never releases the addon.
-
 ## Direction
 
 Everlook works like Leatrix Plus. It tweaks, hides or automates something the default UI already does, behind an option the player turns on. It never replaces a Blizzard frame or builds a rival UI. An earlier attempt at replacement action bars and unit frames was removed after it proved too costly to get right. The lesson that carries over: an addon function that Blizzard's secure code calls taints the code that runs after it, which showed in flyouts in combat.

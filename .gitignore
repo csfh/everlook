@@ -8,6 +8,7 @@ node_modules
 .playwright-mcp
 /.worktrees/
 dist
+target/
 .claude/
 __pycache__/
 luac.out
