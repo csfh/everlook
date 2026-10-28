@@ -110,4 +110,4 @@ function layouts.ours(info, presets)
 	end
 end
 
-Everlook.bar_layouts = layouts
+Everlook.action_bar_slots_layouts = layouts

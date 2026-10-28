@@ -85,7 +85,7 @@ end
 
 local kept = {
 	"trace", "sched", "optimize", "settings_build", "module", "qol", "bags", "blizzard_settings",
-	"bar_slots", "waves", "tooltips", "combat", "install", "errors", "title_fit", "overlaps",
+	"action_bar_slots", "waves", "tooltips", "combat", "install", "errors", "title_fit", "overlaps",
 	"quest_decide", "reward_marks", "island_contrast",
 }
 for _, name in ipairs(kept) do

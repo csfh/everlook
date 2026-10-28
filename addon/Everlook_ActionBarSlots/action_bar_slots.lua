@@ -1,7 +1,7 @@
 local addon_name = ...
 local Everlook = Everlook
 local module = Everlook.module
-local layouts = Everlook.bar_layouts
+local layouts = Everlook.action_bar_slots_layouts
 local settings = Everlook.blizzard_settings
 local id = "action_bar_slots"
 

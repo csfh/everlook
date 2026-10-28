@@ -55,10 +55,10 @@ return function(root, check)
 		for key, value in pairs(extra or {}) do env[key] = value end
 		local addon = {}
 		env.Everlook = addon
-		for _, file in ipairs({ "world", "module", "blizzard_settings", "bar_layouts", "bar_slots" }) do
+		for _, file in ipairs({ "world", "module", "blizzard_settings", "action_bar_slots_layouts", "action_bar_slots" }) do
 			local chunk = assert(loadfile(source(file)))
 			setfenv(chunk, env)
-			chunk(file == "bar_slots" and "Everlook_ActionBarSlots" or "Everlook", addon)
+			chunk(file == "action_bar_slots" and "Everlook_ActionBarSlots" or "Everlook", addon)
 		end
 		local function fire(event)
 			for _, frame in ipairs(frames) do
@@ -71,7 +71,7 @@ return function(root, check)
 	-- Pure logic on layout data.
 	do
 		local addon = load_module()
-		local layouts = addon.bar_layouts
+		local layouts = addon.action_bar_slots_layouts
 		local c = layouts.constants()
 		check("the constants come from the game's own enums", c and c.system == SYSTEM and c.always_show == ALWAYS and c.character == CHARACTER and c.max == 5)
 
