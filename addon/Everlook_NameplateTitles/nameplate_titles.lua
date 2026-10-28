@@ -3,7 +3,7 @@ local Everlook = Everlook
 local module = Everlook.module
 local plates = Everlook.nameplates
 local id = "nameplate_titles"
-local SOURCE = "everlook_titles"
+local SOURCE = "everlook.nameplate_titles"
 
 -- The client draws an NPC's name and <title> in the world as engine text, which an addon cannot restyle. A friendly
 -- NPC's nameplate is a frame, so it takes the same name style as a player's. Nameplates carry no title, so this

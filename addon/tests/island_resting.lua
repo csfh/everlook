@@ -47,7 +47,7 @@ return function(root, check, island_world)
 		local api = env.Everlook.island
 		local shown = finder(frames)
 		local view = addon.island.view()
-		check("the level chip is the island's own resting status", view.resting and view.resting.source == "everlook_resting" and shown("12") ~= nil)
+		check("the level chip is the island's own resting status", view.resting and view.resting.source == "everlook.island_resting" and shown("12") ~= nil)
 		check("it is no status, history row, toast or unread notice", view.status == nil and #view.notices == 0 and #view.toasts == 0 and view.unread_count == 0)
 
 		local background = api.notify({ source = "A", key = "bg", text = "Quest", presentation = "status", rank = "background",

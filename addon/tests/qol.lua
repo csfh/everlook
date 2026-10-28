@@ -1115,7 +1115,7 @@ return function(root, check)
 	addon2.module.set("flight_time", "enabled", true)
 	local ground_poller
 	for _, frame in ipairs(frames) do
-		if frame.name == "EverlookFlightPoller" then ground_poller = frame end
+		if frame.name == "EverlookFlightTimePoller" then ground_poller = frame end
 	end
 	check("flight time stays idle until a flight is taken", ground_poller and ground_poller.scripts.OnUpdate == nil)
 	hooks.TakeTaxiNode(2)
@@ -2082,7 +2082,7 @@ return function(root, check)
 		cursor.x, cursor.y = 960, 540
 		wheel.open({ "Attack", "Warning", "On my way" }, 960, 540)
 		local root
-		for _, object in ipairs(made) do if object.name == "EverlookRadialWheel" then root = object end end
+		for _, object in ipairs(made) do if object.name == "EverlookRadialMenuWheel" then root = object end end
 		check("opening shows the wheel", wheel.is_open() and root and root.shown)
 		local texts = {}
 		for _, object in ipairs(made) do if object.kind == "fontstring" and object.text then texts[#texts + 1] = object.text end end
@@ -2121,7 +2121,7 @@ return function(root, check)
 	local function radial_fixture(real_wheel)
 		local radial_addon, radial_env, event, _, _, frames = load_qol()
 		local button
-		for _, frame in ipairs(frames) do if frame.name == "EverlookRadialButton" then button = frame end end
+		for _, frame in ipairs(frames) do if frame.name == "EverlookRadialMenuButton" then button = frame end end
 		local hover = { exists = false, is_self = false, is_player = false, can_attack = false, guid = "Player-1-0A", name = "Thrall", realm = "Orgrimmar",
 			in_party = false, in_group = false, in_raid = false, leader = false, assistant = false, over = nil }
 		local seen = { calls = {}, closed = 0 }
@@ -2170,7 +2170,7 @@ return function(root, check)
 			cursor.x, cursor.y = 960, 540
 			seen.render = function()
 				for _, object in ipairs(made) do
-					if object.name == "EverlookRadialWheel" then object.scripts.OnUpdate(object, 0.016) end
+					if object.name == "EverlookRadialMenuWheel" then object.scripts.OnUpdate(object, 0.016) end
 				end
 			end
 		else
@@ -2260,7 +2260,7 @@ return function(root, check)
 		for _, module in ipairs(radial_addon.module.modules) do
 			if module.id == "radial_menu" then radial_module = module end
 		end
-		check("the page asks for the button's own binding", radial_module and radial_module.keybinding == "CLICK EverlookRadialButton:LeftButton")
+		check("the page asks for the button's own binding", radial_module and radial_module.keybinding == "CLICK EverlookRadialMenuButton:LeftButton")
 		radial_addon.module.set("radial_menu", "enabled", false)
 		press()
 		check("a disabled module opens nothing", seen.opened == nil)
@@ -2710,11 +2710,11 @@ return function(root, check)
 		check("quest context follows native super tracking", view.current.id == 22 and view.current.distance == 800)
 		check("native objectives retain readable counts", view.current.objectives[1].fulfilled == 1 and view.current.objectives[1].required == 6)
 		local function held() return addon.island.view().background end
-		check("the quest capsule is a background status of the quest source", held() ~= nil and held().source == "everlook_quests")
+		check("the quest capsule is a background status of the quest source", held() ~= nil and held().source == "everlook.island_quests")
 		addon.module.set("island", "enabled", false)
 		check("turning the island off clears it", held() == nil)
 		addon.module.set("island", "enabled", true)
-		check("and it is back when the island is", held() ~= nil and held().source == "everlook_quests" and held().count == 1)
+		check("and it is back when the island is", held() ~= nil and held().source == "everlook.island_quests" and held().count == 1)
 		addon.module.set("island", "quest_plan", true)
 		view = addon.island.view().quests
 		check("ready quests use distance without encounter difficulty", view.order[1].id == 23 and view.order[1].ready)
@@ -3548,7 +3548,7 @@ return function(root, check)
 		addon.module.set("flight_time", "enabled", true)
 		local poller, timer
 		for _, object in ipairs(frames) do
-			if object.name == "EverlookFlightPoller" then poller = object end
+			if object.name == "EverlookFlightTimePoller" then poller = object end
 			if object.name == "EverlookFlightTime" then timer = object end
 		end
 		check("flight time does not poll while you are on the ground", poller and poller.scripts.OnUpdate == nil)
@@ -4092,7 +4092,7 @@ return function(root, check)
 			found and not missing and table.concat(names, ",") == "Presets,Placement,Opening,Closed pill,Quest display,Notices,Activity")
 		check("the island starts disabled", not island.module.enabled("island"))
 		check("the island key is not the radial menu key",
-			found.keybinding ~= "CLICK EverlookRadialButton:LeftButton" and island_env.BINDING_NAME_EVERLOOK_ISLAND == "Open the island")
+			found.keybinding ~= "CLICK EverlookRadialMenuButton:LeftButton" and island_env.BINDING_NAME_EVERLOOK_ISLAND == "Open the island")
 		check("money formats gold, silver and copper",
 			island.island_vitals.money(1234567) == "123g 45s 67c"
 			and island.island_vitals.money(0) == "0c"
@@ -4293,7 +4293,7 @@ return function(root, check)
 		env.everlook_island_key("up")
 		check("holding while pinned restores the pin", addon.island.view().pinned and addon.island.view().mode == "open")
 		for _, frame in ipairs(frames) do
-			if frame.name == "EverlookRadialButton" then
+			if frame.name == "EverlookRadialMenuButton" then
 				frame.scripts.PreClick(frame, "LeftButton", true)
 				frame.scripts.PostClick(frame, "LeftButton", true)
 				frame.scripts.PreClick(frame, "LeftButton", false)

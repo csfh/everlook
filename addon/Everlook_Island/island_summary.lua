@@ -8,7 +8,7 @@ local Everlook = Everlook
 local summary = {}
 Everlook.island_summary = summary
 
-local SOURCE = "everlook_summary"
+local SOURCE = "everlook.island_summary"
 local last_signature
 local handles = {}
 
@@ -80,7 +80,7 @@ function summary.push(readout, low_slots, force)
 end
 
 -- The closed pill's resting display. It is pushed as a resting status, the lowest rung of the capsule.
-local RESTING_SOURCE = "everlook_resting"
+local RESTING_SOURCE = "everlook.island_resting"
 local resting_signature
 local resting_handle
 

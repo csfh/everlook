@@ -98,7 +98,7 @@ return function(root, check, island_world, quest_world)
 			{ kind = "row", row = { title = "Fixed", arrow = 1.5 } },
 			{ kind = "row", row = { title = "Live", arrow = function() return 0.5 end }, role = "title" },
 			{ kind = "text", runs = { { text = "Suggested, ", tone = "secondary" }, { text = "ready to turn in", tone = "success" } } } } })) ~= nil)
-		local builtin = api.section(spec({ source = "everlook_quests", key = "first", order = 10 }))
+		local builtin = api.section(spec({ source = "everlook.island_quests", key = "first", order = 10 }))
 		check("one of our own sources may take a slot below 100", type(builtin) == "number")
 
 		-- Updating and dismissing use the same two functions as a notice.

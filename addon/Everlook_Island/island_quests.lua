@@ -591,7 +591,7 @@ end
 -- through Everlook.island.section like anyone's. The card is the quest to follow with its objectives,
 -- and the plan the next three after it.
 local OBJECTIVES_SHOWN = 4
-local SOURCE = "everlook_quests"
+local SOURCE = "everlook.island_quests"
 local pushed_signature
 
 -- Plain, and short enough for a row.

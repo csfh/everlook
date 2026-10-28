@@ -4,7 +4,7 @@ local module = Everlook.module
 local id = "radial_menu"
 
 -- The key is a click on this button, which Bindings.xml binds as a CLICK action.
-local BUTTON = "EverlookRadialButton"
+local BUTTON = "EverlookRadialMenuButton"
 local ACTION = "CLICK " .. BUTTON .. ":LeftButton"
 
 BINDING_HEADER_EVERLOOK_RADIAL_MENU = "Everlook Radial menu"

@@ -13,7 +13,7 @@ function IsInRaid() return false end
 local pings = {}
 C_Ping = { SendMacroPing = function(kind) pings[#pings + 1] = kind end }
 
-local key = EverlookRadialButton
+local key = EverlookRadialMenuButton
 harness.check("the key's button exists, and nothing can click it with the mouse", key ~= nil and not key:IsMouseEnabled())
 harness.move(960, 540)
 key:Click("LeftButton", true)

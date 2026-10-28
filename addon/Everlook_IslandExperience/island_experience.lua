@@ -548,7 +548,7 @@ push = function()
 		if unfolded or not expandable or index == 1 then rows[#rows + 1] = { row[1], row[2], row[3] } end
 	end
 	section_handle = api.section({
-		source = "everlook_experience", key = "table", region = "pane_b", order = 20,
+		source = "everlook.experience", key = "table", region = "pane_b", order = 20,
 		blocks = { {
 			kind = "table", title = "Experience", columns = { "Hour", "Day" }, rows = rows,
 			footer = data.footer and plain(data.footer) or nil,

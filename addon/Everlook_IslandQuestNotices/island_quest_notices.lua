@@ -58,7 +58,7 @@ local function ready()
 	if not changed or not latest then return end
 	local quest_id = latest.id
 	state.ready_handle = notify({
-		source = "everlook.quests", key = "ready", kind = "quest", persist = true,
+		source = "everlook.quest_notices", key = "ready", kind = "quest", persist = true,
 		text = count == 1 and latest.title or (count .. " quests ready"),
 		detail = "Ready to turn in",
 		actions = {
@@ -117,7 +117,7 @@ local function next_quest()
 	if announce then state.next_toast = time end
 	local quest_id = suggestion.id
 	state.next_handle = notify({
-		source = "everlook.quests", key = "next-quest", kind = "quest", persist = true,
+		source = "everlook.quest_notices", key = "next-quest", kind = "quest", persist = true,
 		text = suggestion.title, detail = "Suggested next",
 		presentation = announce and "toast" or "inbox",
 		actions = {
@@ -187,7 +187,7 @@ local function pin_suggestions()
 	state.pin_seen[record.id], state.pin_at = time, time
 	local quest_id = record.id
 	state.pin_handle = notify({
-		source = "everlook.quests", key = "pin-suggest", kind = "quest", duration = 12,
+		source = "everlook.quest_notices", key = "pin-suggest", kind = "quest", duration = 12,
 		text = "Pin " .. record.title .. "?", detail = PIN_REASONS[chosen.kind] .. ", " .. quests.where(record),
 		actions = {
 			{ id = "pin", label = "Pin", type = "callback", on_click = function(handle)
@@ -209,7 +209,7 @@ local function turned_in(quest_id, _, money)
 	local reward = plain_number(money)
 	notify({
 		text = "Quest completed", detail = title or ("Quest #" .. quest_id), kind = "quest", severity = "success",
-		source = "everlook.quests", key = "turnin:" .. state.turnins, stack = "turnin",
+		source = "everlook.quest_notices", key = "turnin:" .. state.turnins, stack = "turnin",
 		money = reward and reward > 0 and reward % 1 == 0 and reward or nil,
 	})
 end

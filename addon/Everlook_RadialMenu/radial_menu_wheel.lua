@@ -63,7 +63,7 @@ local function update()
 end
 
 local function build_root()
-	root = CreateFrame("Frame", "EverlookRadialWheel", UIParent)
+	root = CreateFrame("Frame", "EverlookRadialMenuWheel", UIParent)
 	root:SetFrameStrata("FULLSCREEN_DIALOG")
 	root:SetSize(1, 1)
 	root:EnableMouse(false)

@@ -191,7 +191,7 @@ local function apply(enabled)
 		label:SetPoint("CENTER")
 		-- The poller is its own frame so hiding the timer does not stop the sample.
 		-- It stays idle on the ground. TakeTaxiNode starts it, and landing stops it.
-		poller = CreateFrame("Frame", "EverlookFlightPoller")
+		poller = CreateFrame("Frame", "EverlookFlightTimePoller")
 		frame:Hide()
 	end
 	if route then start_watch() else resume_route() end

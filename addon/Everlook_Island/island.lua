@@ -1157,7 +1157,7 @@ local function layout_expanded(list, status, two)
 	-- Its heading is "Quests", unless the first section is another addon's, whose title it takes.
 	local a_list = two and sections.list("pane_a") or {}
 	local first_a = a_list[1]
-	local quest_title = first_a and first_a.source ~= "everlook_quests" and first_a.title or nil
+	local quest_title = first_a and first_a.source ~= "everlook.island_quests" and first_a.title or nil
 	call(shell.quest_heading, "Show")
 	shell.heading(shell.quest_heading, quest_title or "Quests")
 	local a_end = shell.blocks_a:paint(a_list, space.near, left_w, quest_title ~= nil)

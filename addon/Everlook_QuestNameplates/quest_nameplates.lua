@@ -4,7 +4,7 @@ local module = Everlook.module
 local plates = Everlook.nameplates
 local plain = plates.plain
 local id = "quest_nameplates"
-local SOURCE = "everlook_quests"
+local SOURCE = "everlook.quest_nameplates"
 
 -- The game's own quest mark floats above a unit and an addon can neither move nor restyle it, so this offers the
 -- nameplate view a small mark of its own, and the game's stays where it is. The game says whether a unit is part
