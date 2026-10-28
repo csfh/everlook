@@ -1,7 +1,7 @@
 local addon_name = ...
 local Everlook = Everlook
 local module = Everlook.module
-local id = "chat_tweaks"
+local id = "chat_layout"
 
 Everlook.chat_tweaks = {}
 

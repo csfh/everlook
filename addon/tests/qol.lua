@@ -1769,13 +1769,13 @@ return function(root, check)
 	end
 	check("chat tweaks change nothing while off", anchors(env7.ChatFrame1.editBox) == "TOPLEFT,frame,BOTTOMLEFT,-5,-2;RIGHT,bar,RIGHT,8,0" and env7.ChatFrameMenuButton.shown)
 
-	addon7.module.set("chat_tweaks", "enabled", true)
+	addon7.module.set("chat_layout", "enabled", true)
 	check("the edit box moves above the chat tab", anchors(env7.ChatFrame1.editBox) == "BOTTOMLEFT,tab,TOPLEFT,-5,2;RIGHT,bar,RIGHT,8,0")
 	check("a chat window with no tab uses the window itself",
 		env7.ChatFrame2.editBox.points[1][2] == env7.ChatFrame2 and env7.ChatFrame2.editBox.points[1][3] == "TOPLEFT")
 	check("the chat buttons are hidden", not env7.ChatFrameMenuButton.shown and not env7.ChatFrameChannelButton.shown)
 	check("the fade time starts at the game default", env7.ChatFrame1.time == 120 and env7.ChatFrame2.time == 120)
-	addon7.module.set("chat_tweaks", "fade_seconds", 30)
+	addon7.module.set("chat_layout", "fade_seconds", 30)
 	check("the fade slider sets how long chat stays", env7.ChatFrame1.time == 30 and env7.ChatFrame2.time == 30)
 	env7.ChatFrameMenuButton:Show()
 	check("a button the game shows again is hidden again", not env7.ChatFrameMenuButton.shown)
@@ -1784,20 +1784,20 @@ return function(root, check)
 	event7("UPDATE_CHAT_WINDOWS")
 	check("a chat window refresh puts the edit box back on top", env7.ChatFrame1.editBox.points[1][1] == "BOTTOMLEFT")
 
-	addon7.module.set("chat_tweaks", "editbox_top", false)
+	addon7.module.set("chat_layout", "editbox_top", false)
 	check("clearing the edit box option restores its anchors", anchors(env7.ChatFrame1.editBox) == "TOPLEFT,frame,BOTTOMLEFT,-5,-2;RIGHT,bar,RIGHT,8,0")
-	addon7.module.set("chat_tweaks", "hide_buttons", false)
+	addon7.module.set("chat_layout", "hide_buttons", false)
 	check("clearing the button option brings back the buttons that were shown", env7.ChatFrameMenuButton.shown and env7.ChatFrameChannelButton.shown and not env7.ChatFrameToggleVoiceMuteButton.shown)
-	addon7.module.set("chat_tweaks", "editbox_top", true)
-	addon7.module.set("chat_tweaks", "hide_buttons", true)
-	addon7.module.set("chat_tweaks", "enabled", false)
+	addon7.module.set("chat_layout", "editbox_top", true)
+	addon7.module.set("chat_layout", "hide_buttons", true)
+	addon7.module.set("chat_layout", "enabled", false)
 	check("turning the module off restores anchors, fade time and buttons",
 		anchors(env7.ChatFrame1.editBox) == "TOPLEFT,frame,BOTTOMLEFT,-5,-2;RIGHT,bar,RIGHT,8,0"
 		and env7.ChatFrame1.time == 120 and env7.ChatFrame2.time == 60
 		and env7.ChatFrameMenuButton.shown and env7.ChatFrameChannelButton.shown and not env7.ChatFrameToggleVoiceMuteButton.shown)
 	env7.ChatFrameChannelButton = nil
 	env7.CHAT_FRAMES = { "ChatFrame1", "ChatFrame3" }
-	addon7.module.set("chat_tweaks", "enabled", true)
+	addon7.module.set("chat_layout", "enabled", true)
 	check("a button or window this client does not have is skipped", not env7.ChatFrameMenuButton.shown and env7.ChatFrame1.time == 30)
 
 	local minimap_scripts, toggles, tooltip_lines = {}, 0, {}
@@ -1965,7 +1965,7 @@ return function(root, check)
 	check("every text size is in points", sliders.Everlook_QoL_fonts_size_offset.format(3) == "3 pt" and sliders.Everlook_QoL_unit_names_extra.format(4) == "4 pt"
 		and sliders.Everlook_QoL_quest_interface_text_size.format(16) == "16 pt" and sliders.Everlook_QoL_quest_tracker_text_size.format(16) == "16 pt")
 	check("the Island's position is in pixels", sliders.Everlook_QoL_smart_island_position_x.format(-103) == "-103 px" and sliders.Everlook_QoL_smart_island_position_top.format(12) == "12 px")
-	check("a slider with a unit shows it after the number", sliders.Everlook_QoL_smart_island_size.format(105) == "105%" and sliders.Everlook_QoL_chat_tweaks_fade_seconds.format(120) == "120 s")
+	check("a slider with a unit shows it after the number", sliders.Everlook_QoL_smart_island_size.format(105) == "105%" and sliders.Everlook_QoL_chat_layout_fade_seconds.format(120) == "120 s")
 	check("a label shows the step the value will be stored on", sliders.Everlook_QoL_smart_island_size.format(97) == "95%" and sliders.Everlook_QoL_smart_island_size.format(98) == "100%")
 	local scale = sliders.Everlook_QoL_swing_timers_scale
 	check("a percentage label shows the step too", scale.format(83) == "80%" and scale.format(87) == "90%")

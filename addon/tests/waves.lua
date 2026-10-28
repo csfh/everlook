@@ -447,8 +447,8 @@ return function(root, check)
 		filters[event] = nil
 	end
 	play.CHAT_FRAMES = {}
-	addon.module.set("chat_tweaks", "enabled", true)
-	addon.module.set("chat_tweaks", "timestamps", true)
+	addon.module.set("chat_layout", "enabled", true)
+	addon.module.set("chat_layout", "timestamps", true)
 	check("a plain chat line gains a timestamp", addon.chat_tweaks.stamp("Hello") == "09:05 Hello")
 	-- Same rule as ChatFrameUtil.ProcessMessageEventFilters: a truthy first
 	-- return drops the line, and a new message replaces the arguments that follow.
@@ -470,7 +470,7 @@ return function(root, check)
 	local secret_text, secret_author = shown_line(filters.CHAT_MSG_SAY, "secret", "Thrall")
 	check("secret chat text stays in place", secret_text == "secret" and secret_author == "Thrall" and addon.chat_tweaks.stamp("secret") == "secret")
 	play.issecretvalue = nil
-	addon.module.set("chat_tweaks", "timestamps", false)
+	addon.module.set("chat_layout", "timestamps", false)
 	check("turning timestamps off removes the prefix", addon.chat_tweaks.stamp("Hello") == "Hello" and filters.CHAT_MSG_SAY == nil)
 	local util_filters = {}
 	play.ChatFrameUtil = {
@@ -481,10 +481,10 @@ return function(root, check)
 			util_filters[event] = nil
 		end,
 	}
-	addon.module.set("chat_tweaks", "timestamps", true)
+	addon.module.set("chat_layout", "timestamps", true)
 	text, author = shown_line(util_filters.CHAT_MSG_SAY, "Hello", "Thrall", "1")
 	check("timestamps register on ChatFrameUtil and keep the sender", text == "09:05 Hello" and author == "Thrall" and filters.CHAT_MSG_SAY == nil)
-	addon.module.set("chat_tweaks", "timestamps", false)
+	addon.module.set("chat_layout", "timestamps", false)
 	check("turning timestamps off removes the ChatFrameUtil filter", util_filters.CHAT_MSG_SAY == nil)
 	play.ChatFrameUtil = nil
 end
