@@ -16,5 +16,3 @@ Skills live in `~/.agents/skills` (some are linked into `~/.claude/skills`). Use
 - Invoke `pick-ui-library` when choosing a library. The site in `www/` is vanilla Vite.
 - Invoke `animate`, `emil-design-eng`, `apple-design`, `review-animations`, `improve-animations`, or `find-animation-opportunities` for motion and polish, and `mobile-native` for touch and small-screen behavior.
 - Invoke `swe` for implementation, refactors, and commits, `tdd` for test-first work, and `diagnosing-bugs` for anything broken.
-
-The addon in `addon/` has its own domain guidance in `addon/.cursor/skills/wow-retail-patterns/`.
