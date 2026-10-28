@@ -1,5 +1,5 @@
 ## Interface: 16001
-## Title: |cffffd100Everlook|r |cff66bbffFriendConveniences|r
+## Title: |cffffd100Everlook|r |cff66bbffFriend conveniences|r
 ## Notes: When a party invite or a duel arrives, this accepts or declines it if the matching choice below is on, and closes that request.
 ## Author: Christoffer Hallas
 ## Dependencies: Everlook

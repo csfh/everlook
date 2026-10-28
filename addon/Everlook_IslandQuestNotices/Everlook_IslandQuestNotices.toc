@@ -1,5 +1,5 @@
 ## Interface: 16001
-## Title: |cffffd100Everlook|r |cffad76efIslandQuestNotices|r
+## Title: |cffffd100Everlook|r |cffad76efIsland quest notices|r
 ## Notes: Notices for quest turn-ins, quests ready to hand in, the suggested next quest, and quests worth pinning.
 ## Author: Christoffer Hallas
 ## Dependencies: Everlook, Everlook_Island

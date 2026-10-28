@@ -1,5 +1,5 @@
 ## Interface: 16001
-## Title: |cffffd100Everlook|r |cff66bbffQuestTextSize|r
+## Title: |cffffd100Everlook|r |cff66bbffQuest text size|r
 ## Notes: Sets the quest description, objectives, reward, and progress text to the size you choose, and waits while you are in combat.
 ## Author: Christoffer Hallas
 ## Dependencies: Everlook

@@ -1,5 +1,5 @@
 ## Interface: 16001
-## Title: |cffffd100Everlook|r |cff66bbffAutoRepair|r
+## Title: |cffffd100Everlook|r |cff66bbffAuto repair|r
 ## Notes: Repairs your gear when a repair vendor opens and something needs repair.
 ## Author: Christoffer Hallas
 ## Dependencies: Everlook

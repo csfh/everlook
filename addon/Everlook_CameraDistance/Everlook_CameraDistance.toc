@@ -1,5 +1,5 @@
 ## Interface: 16001
-## Title: |cffffd100Everlook|r |cff66bbffCameraDistance|r
+## Title: |cffffd100Everlook|r |cff66bbffCamera distance|r
 ## Notes: Sets the farthest the camera can zoom out, using the factor on Maximum camera distance, from 1 to 4.
 ## Author: Christoffer Hallas
 ## Dependencies: Everlook

@@ -1,5 +1,5 @@
 ## Interface: 16001
-## Title: |cffffd100Everlook|r |cff66bbffSellJunk|r
+## Title: |cffffd100Everlook|r |cff66bbffSell junk|r
 ## Notes: Sells gray items when a vendor opens, and says what that junk brought in once selling stops.
 ## Author: Christoffer Hallas
 ## Dependencies: Everlook

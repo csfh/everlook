@@ -1,5 +1,5 @@
 ## Interface: 16001
-## Title: |cffffd100Everlook|r |cffad76efIslandInvites|r
+## Title: |cffffd100Everlook|r |cffad76efIsland invites|r
 ## Notes: Shows a toast when someone invites you to a group.
 ## Author: Christoffer Hallas
 ## Dependencies: Everlook, Everlook_Island

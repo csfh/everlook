@@ -1,5 +1,5 @@
 ## Interface: 16001
-## Title: |cffffd100Everlook|r |cff66bbffCinematicSkip|r
+## Title: |cffffd100Everlook|r |cff66bbffCinematic skip|r
 ## Notes: Closes a cinematic or a movie when it starts.
 ## Author: Christoffer Hallas
 ## Dependencies: Everlook

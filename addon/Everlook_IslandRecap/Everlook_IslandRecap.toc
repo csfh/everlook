@@ -1,5 +1,5 @@
 ## Interface: 16001
-## Title: |cffffd100Everlook|r |cffad76efIslandRecap|r
+## Title: |cffffd100Everlook|r |cffad76efIsland recap|r
 ## Notes: Sums up quests, experience, money and time every 30 minutes.
 ## Author: Christoffer Hallas
 ## Dependencies: Everlook, Everlook_Island

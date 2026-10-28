@@ -1,5 +1,5 @@
 ## Interface: 16001
-## Title: |cffffd100Everlook|r |cff66bbffRadialMenu|r
+## Title: |cffffd100Everlook|r |cff66bbffRadial menu|r
 ## Notes: Hold the key over a player, a hostile unit, an object, the ground, or your own character, flick toward an action, and let go.
 ## Author: Christoffer Hallas
 ## Dependencies: Everlook

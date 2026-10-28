@@ -1,5 +1,5 @@
 ## Interface: 16001
-## Title: |cffffd100Everlook|r |cffad76efIslandMail|r
+## Title: |cffffd100Everlook|r |cffad76efIsland mail|r
 ## Notes: Tells you when new mail arrives, and what is waiting once you open the mailbox.
 ## Author: Christoffer Hallas
 ## Dependencies: Everlook, Everlook_Island

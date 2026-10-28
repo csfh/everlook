@@ -1,5 +1,5 @@
 ## Interface: 16001
-## Title: |cffffd100Everlook|r |cff66bbffAutoResponses|r
+## Title: |cffffd100Everlook|r |cff66bbffAuto responses|r
 ## Notes: When a summon confirmation, a resurrection offer, or a good item's delete confirmation appears, this accepts the summon or the resurrection and closes it, or types the delete word, if that choice below is on.
 ## Author: Christoffer Hallas
 ## Dependencies: Everlook

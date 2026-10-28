@@ -266,7 +266,8 @@ class LayoutTest(unittest.TestCase):
                     continue
                 name = folder.name.removeprefix("Everlook_")
                 color = self.ISLAND if self.is_island(name) else self.MODULE
-                self.assertEqual(fields.get("Title"), f"{prefix} |cff{color}{name}|r")
+                words = re.sub(r"(?<!^)(?=[A-Z])", " ", name).lower().capitalize()
+                self.assertEqual(fields.get("Title"), f"{prefix} |cff{color}{words}|r")
 
     def test_the_core_version_is_written_the_way_the_release_reads_and_bumps_it(self):
         # auto_release knows one form, "## Version: x.y.z", so any other spelling fails here, before a push.

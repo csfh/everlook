@@ -1,5 +1,5 @@
 ## Interface: 16001
-## Title: |cffffd100Everlook|r |cff66bbffMinimapCoordinates|r
+## Title: |cffffd100Everlook|r |cff66bbffMinimap coordinates|r
 ## Notes: Shows where you are on the current map, under the minimap, as the horizontal position and then the vertical one, each with one decimal, and keeps that line current while you move.
 ## Author: Christoffer Hallas
 ## Dependencies: Everlook
