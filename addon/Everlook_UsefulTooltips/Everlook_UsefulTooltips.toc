@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: |cffffd100Everlook|r |cff66bbffUseful tooltips|r
-## Notes: Adds item and creature ids, a vendor price, and a bag count to the matching tooltip.
+## Notes: Adds item and creature IDs, a vendor price, and a bag count to the matching tooltip.
 ## Author: Christoffer Hallas
 ## Dependencies: Everlook
 ## Group: Everlook

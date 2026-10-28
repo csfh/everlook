@@ -48,11 +48,11 @@ end
 
 module.register({
 	addon = addon_name, page = "tooltips", order = 10,
-	id = id, name = "Useful tooltips", description = "Adds item and creature ids, a vendor price, and a bag count to the matching tooltip. An id the client hides adds nothing, player, spell, and object tooltips stay as they are, each line has its own option, and turning this off leaves them off the next tooltip.",
+	id = id, name = "Useful tooltips", description = "Adds item and creature IDs, a vendor price, and a bag count to the matching tooltip. An ID the client hides adds nothing, player, spell, and object tooltips stay as they are, each line has its own option, and turning this off leaves them off the next tooltip.",
 	options = {
-		item_ids = { name = "Show item IDs", default = true, description = "Adds the item id to an item tooltip, and other tooltips stay as they are. Vendor value and bag quantity stay on their own options, and an id the client hides adds no line." },
-		npc_ids = { name = "Show NPC IDs", default = true, description = "Adds the NPC id to a creature or vehicle tooltip. Players, objects, and item tooltips stay as they are, and an id the client hides adds no line." },
-		vendor_price = { name = "Show vendor value per item", default = true, description = "Adds the price a vendor pays for one of the item. An item with no sell price gets no line, other tooltips stay as they are, the bag total stays on its own option, and an id the client hides adds no line." },
+		item_ids = { name = "Show item IDs", default = true, description = "Adds the item ID to an item tooltip, and other tooltips stay as they are. Vendor value and bag quantity stay on their own options, and an ID the client hides adds no line." },
+		npc_ids = { name = "Show NPC IDs", default = true, description = "Adds the NPC ID to a creature or vehicle tooltip. Players, objects, and item tooltips stay as they are, and an ID the client hides adds no line." },
+		vendor_price = { name = "Show vendor value per item", default = true, description = "Adds the price a vendor pays for one of the item. An item with no sell price gets no line, other tooltips stay as they are, the bag total stays on its own option, and an ID the client hides adds no line." },
 		stack_total = { name = "Show bag quantity and total vendor value", default = true, description = "On an item tooltip, adds the number in your bags and what a vendor would pay for all of them, once you have more than one and the item sells. The bank is left out, a single copy or an item with no sell price gets no line, and the price of one item stays on its own option." },
 	},
 	apply = install, events = { "ADDON_LOADED" }, on_event = function() install(true) end,
