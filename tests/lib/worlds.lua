@@ -1,8 +1,8 @@
 -- The worlds the suites load the addon into: every module file on stand-ins for the game, and the
 -- island and quest states on top of it. A suite gets these through the lib table run.lua hands it.
-return function(root)
-	local source, load_order = dofile(root .. "/tests/lib/source.lua")(root)
-	local lib = { root = root, source = source, layout = dofile(root .. "/tests/lib/layout.lua") }
+return function(tests, root)
+	local source, load_order = dofile(tests .. "/lib/source.lua")(root)
+	local lib = { root = root, source = source, layout = dofile(tests .. "/lib/layout.lua") }
 	function lib.read_source(name)
 		local handle = assert(io.open((source(name)), "r"))
 		local text = handle:read("*a")

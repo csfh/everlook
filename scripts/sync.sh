@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-root="$(cd "$(dirname "$0")/.." && pwd)"
+addon="$(cd "$(dirname "$0")/../addon" && pwd)"
 addons="${EVERLOOK_ADDONS_DIR:-}"
 if [ -z "$addons" ]; then
 	echo "addon-sync: set EVERLOOK_ADDONS_DIR to your World of Warcraft Interface/AddOns folder" >&2
@@ -29,7 +29,7 @@ set_aside() {
 	echo "$backup/$name"
 }
 
-for source in "$root"/Everlook "$root"/Everlook_*; do
+for source in "$addon"/Everlook "$addon"/Everlook_*; do
 	[ -d "$source" ] || continue
 	name="$(basename "$source")"
 	dest="$addons/$name"
@@ -43,7 +43,7 @@ for dest in "$addons"/Everlook_*; do
 	if [ -L "$dest" ] && [ ! -e "$dest" ]; then
 		target="$(readlink "$dest")"
 		case "$target" in
-			"$root"/*) rm "$dest" && echo "addon-sync: removed $dest, whose folder is gone" ;;
+			"$addon"/*) rm "$dest" && echo "addon-sync: removed $dest, whose folder is gone" ;;
 		esac
 	fi
 done

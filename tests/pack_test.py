@@ -11,8 +11,9 @@ import unittest
 import zipfile
 from pathlib import Path
 
-SCRIPTS = Path(__file__).resolve().parent
-ADDON = SCRIPTS.parent
+REPOSITORY = Path(__file__).resolve().parents[1]
+SCRIPTS = REPOSITORY / "scripts"
+ADDON = REPOSITORY / "addon"
 
 
 class PackTest(unittest.TestCase):
@@ -20,22 +21,23 @@ class PackTest(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory(prefix="everlook-pack-")
         self.addCleanup(temporary.cleanup)
         self.base = Path(temporary.name)
-        self.addon = self.base / "repo with spaces" / "addon"
+        self.repository = self.base / "repo with spaces"
+        self.addon = self.repository / "addon"
         self.core = self.addon / "Everlook"
         self.module = self.addon / "Everlook_SellJunk"
-        for folder in (self.addon / "scripts", self.core, self.module):
+        for folder in (self.repository / "scripts", self.core, self.module):
             folder.mkdir(parents=True)
         (self.core / "Everlook.toc").write_text("## Interface: 16001\n## Title: Everlook\n## Version: 0.1.0\n")
         (self.core / "world.lua").write_text("local _, Everlook = ...\n")
         (self.module / "Everlook_SellJunk.toc").write_text(
             "## Interface: 16001\n## Title: Sell junk\n## Dependencies: Everlook\n\nsell_junk.lua\n")
         (self.module / "sell_junk.lua").write_text("local addon_name = ...\n")
-        (self.addon.parent / "LICENSE").write_text("MIT License\n")
-        shutil.copyfile(SCRIPTS / "pack.sh", self.addon / "scripts" / "pack.sh")
+        (self.repository / "LICENSE").write_text("MIT License\n")
+        shutil.copyfile(SCRIPTS / "pack.sh", self.repository / "scripts" / "pack.sh")
 
     def run_pack(self, output, version="0.1.0", environment=None):
         return subprocess.run(
-            ["bash", str(self.addon / "scripts" / "pack.sh"), version, str(output)],
+            ["bash", str(self.repository / "scripts" / "pack.sh"), version, str(output)],
             capture_output=True, text=True, env=environment,
         )
 
@@ -50,7 +52,7 @@ class PackTest(unittest.TestCase):
             self.assertNotIn("LICENSE", archive.getnames())
 
     def test_pack_refuses_to_run_without_a_license(self):
-        (self.addon.parent / "LICENSE").unlink()
+        (self.repository / "LICENSE").unlink()
         result = self.run_pack(self.base / "unlicensed")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Missing LICENSE", result.stderr)
@@ -117,8 +119,7 @@ class ReleaseArchiveTest(unittest.TestCase):
                     match = re.match(r"^([\w./\\-]+\.(?:lua|xml))\s*$", line)
                     if match:
                         self.assertTrue((unpacked / folder / match.group(1).replace("\\", "/")).is_file(), f"{folder} lists {match.group(1)}")
-            shutil.copytree(ADDON / "tests", unpacked / "tests", ignore=shutil.ignore_patterns("__pycache__", "*.py"))
-            suite = subprocess.run(["lua5.1", "tests/run.lua"], cwd=unpacked, capture_output=True, text=True)
+            suite = subprocess.run(["lua5.1", "tests/run.lua", str(unpacked)], cwd=REPOSITORY, capture_output=True, text=True)
             self.assertEqual(suite.returncode, 0, suite.stdout + suite.stderr)
 
 

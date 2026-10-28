@@ -22,9 +22,6 @@ jobs:
     needs: checks
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: addon
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -35,7 +32,7 @@ jobs:
       - name: Bump version
         id: bump
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: python3 scripts/auto_release.py maybe-bump --root "${{ github.workspace }}/addon" --before "${{ github.event.before }}" --after "${{ github.sha }}"
+        run: python3 scripts/auto_release.py maybe-bump --root addon --before "${{ github.event.before }}" --after "${{ github.sha }}"
 
       - name: Pack Everlook
         if: steps.bump.outputs.release != 'false'
@@ -45,7 +42,7 @@ jobs:
           if [[ -n "${{ steps.bump.outputs.version }}" ]]; then
             version="${{ steps.bump.outputs.version }}"
           else
-            version="$(awk -F': ' '/^## Version:/{gsub("\r","",$2); print $2; exit}' Everlook/Everlook.toc)"
+            version="$(awk -F': ' '/^## Version:/{gsub("\r","",$2); print $2; exit}' addon/Everlook/Everlook.toc)"
           fi
           archive="$(bash scripts/pack.sh "${version}")"
           echo "version=${version}" >> "${GITHUB_OUTPUT}"
@@ -58,7 +55,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Everlook/Everlook.toc
+          git add addon/Everlook/Everlook.toc
           git commit -m "chore: release addon ${{ steps.bump.outputs.version }}"
           bash scripts/push_release_commit.sh
 
@@ -81,7 +78,7 @@ jobs:
           if [[ -z "${since}" ]]; then
             since="${BEFORE}"
           fi
-          python3 scripts/auto_release.py release-notes --since "${since}" > "${RUNNER_TEMP}/notes.md" \
+          python3 scripts/auto_release.py release-notes --root addon --since "${since}" > "${RUNNER_TEMP}/notes.md" \
             || echo "See the commit history for this release." > "${RUNNER_TEMP}/notes.md"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

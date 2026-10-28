@@ -4,23 +4,23 @@ Everlook is a set of World of Warcraft quality-of-life addons and a static site 
 
 | Path | What it is |
 | --- | --- |
-| `addon/` | The addons, Lua 5.1: the core `Everlook` and its `Everlook_<Name>` modules, with their tests (`addon/tests`) and release scripts (`addon/scripts`). |
+| `addon/` | The addons, Lua 5.1, and nothing else: the core `Everlook` and its `Everlook_<Name>` modules, the folders a release ships. |
 | `harness/` | A Rust host (`mlua`, Lua 5.1) that runs the addon files with the game's frame, mouse and clock rules. It never ships. |
 | `www/` | The Vite site for Cloudflare Pages. It reads the module list from the addon TOCs at build time. |
+| `scripts/` | Linking the addons into the game, packing and releasing them, and generating the island's art. |
+| `tests/` | The addon's Lua suite, the folder and luac checks, and the scripts' tests. |
 
 ## Checks and releases
 
-`just test` runs `just test-addon` (the Lua suite, `addon/tests/folders_test.py`, `addon/tests/luac_test.py`, and each script's test beside it in `addon/scripts`), `just test-harness` and `just test-www`. CI runs the same recipes (`.github/workflows/checks.yml`).
+`just test` runs `just test-addon` (everything in `tests/`), `just test-harness` and `just test-www`. CI runs the same recipes (`.github/workflows/checks.yml`).
 
-A push to `main` that changes `addon/` can publish a GitHub Release tagged `addon-v<version>`. Commit types decide it: `feat` is minor, `fix`, `perf`, `refactor` and `revert` are patch, and `docs`, `test`, `chore`, `ci`, `style` and `build` do not release. Commit one module at a time, as `feat(addon): ...`, so any one of them can be reverted alone. Do not tag or push `main` unless asked. The version in `addon/Everlook/Everlook.toc` is what ships when that line changes by hand. Module TOCs have no `## Version` until `addon/scripts/pack.sh` stamps it.
+A push to `main` that changes `addon/` can publish a GitHub Release tagged `addon-v<version>`. Commit types decide it: `feat` is minor, `fix`, `perf`, `refactor` and `revert` are patch, and `docs`, `test`, `chore`, `ci`, `style` and `build` do not release. Commit one module at a time, as `feat(addon): ...`, so any one of them can be reverted alone. Do not tag or push `main` unless asked. The version in `addon/Everlook/Everlook.toc` is what ships when that line changes by hand. Module TOCs have no `## Version` until `scripts/pack.sh` stamps it. A commit that touches only `scripts/`, `tests/`, `harness/` or `www/` never releases.
 
 ## The addon
 
-Paths in this section and the next are under `addon/`.
+Lua 5.1 only. No Ace, LibStub or embeds. Each folder named `Everlook` or `Everlook_<Name>` is one addon the game loads, and its TOC order is its wiring. `Everlook` is the core: the shared helpers, the module registry, the settings page and the minimap button (`EverlookMinimapButton`, showing `addon/Everlook/assets/logo.tga`). Every other folder is a module addon that depends on it, grouped under Everlook in the addon list. Core files take the namespace from `local _, Everlook = ...`, and `world.lua` shares it as the global `Everlook`. A module addon's files start with `local addon_name = ...` and `local Everlook = Everlook`.
 
-Lua 5.1 only. No Ace, LibStub or embeds. Each folder named `Everlook` or `Everlook_<Name>` is one addon the game loads, and its TOC order is its wiring. `Everlook` is the core: the shared helpers, the module registry, the settings page and the minimap button (`EverlookMinimapButton`, showing `assets/logo.tga`). Every other folder is a module addon that depends on it, grouped under Everlook in the addon list. Core files take the namespace from `local _, Everlook = ...`, and `world.lua` shares it as the global `Everlook`. A module addon's files start with `local addon_name = ...` and `local Everlook = Everlook`.
-
-Modules register with `Everlook.module.register` from `Everlook/module.lua`, and each starts disabled. Settings live in `EverlookSaved.modules`. `Everlook/settings.lua` builds the native Everlook settings page at login, after every module addon has registered. Its subpages come from the page list in `module.lua` (Quests, Vendors, Loot and mail, Social, Chat, Tooltips, Map, Action bars, Bags, Nameplates, Text and names, Combat, Screen and camera, Loading, Island, Radial menu), plus Performance and Debug, which turns the taint log off. A module names its page and its place on it. The bundled Expressway and Manrope fonts keep their licences in `Everlook_Fonts/assets/`, and `fonts.txt` there says where each came from.
+Modules register with `Everlook.module.register` from `addon/Everlook/module.lua`, and each starts disabled. Settings live in `EverlookSaved.modules`. `addon/Everlook/settings.lua` builds the native Everlook settings page at login, after every module addon has registered. Its subpages come from the page list in `module.lua` (Quests, Vendors, Loot and mail, Social, Chat, Tooltips, Map, Action bars, Bags, Nameplates, Text and names, Combat, Screen and camera, Loading, Island, Radial menu), plus Performance and Debug, which turns the taint log off. A module names its page and its place on it. The bundled Expressway and Manrope fonts keep their licences in `addon/Everlook_Fonts/assets/`, and `fonts.txt` there says where each came from.
 
 ### Direction
 
@@ -28,7 +28,7 @@ Everlook works like Leatrix Plus. It tweaks, hides or automates something the de
 
 ### Entry points
 
-The minimap icon and `/everlook`, with its short form `/el`, are the only ways in, and they toggle the Everlook settings page. Any new feature gets a control on that page. Slash commands and menus beyond those are out, and `tests/luac_test.py` fails on any other slash command. The radial menu keybinding is the click binding `CLICK EverlookRadialMenuButton:LeftButton` in `Everlook_RadialMenu/Bindings.xml`. The island's two bindings are in `Everlook_Island/Bindings.xml`: `EVERLOOK_ISLAND`, with `runOnUp` to handle holding and releasing its key, and `EVERLOOK_ISLAND_DISMISS`, which dismisses the newest island toast, the keyboard route to its right-click dismiss. The player sets the radial key on the Radial menu page and the island key on the Island page, or under Key Bindings. Another keybinding needs the same kind of reason.
+The minimap icon and `/everlook`, with its short form `/el`, are the only ways in, and they toggle the Everlook settings page. Any new feature gets a control on that page. Slash commands and menus beyond those are out, and `tests/luac_test.py` fails on any other slash command. The radial menu keybinding is the click binding `CLICK EverlookRadialMenuButton:LeftButton` in `addon/Everlook_RadialMenu/Bindings.xml`. The island's two bindings are in `addon/Everlook_Island/Bindings.xml`: `EVERLOOK_ISLAND`, with `runOnUp` to handle holding and releasing its key, and `EVERLOOK_ISLAND_DISMISS`, which dismisses the newest island toast, the keyboard route to its right-click dismiss. The player sets the radial key on the Radial menu page and the island key on the Island page, or under Key Bindings. Another keybinding needs the same kind of reason.
 
 ### The client
 
@@ -56,7 +56,7 @@ The tests check module logic and nothing about how the game behaves, so a change
 | Layer | Run with | What it proves |
 | --- | --- | --- |
 | Lua suite | `lua5.1 tests/run.lua` | Module logic on plain Lua 5.1 with stand-ins for the game's API. |
-| Folder, luac and script checks | `tests/folders_test.py`, `tests/luac_test.py`, and each script's `_test` beside it in `scripts/`; `just test-addon` runs them with the Lua suite | The rules for addon folders above, `luac5.1` limits (200 locals, 60 upvalues) and stray globals, and the packed release (folders, versions, license, checksums, the same bytes twice). `scripts/pack_test.py` unpacks a real release and runs the suite against it. |
+| Folder, luac and script checks | `tests/folders_test.py`, `tests/luac_test.py`, and a `tests/<script>_test` for each script; `just test-addon` runs them with the Lua suite | The rules for addon folders above, `luac5.1` limits (200 locals, 60 upvalues) and stray globals, and the packed release (folders, versions, license, checksums, the same bytes twice). `tests/pack_test.py` unpacks a real release and runs the suite against it (`lua5.1 tests/run.lua <folder>`). |
 | Harness | `just test-harness` | The real addon files on frames with the game's strata, mouse, clock and animation rules (`harness/`, below). |
 
 Rules for writing a test, each from a mistake already made:
@@ -64,7 +64,7 @@ Rules for writing a test, each from a mistake already made:
 - A stand-in widget lists the methods it has and raises on any other. A catch-all that does nothing lets a typo pass.
 - Mock only names that appear in Blizzard's own code (wow-ui-source 12.0.0, `Mainline` and `Shared`). A mock of a function the game lacks lets broken code pass.
 - Write the failing test first, and check that it fails for the reason you think by running it against the old code.
-- A test file is named for what it tests, as the source files are: a core file (`module.lua`), a module (`bags.lua`), a module part (`island_toasts.lua`) or an Island extension (`island_share.lua`). It returns `function(check, lib)` and is listed in `run.lua`; `tests/folders_test.py` fails on one that is not. `lib` comes from `tests/lib/`: `root` is the addon folder, `source` finds an addon file and `read_source` reads it, `layout` resolves anchors to rectangles, and `worlds.lua` loads the addon (`load_all`, which loads every addon from its TOC in the game's order, `load_files`, `island_world`, `quest_world` and their helpers, such as `notice_key`). Lua allows 200 locals in one function, so a group of checks goes in a `do ... end` block.
+- A test file is named for what it tests, as the source files are: a core file (`module.lua`), a module (`bags.lua`), a module part (`island_toasts.lua`) or an Island extension (`island_share.lua`). It returns `function(check, lib)` and is listed in `run.lua`; `tests/folders_test.py` fails on one that is not. `lib` comes from `tests/lib/`: `root` is the addon folder (`addon/`, or the one given to `run.lua`), `source` finds an addon file and `read_source` reads it, `layout` resolves anchors to rectangles, and `worlds.lua` loads the addon (`load_all`, which loads every addon from its TOC in the game's order, `load_files`, `island_world`, `quest_world` and their helpers, such as `notice_key`). Lua allows 200 locals in one function, so a group of checks goes in a `do ... end` block.
 
 ## Harness
 

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
-script="${here}/push_release_commit.sh"
+script="${here}/../scripts/push_release_commit.sh"
 work="$(mktemp -d)"
 trap 'rm -rf "${work}"' EXIT
 export RELEASE_PUSH_RETRY_DELAY=0

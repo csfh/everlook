@@ -265,7 +265,7 @@ def maybe_bump(root: Path, before: str, after: str) -> tuple[str, bool, bool, st
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=("maybe-bump", "release-notes"))
-    parser.add_argument("--root", type=Path, default=Path.cwd())
+    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1] / "addon")
     parser.add_argument("--before", default=ZERO_SHA)
     parser.add_argument("--after", default="HEAD")
     parser.add_argument("--since", default="")

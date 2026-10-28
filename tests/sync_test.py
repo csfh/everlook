@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-SCRIPTS = Path(__file__).resolve().parent
+SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 
 
 class SyncTest(unittest.TestCase):
@@ -14,20 +14,21 @@ class SyncTest(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory(prefix="everlook-sync-")
         self.addCleanup(temporary.cleanup)
         base = Path(temporary.name)
-        self.addon = base / "repo with spaces" / "addon"
+        self.repository = base / "repo with spaces"
+        self.addon = self.repository / "addon"
         self.core = self.addon / "Everlook"
         self.module = self.addon / "Everlook_SellJunk"
-        for folder in (self.addon / "scripts", self.core, self.module):
+        for folder in (self.repository / "scripts", self.core, self.module):
             folder.mkdir(parents=True)
         (self.core / "Everlook.toc").write_text("## Interface: 16001\n")
         (self.module / "Everlook_SellJunk.toc").write_text("## Interface: 16001\n")
-        shutil.copyfile(SCRIPTS / "sync.sh", self.addon / "scripts" / "sync.sh")
+        shutil.copyfile(SCRIPTS / "sync.sh", self.repository / "scripts" / "sync.sh")
         self.addons = base / "game with spaces" / "AddOns"
         self.destination = self.addons / "Everlook"
 
     def sync(self):
         result = subprocess.run(
-            ["bash", str(self.addon / "scripts" / "sync.sh")],
+            ["bash", str(self.repository / "scripts" / "sync.sh")],
             capture_output=True, text=True, env={**os.environ, "EVERLOOK_ADDONS_DIR": str(self.addons)},
         )
         self.assertEqual(result.returncode, 0, result.stderr)

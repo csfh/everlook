@@ -2,8 +2,9 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
-license="${root}/../LICENSE"
-core="${root}/Everlook"
+addon="${root}/addon"
+license="${root}/LICENSE"
+core="${addon}/Everlook"
 version="${1:-}"
 outdir="${2:-$root/dist}"
 
@@ -12,7 +13,7 @@ if [[ -z "${version}" ]]; then
 fi
 
 if [[ -z "${version}" ]]; then
-  echo "Could not determine Everlook version from Everlook/Everlook.toc" >&2
+  echo "Could not determine Everlook version from addon/Everlook/Everlook.toc" >&2
   exit 1
 fi
 
@@ -21,7 +22,7 @@ trap 'rm -rf "${stage}"' EXIT
 mkdir -p "${outdir}"
 
 folders=()
-for source in "${root}"/Everlook "${root}"/Everlook_*; do
+for source in "${addon}"/Everlook "${addon}"/Everlook_*; do
   [[ -d "${source}" ]] || continue
   name="$(basename "${source}")"
   folders+=("${name}")

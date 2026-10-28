@@ -5,8 +5,10 @@ import sys
 import unittest
 
 
-ADDON = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ADDON / "scripts"))
+REPOSITORY = Path(__file__).resolve().parents[1]
+ADDON = REPOSITORY / "addon"
+TESTS = REPOSITORY / "tests"
+sys.path.insert(0, str(REPOSITORY / "scripts"))
 import auto_release  # noqa: E402
 
 
@@ -137,11 +139,11 @@ class FoldersTest(unittest.TestCase):
         # A test file is named for the core file, module, module part or Island extension it tests,
         # and run.lua runs every one of them.
         shipped = {path.stem for folder in self.folders() for path in folder.glob("*.lua")}
-        tests = sorted(path.stem for path in (ADDON / "tests").glob("*.lua") if path.name != "run.lua")
+        tests = sorted(path.stem for path in TESTS.glob("*.lua") if path.name != "run.lua")
         for stem in tests:
             with self.subTest(test=stem):
                 self.assertIn(stem, shipped)
-        runner = (ADDON / "tests" / "run.lua").read_text()
+        runner = (TESTS / "run.lua").read_text()
         start = runner.index("local suites = {")
         listed = re.findall(r'"([a-z_]+)"', runner[start:runner.index("}", start)])
         self.assertEqual(listed, sorted(listed), "run.lua lists its suites in order")

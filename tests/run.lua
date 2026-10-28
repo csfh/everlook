@@ -1,9 +1,14 @@
-local root = arg and arg[0] and arg[0]:match("(.+)[/\\]tests[/\\]run%.lua$") or "."
-if root == "" then
-	root = "."
+-- Runs every suite against the addon folders in addon/, or in the folder given as the first argument, such as an
+-- unpacked release.
+local repository = arg and arg[0] and arg[0]:match("(.+)[/\\]tests[/\\]run%.lua$") or "."
+if repository == "" then
+	repository = "."
 end
+local tests = repository .. "/tests"
+local root = arg and arg[1] or repository .. "/addon"
+assert(io.open(root .. "/Everlook/Everlook.toc", "r"), "No addon at " .. root .. ": run.lua needs a folder that holds Everlook/"):close()
 
-local lib = dofile(root .. "/tests/lib/worlds.lua")(root)
+local lib = dofile(tests .. "/lib/worlds.lua")(tests, root)
 local failed, checked = 0, 0
 
 local function check(name, condition)
@@ -89,7 +94,7 @@ local suites = {
 	"world",
 }
 for _, name in ipairs(suites) do
-	assert(loadfile(root .. "/tests/" .. name .. ".lua"))()(check, lib)
+	assert(loadfile(tests .. "/" .. name .. ".lua"))()(check, lib)
 end
 
 if failed > 0 then

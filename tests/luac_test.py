@@ -13,7 +13,7 @@ import subprocess
 import unittest
 from pathlib import Path
 
-ADDON = Path(__file__).resolve().parents[1]
+ADDON = Path(__file__).resolve().parents[1] / "addon"
 LUAC = "luac5.1"
 MAIN_LOCALS_MAX = 180
 UPVALUES_MAX = 55

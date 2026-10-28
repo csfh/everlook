@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the Island's textures in Everlook_Island/assets: run `python3 scripts/generate_island_art.py` from addon/.
+"""Generate the Island's textures in addon/Everlook_Island/assets: `python3 scripts/generate_island_art.py`.
 
 They are original geometry, authored for Everlook, with no third-party art. Each is an uncompressed 32-bit TGA
 with a top-left origin, white so the game can tint it, and alpha supersampled four by four.
@@ -45,7 +45,7 @@ def ring_small(x, y):
 
 
 def main():
-    assets = Path(__file__).resolve().parents[1] / "Everlook_Island" / "assets"
+    assets = Path(__file__).resolve().parents[1] / "addon" / "Everlook_Island" / "assets"
     # A quarter circle. Mirrored, it gives the four corners, and the straight pieces between them stretch, so the
     # radius stays the same as a card grows.
     tga(assets / "island_corner.tga", 32,

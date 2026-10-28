@@ -9,13 +9,11 @@ default:
 # Every check: the addon, the harness and the site
 test: test-addon test-harness test-www
 
-# The Lua suite, the folder and luac checks, and the scripts' own tests
-[working-directory('addon')]
+# Everything in tests/: the Lua suite, the folder and luac checks, and the scripts' tests
 test-addon:
     lua5.1 tests/run.lua
     python3 -m unittest discover --quiet --start-directory tests --pattern '*_test.py'
-    python3 -m unittest discover --quiet --start-directory scripts --pattern '*_test.py'
-    bash scripts/push_release_commit_test.sh
+    bash tests/push_release_commit_test.sh
 
 # Every harness scenario, run against addon/
 [working-directory('harness')]
@@ -42,4 +40,4 @@ prepush: test-addon test-harness
 
 # Link the addon folders into the game's AddOns folder, EVERLOOK_ADDONS_DIR
 sync:
-    bash addon/scripts/sync.sh
+    bash scripts/sync.sh

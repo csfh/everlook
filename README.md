@@ -9,9 +9,11 @@ Download the latest release from https://github.com/csfh/everlook/releases/lates
 ## Layout
 
 ```
-addon/    The Everlook core and its Everlook_<Name> modules, with their tests and release scripts
+addon/    The Everlook core and its Everlook_<Name> modules: the folders a release ships
 harness/  A Rust host that runs the addon files with the game's frame, mouse and clock rules. It never ships
 www/      The static site (Vite) for Cloudflare Pages
+scripts/  Sync, pack, release and the island's art
+tests/    The addon's Lua suite, the folder and luac checks, and the scripts' tests
 ```
 
 ## Develop
@@ -24,11 +26,11 @@ just prepush   # before a push that releases the addon
 
 `just` lists every recipe. `just sync` reads `EVERLOOK_ADDONS_DIR` from the environment or `.env.local`, and moves a real folder that is in the way to a backup first. The rules for the code and its tests are in `AGENTS.md`.
 
-In `harness/`, `cargo run -- run scenarios/island_mouse.lua` runs one scenario and prints its checks, `cargo run -- render scenarios/island_gallery.lua out.html` draws a scenario's `harness.snapshot(name)` states into one HTML file, `cargo run -- serve scenarios/island_mouse.lua` shows the same live (hover, click, wheel, step the clock), and `cargo run -- gen-api <wow-ui-source>` rebuilds `api/widgets.json` and `api/fonts.json`.
+In `harness/`, `cargo run -- run scenarios/island_mouse.lua` runs one scenario and prints its checks, `cargo run -- render scenarios/island_gallery.lua out.html` draws a scenario's `harness.snapshot(name)` states into one HTML file, `cargo run -- serve scenarios/island_mouse.lua` shows the same live (hover, click, wheel, step the clock), and `cargo run -- gen-api <wow-ui-source>` rebuilds `harness/api/widgets.json` and `harness/api/fonts.json`.
 
 ## Release
 
-A push to `main` runs the checks and, when its commits ask for one, publishes a GitHub Release tagged `addon-v<version>`: a tarball, a zip and their checksums, from `addon/scripts/pack.sh`. The commit types decide it, as `AGENTS.md` lists, and a commit outside `addon/` never releases. The version in `addon/Everlook/Everlook.toc`, written `## Version: x.y.z`, is what ships when that line changes by hand; `addon/tests/folders_test.py` fails on any other form. Do not tag a release yourself.
+A push to `main` runs the checks and, when its commits ask for one, publishes a GitHub Release tagged `addon-v<version>`: a tarball, a zip and their checksums, from `scripts/pack.sh`. The commit types decide it, as `AGENTS.md` lists, and a commit outside `addon/` never releases. The version in `addon/Everlook/Everlook.toc`, written `## Version: x.y.z`, is what ships when that line changes by hand; `tests/folders_test.py` fails on any other form. Do not tag a release yourself.
 
 CI has never played the build, so before that push:
 
