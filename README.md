@@ -12,7 +12,7 @@ Download the latest release from https://github.com/csfh/everlook/releases/lates
 addon/    The Everlook core and its Everlook_<Name> modules (the folders a release ships), and their tests
 harness/  A Rust host that runs the addon files with the game's frame, mouse and clock rules. It never ships
 www/      The static site (Vite) for Cloudflare Pages
-scripts/  Sync, pack, release and the island's art, each with its test
+scripts/  Sync, pack and release, each with its test
 ```
 
 ## Develop

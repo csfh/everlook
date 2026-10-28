@@ -7,7 +7,7 @@ Everlook is a set of World of Warcraft quality-of-life addons and a static site 
 | `addon/` | The addons, Lua 5.1: the core `Everlook` and its `Everlook_<Name>` modules, the folders a release ships, and their tests in `addon/tests`. |
 | `harness/` | A Rust host (`mlua`, Lua 5.1) that runs the addon files with the game's frame, mouse and clock rules. It never ships. |
 | `www/` | The Vite site for Cloudflare Pages. It reads the module list from the addon TOCs at build time. |
-| `scripts/` | Linking the addons into the game, packing and releasing them, and generating the island's art, each with its test beside it. |
+| `scripts/` | Linking the addons into the game, and packing and releasing them, each with its test beside it. |
 
 ## Checks and releases
 
