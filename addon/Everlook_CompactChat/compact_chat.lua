@@ -72,7 +72,7 @@ local function shrink_channel(text)
 	end, 1))
 end
 
-function Everlook.chat_format_line(text)
+local function format_line(text)
 	if not module.enabled(id) or type(text) ~= "string" or (issecretvalue and issecretvalue(text)) then
 		return text
 	end
@@ -88,7 +88,7 @@ local function wrap(frame)
 	if type(frame) ~= "table" or wrapped[frame] or type(frame.AddMessage) ~= "function" then return end
 	local add = frame.AddMessage
 	frame.AddMessage = function(self, text, ...)
-		return add(self, Everlook.chat_format_line(text), ...)
+		return add(self, format_line(text), ...)
 	end
 	wrapped[frame] = true
 end
