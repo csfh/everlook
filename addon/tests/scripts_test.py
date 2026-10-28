@@ -307,6 +307,19 @@ class LayoutTest(unittest.TestCase):
                     tables = {function or assigned for function, assigned in defined}
                     self.assertLessEqual(tables, {module_id, path.stem})
 
+    def test_a_module_is_called_what_its_folder_says(self):
+        # Settings names a module as the addon list does: the folder's words, in sentence case.
+        for folder in self.folders():
+            for path in sorted(folder.glob("*.lua")):
+                text = path.read_text()
+                call = text.find("module.register(")
+                if call < 0:
+                    continue
+                found = re.search(r'\bname = "([^"]+)"', text[call:call + 800])
+                expected = re.sub(r"(?<!^)(?=[A-Z])", " ", folder.name.removeprefix("Everlook_")).lower().capitalize()
+                with self.subTest(addon=folder.name):
+                    self.assertEqual(found and found.group(1), expected)
+
     NAMEPLATE_PROVIDERS = {"QuestNameplates", "NameplateTitles"}
 
     def test_modules_depend_on_everlook_and_sit_in_its_group(self):
