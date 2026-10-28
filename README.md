@@ -13,11 +13,11 @@ Everlook tweaks the default interface. Each module starts off, and you turn on t
 ## Addon
 
 ```sh
-just test addon     # Lua suite, script and luac checks
-just test harness   # the addon files on the harness (harness/, Rust)
+just test-addon     # Lua suite, folder and luac checks, and the scripts' tests
+just test-harness   # the addon files on the harness (harness/, Rust)
 ```
 
-`just addon sync` links the addon folders into the game; it reads `EVERLOOK_ADDONS_DIR` from the environment or `.env.local`. See `addon/README.md` and `addon/RELEASING.md`.
+`just sync` links the addon folders into the game; it reads `EVERLOOK_ADDONS_DIR` from the environment or `.env.local`. See `addon/README.md` and `addon/RELEASING.md`.
 
 Releases are GitHub Releases tagged `addon-v<version>`. A push to `main` that changes `addon/**` runs the addon tests and, when the commits ask for one, publishes that release. A commit outside `addon/` never releases.
 

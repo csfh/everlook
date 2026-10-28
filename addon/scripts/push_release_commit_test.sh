@@ -9,8 +9,9 @@ trap 'rm -rf "${work}"' EXIT
 export RELEASE_PUSH_RETRY_DELAY=0
 failed=0
 
+# A check prints nothing unless it fails; the git output of a passing run is noise.
 check() {
-  if ! "$@"; then
+  if ! "$@" >/dev/null 2>&1; then
     echo "FAIL: ${CHECK_NAME}" >&2
     failed=1
   fi
@@ -77,7 +78,7 @@ new_clone first
 new_clone second
 release_commit first same.txt one
 release_commit second same.txt two
-( cd "${work}/first" && bash "${script}" )
+( cd "${work}/first" && bash "${script}" ) >/dev/null 2>&1
 CHECK_NAME="a real conflict fails the job"
 if ( cd "${work}/second" && bash "${script}" ) >/dev/null 2>&1; then
   echo "FAIL: ${CHECK_NAME}" >&2
@@ -88,4 +89,7 @@ check test ! -d "${work}/second/.git/rebase-merge" -a ! -d "${work}/second/.git/
 CHECK_NAME="the remote keeps only the commit that got there first"
 check test "$(git -C "${work}/remote.git" show main:same.txt)" = "one"
 
+if [[ "${failed}" -eq 0 ]]; then
+  echo "push_release_commit_test: ok"
+fi
 exit "${failed}"

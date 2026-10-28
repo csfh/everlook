@@ -21,9 +21,7 @@ Lua 5.1 only. No Ace, LibStub, or embeds. See [AGENTS.md](AGENTS.md) for the rul
 ## Test
 
 ```sh
-lua5.1 tests/run.lua
-python3 tests/scripts_test.py
-python3 tests/luac_test.py
+just test-addon
 ```
 
 ## Package

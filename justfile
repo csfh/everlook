@@ -1,52 +1,45 @@
 set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
-# Machine-specific settings, such as EVERLOOK_ADDONS_DIR for `just addon sync`.
+# Machine-specific settings, such as EVERLOOK_ADDONS_DIR for `just sync`.
 set dotenv-filename := ".env.local"
 
+# List the recipes
 default:
-    @just --list
+    @just --list --unsorted
 
-# addon, harness, www, or all
-test target="all":
-    @just {{ if target == "all" { "addontest harnesstest wwwbuild" } else if target == "addon" { "addontest" } else if target == "harness" { "harnesstest" } else if target == "www" { "wwwbuild" } else { error("unknown test target `" + target + "`; expected addon, harness, www, or omit for all") } }}
+# Every check: the addon, the harness and the site
+test: test-addon test-harness test-www
 
-# addon: the checks to run before a push that releases it
-prepush target="addon":
-    @just {{ if target == "addon" { "addonprepush" } else { error("unknown prepush target `" + target + "`; expected addon") } }}
-
-# sync (link into WoW)
-addon action:
-    @just {{ if action == "sync" { "addonsync" } else { error("unknown addon action `" + action + "`; expected sync") } }}
-
-[private]
+# The Lua suite, the folder and luac checks, and the scripts' own tests
 [working-directory('addon')]
-addontest:
+test-addon:
     lua5.1 tests/run.lua
-    python3 tests/scripts_test.py
-    python3 tests/luac_test.py
+    python3 -m unittest discover --quiet --start-directory tests --pattern '*_test.py'
+    python3 -m unittest discover --quiet --start-directory scripts --pattern '*_test.py'
+    bash scripts/push_release_commit_test.sh
 
-[private]
-addonprepush:
-    @just addontest
-    @just harnesstest
-    @just addonsubjects
-    @echo "Tests and harness passed. Now run the in-game smoke list in addon/RELEASING.md before pushing."
-
-# Release notes are made from commit subjects, so a subject past 100 characters is a note nobody can read.
-[private]
-[working-directory('addon')]
-addonsubjects:
-    @long="$(git log --format='%h %s' origin/main..HEAD | awk '{ if (length($0) - 8 > 100) print }')"; if [ -n "$long" ]; then echo "These commit subjects are over 100 characters; put the detail in the body:" >&2; echo "$long" >&2; exit 1; fi
-
-[private]
+# Every harness scenario, run against addon/
 [working-directory('harness')]
-harnesstest:
-    cargo test -q --locked
+test-harness:
+    cargo test --quiet --locked
 
-[private]
+# The site's build
 [working-directory('www')]
-wwwbuild:
-    npm ci && npm run build
+test-www:
+    npm ci
+    npm run build
 
-[private]
-addonsync:
+# Before a push that releases the addon. Release notes are made from commit subjects, so one over 100 characters fails.
+prepush: test-addon test-harness
+    #!/usr/bin/env bash
+    set -euo pipefail
+    long="$(git log --format='%h %s' origin/main..HEAD | awk 'length($0) - 8 > 100')"
+    if [[ -n "${long}" ]]; then
+        echo "These commit subjects are over 100 characters; put the detail in the body:" >&2
+        echo "${long}" >&2
+        exit 1
+    fi
+    echo "Checks passed. Now walk the smoke list in addon/RELEASING.md in the game before pushing."
+
+# Link the addon folders into the game's AddOns folder, EVERLOOK_ADDONS_DIR
+sync:
     bash addon/scripts/sync.sh

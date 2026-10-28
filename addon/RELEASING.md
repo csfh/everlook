@@ -2,12 +2,12 @@
 
 A push to `main` that changes `addon/**` runs the addon tests and, when the commits ask for one, publishes a GitHub Release tagged `addon-v<version>`. CI has never played the build, so the smoke list below still happens in the client before that push.
 
-The version in `addon/Everlook/Everlook.toc`, written `## Version: x.y.z`, is what ships when that line changes by hand. The release reads and bumps only that form, and `tests/scripts_test.py` fails on any other. Do not tag a release yourself, and do not bump the version past what the release workflow should publish.
+The version in `addon/Everlook/Everlook.toc`, written `## Version: x.y.z`, is what ships when that line changes by hand. The release reads and bumps only that form, and `tests/folders_test.py` fails on any other. Do not tag a release yourself, and do not bump the version past what the release workflow should publish.
 
 ## Before the push
 
-1. `just prepush addon`. It runs the Lua tests, the script tests, the luac checks, and the harness against this repository's `addon/`, then fails if a commit subject since `origin/main` is over 100 characters, because the release notes are made from subjects.
-2. `just addon sync`, then log in on the current client with the modules the push touches turned on.
+1. `just prepush`. It runs the Lua tests, the script tests, the luac checks, and the harness against this repository's `addon/`, then fails if a commit subject since `origin/main` is over 100 characters, because the release notes are made from subjects.
+2. `just sync`, then log in on the current client with the modules the push touches turned on.
 3. Walk the list below. Skip anything the push did not touch, and say which were skipped.
 4. Watch the Lua error display (`/console scriptErrors 1` if it is off) and the Everlook Debug page.
 

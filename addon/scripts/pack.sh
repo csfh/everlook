@@ -66,7 +66,7 @@ tar -C "${stage}" --sort=name --mtime="@${epoch}" --owner=0 --group=0 --numeric-
 
 # Windows opens a .zip without extra tools, so every release carries the same folders as one.
 zip_archive="${outdir}/Everlook-${version}.zip"
-uv run --no-project python - "${stage}" "${zip_archive}" "${epoch}" "${folders[@]}" <<'PY'
+python3 - "${stage}" "${zip_archive}" "${epoch}" "${folders[@]}" <<'PY'
 import sys
 import time
 import zipfile
@@ -92,7 +92,7 @@ for name in "${folders[@]}"; do
   fi
 done
 
-zip_members="$(uv run --no-project python -c 'import sys, zipfile; print("\n".join(zipfile.ZipFile(sys.argv[1]).namelist()))' "${zip_archive}")"
+zip_members="$(python3 -c 'import sys, zipfile; print("\n".join(zipfile.ZipFile(sys.argv[1]).namelist()))' "${zip_archive}")"
 for name in "${folders[@]}"; do
   if ! grep -Fx "${name}/${name}.toc" <<<"${zip_members}" >/dev/null; then
     echo "Packed zip is missing ${name}/${name}.toc" >&2
