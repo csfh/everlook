@@ -14,6 +14,15 @@ grouped under Everlook in the AddOns list and configured under `/el` (or the min
 - `EverlookPerformance/`: frame-time chart, task table and load history.
 - Every other `Everlook*` folder is one feature.
 
+## Site
+
+`www/` is the project page, built with Vite. It lists every addon from its `.toc` (`## Title`,
+`## Notes`) under the settings folder it uses in game.
+
+```sh
+cd www && npm ci && npm run build   # output in www/dist
+```
+
 ## Install
 
 ```sh
