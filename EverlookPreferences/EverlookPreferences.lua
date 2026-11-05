@@ -18,7 +18,7 @@ EverlookPreferences = Preferences
 -- pages inside a folder sort alphabetically.
 Preferences.FOLDERS = {
 	{ name = "Quests", about = "Accepting and turning in quests." },
-	{ name = "Bags & Vendors", about = "Repairs, junk, mail, containers and gear upgrades." },
+	{ name = "Bags & Vendors", about = "Repairs, junk, mail, containers, looting and gear upgrades." },
 	{ name = "Action Bars", about = "Hotkey labels, spell ranks and swing timers." },
 	{ name = "Chat & Social", about = "Chat labels, invites, summons, resurrections and duels." },
 	{ name = "Tooltips", about = "Extra tooltip lines, and where the tooltip sits." },

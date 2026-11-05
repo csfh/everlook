@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: Looting
+## Notes: Takes loot the moment the window opens when auto loot is on, and confirms bind-on-pickup loot when you're alone.
+## Version: 0.1.0
+## Dependencies: Everlook, EverlookPreferences, EverlookQA
+## Group: Everlook
+## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
+
+EverlookLoot.lua
