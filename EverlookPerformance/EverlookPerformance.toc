@@ -7,3 +7,4 @@
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
 
 EverlookPerformance.lua
+Hitches.lua

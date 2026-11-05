@@ -5,6 +5,7 @@ local Performance = Everlook:NewAddon("EverlookPerformance", {
 	label = "Performance",
 	defaults = {
 		history = {}, -- the last loads, oldest first
+		hitches = {}, -- the last long frames, oldest first (Hitches.lua)
 	},
 })
 
@@ -13,7 +14,20 @@ local Performance = Everlook:NewAddon("EverlookPerformance", {
 EverlookQA:Expect("EverlookPerformance", {
 	"CreateFrame",
 	"GetFramerate",
+	"collectgarbage",
+	"GetTime",
+	"InCombatLockdown",
 }, {
+	"C_AddOnProfiler.GetOverallMetric",
+	"Enum.AddOnProfilerMetric.LastTime",
+	"Enum.AddOnProfilerMetric.CountTimeOver500Ms",
+	"GetRealZoneText",
+	"GetSubZoneText",
+	"IsInInstance",
+	"UnitOnTaxi",
+	"IsMounted",
+	"IsFlying",
+	"GetUnitSpeed",
 	"C_AddOnProfiler.GetTopKAddOnsForMetric",
 	"C_AddOnProfiler.GetApplicationMetric",
 	"Enum.AddOnProfilerMetric.RecentAverageTime",
@@ -367,6 +381,7 @@ function Performance:OnInitialize()
 end
 
 function Performance:OnEnable()
+	self:StartHitches()
 	-- The core marks the end of the loading screen before this runs, so the trace is complete.
 	self:RegisterEvent("LOADING_SCREEN_DISABLED", function()
 		self:UnregisterEvent("LOADING_SCREEN_DISABLED")

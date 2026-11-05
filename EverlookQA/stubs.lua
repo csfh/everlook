@@ -60,6 +60,7 @@ return function(root)
 	local Widget = {}
 	function Widget:RegisterEvent(event) self.events[event] = true end
 	function Widget:UnregisterEvent(event) self.events[event] = nil end
+	function Widget:RegisterAllEvents() self.allEvents = true end
 	function Widget:SetScript(name, handler) self.scripts[name] = handler end
 	function Widget:GetScript(name) return self.scripts[name] end
 	function Widget:SetPoint(...) self.point = { ... } end

@@ -103,4 +103,58 @@ P.page:Hide()
 P.page.scripts.OnHide(P.page)
 check(P.page.scripts.OnUpdate == nil, "hiding the page stops refreshing")
 
+-- Hitches: a long frame is saved with what was going on.
+local H = P.hitchFrame
+check(H and H.allEvents and H.scripts.OnUpdate, "a frame counts every event and times every frame")
+check(P.db.session == 1 and #P.db.hitches == 0, "a new session, nothing recorded yet")
+Enum = { AddOnProfilerMetric = { LastTime = 3, CountTimeOver100Ms = 9, CountTimeOver500Ms = 10 } }
+local profilerCalls = 0
+C_AddOnProfiler = {
+	GetOverallMetric = function(m) profilerCalls = profilerCalls + 1 return m == 3 and 480 or 2 end,
+	GetApplicationMetric = function(m) return m == 3 and 510 or 4 end,
+	GetTopKAddOnsForMetric = function() return { { addOnName = "EverlookUpgrades", metricValue = 470 } } end,
+}
+GetRealZoneText = function() return "Elwynn Forest" end
+local heap = 100000
+collectgarbage = function(what) return what == "count" and heap or 0 end
+local function frame(seconds) H.scripts.OnUpdate(H, seconds) end
+local function event(name) H.scripts.OnEvent(H, name) end
+
+frame(0.016)
+for _ = 1, 3 do event("BAG_UPDATE") end
+event("UNIT_AURA")
+heap = 60000 -- a collection cycle finished
+t.now = 100
+frame(0.52)
+local hitch = P.db.hitches[1]
+check(#P.db.hitches == 1 and hitch.ms == 520 and hitch.frames == 1, "a 520 ms frame is recorded")
+check(hitch.events[1] == "BAG_UPDATE x3" and hitch.events[2] == "UNIT_AURA x1", "with the events before it, busiest first")
+check(hitch.kbBefore == 100000 and hitch.kbAfter == 60000, "and the heap before and after, which shows a collection")
+check(hitch.profiler.addons == 480 and hitch.profiler.game == 510 and hitch.profiler.top[1] == "EverlookUpgrades 470.0",
+	"and the game's profiler: addon time, game time, the busiest addon")
+check(hitch.zone == "Elwynn Forest" and hitch.combat == false and hitch.session == 1, "and where you were")
+frame(0.3)
+check(#P.db.hitches == 1 and hitch.frames == 2 and hitch.ms == 820, "a long frame right after is merged into the same entry")
+frame(0.016)
+check(hitch.nextFrame and hitch.nextFrame.addons == 480, "the profiler is read again a frame later")
+event("BAG_UPDATE")
+frame(0.016)
+check(#P.db.hitches == 1, "normal frames aren't recorded")
+
+t.now = 160
+frame(0.25)
+check(#P.db.hitches == 2 and P.db.hitches[2].sincePrevious == 60 and #P.db.hitches[2].events == 0,
+	"the next hitch says how long since the last; events are counted per frame")
+
+event("LOADING_SCREEN_ENABLED")
+frame(3)
+event("LOADING_SCREEN_DISABLED")
+t.now = 162
+frame(1)
+check(#P.db.hitches == 2, "loading screens, and a few seconds after, aren't hitches")
+t.now = 170
+frame(0.016)
+for i = 1, 60 do t.now = t.now + 10 frame(0.3) frame(0.016) end
+check(#P.db.hitches == 50 and P.db.hitches[50].ms == 300, "only the last 50 are kept")
+
 t.done()
