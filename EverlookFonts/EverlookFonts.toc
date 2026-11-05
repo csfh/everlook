@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Fonts
+## Notes: Expressway for the interface and Manrope for chat and names, with a size adjustment.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

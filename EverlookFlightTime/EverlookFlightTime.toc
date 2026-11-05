@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Flight Time
+## Notes: A flight timer with the destination, time elapsed and time left.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

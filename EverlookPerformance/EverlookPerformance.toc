@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Performance
+## Notes: A frame-time chart, the background task table and recent load times, under /el.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

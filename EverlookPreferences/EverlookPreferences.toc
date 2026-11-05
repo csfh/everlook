@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Preferences
+## Notes: The Everlook settings under /el, their folders, and the minimap button.
 ## Version: 0.1.0
 ## Dependencies: Everlook
 ## Group: Everlook

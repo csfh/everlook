@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Upgrades
+## Notes: Marks gear in your bags and quest rewards that beats what you wear, and shows item levels.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

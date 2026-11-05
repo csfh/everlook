@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Hide Clutter
+## Notes: Hides the talking head, and if you like zone text, red errors, raid warnings and the stance bar.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

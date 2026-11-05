@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Auto Responses
+## Notes: Accepts summons and resurrections, and can fill in the delete confirmation.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

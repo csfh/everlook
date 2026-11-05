@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Optimize
+## Notes: Pauses Lua's garbage collector during loading screens, for faster logins and reloads.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

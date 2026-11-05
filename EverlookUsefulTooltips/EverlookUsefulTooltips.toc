@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Useful Tooltips
+## Notes: Item and NPC IDs, vendor price and bag totals on tooltips.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: QA
+## Notes: Checks that the game functions each Everlook addon needs exist, and switches the taint log.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences
 ## Group: Everlook

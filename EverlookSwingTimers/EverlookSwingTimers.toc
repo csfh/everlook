@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Swing Timers
+## Notes: Sets the size of the swing timers.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Spell Ranks
+## Notes: Puts a newly trained spell rank on your action bars in place of the old one.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

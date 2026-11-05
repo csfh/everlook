@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Auto Quest
+## Notes: Accepts and turns in quests for you, and marks the reward that sells for the most. Hold Shift to pause.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

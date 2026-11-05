@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Sell Junk
+## Notes: Sells gray items at vendors and says what they brought in.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

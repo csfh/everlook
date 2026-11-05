@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Ground Effects
+## Notes: Sets how much grass and ground clutter the game draws, and how far out.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

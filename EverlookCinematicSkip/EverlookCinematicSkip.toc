@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Cinematic Skip
+## Notes: Skips cinematics and movies as they start. Hold Shift to watch.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

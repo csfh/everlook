@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Everlook
+## Notes: The core every Everlook addon builds on: events, saved settings and the frame-budget scheduler.
 ## Version: 0.1.0
 ## SavedVariables: EverlookDB
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga

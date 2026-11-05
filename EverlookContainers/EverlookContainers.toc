@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Containers
+## Notes: Opens clams, crates and other containers in your bags, and takes what's inside.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

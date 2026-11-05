@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Friend Conveniences
+## Notes: Accepts party invites from friends and guildmates, and can decline the rest and duels.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook
