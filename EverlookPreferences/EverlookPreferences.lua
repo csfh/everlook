@@ -22,7 +22,7 @@ Preferences.FOLDERS = {
 	{ name = "Action Bars", about = "Hotkey labels, spell ranks and swing timers." },
 	{ name = "Chat & Social", about = "Chat labels, invites, summons, resurrections and duels." },
 	{ name = "Tooltips", about = "Extra tooltip lines, and where the tooltip sits." },
-	{ name = "World & Camera", about = "Camera, fonts, cinematics, flights, ground clutter and screen clutter." },
+	{ name = "World & Camera", about = "Camera, pointer, fonts, cinematics, flights, ground clutter and screen clutter." },
 	{ name = "Developer", about = "Loading speed, the frame-time chart and the game-function check." },
 }
 
