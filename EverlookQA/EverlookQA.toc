@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: QA
+## Version: 0.1.0
+## Dependencies: Everlook, EverlookPreferences
+## Group: Everlook
+## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
+
+# stubs.lua is for the offline tests only. Never list it here.
+EverlookQA.lua

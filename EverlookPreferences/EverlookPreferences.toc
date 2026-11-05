@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: Preferences
+## Version: 0.1.0
+## Dependencies: Everlook
+## Group: Everlook
+## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
+
+EverlookPreferences.lua
+Minimap.lua

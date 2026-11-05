@@ -1,0 +1,8 @@
+## Interface: 16001
+## Title: Flight Time
+## Version: 0.1.0
+## Dependencies: Everlook, EverlookPreferences, EverlookQA
+## Group: Everlook
+## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
+
+EverlookFlightTime.lua
