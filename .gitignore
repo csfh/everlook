@@ -1,4 +1,8 @@
 .DS_Store
 *.swp
+.env
+.env.*
+*.pem
+*.key
 www/node_modules/
 www/dist/

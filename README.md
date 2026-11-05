@@ -39,3 +39,11 @@ Restart the game client after adding or renaming a folder; `/reload` is enough f
 
 Tests run the real addon files against stand-ins for the game API (`EverlookQA/stubs.lua`).
 They check logic only; anything that touches the game still needs a look in game.
+
+## License
+
+MIT. See [LICENSE](LICENSE). Copyright (c) 2026 Christoffer Hallas.
+
+If you send a pull request or other contribution, you agree to the [CLA](CLA.md).
+
+The fonts in `EverlookFonts/assets/` keep their own licences, bundled beside them: Manrope under the SIL Open Font License 1.1, and Expressway under the Typodermic freeware licence.
