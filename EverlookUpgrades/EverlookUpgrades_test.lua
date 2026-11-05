@@ -21,6 +21,15 @@ local items = {
 	shirt = { "INVTYPE_BODY", { ITEM_MOD_STAMINA_SHORT = 1 } },
 	potion = { "", nil },
 	uncached = { "INVTYPE_HEAD", nil },
+	-- Loaded, but with no stats: GetItemStats returns nothing for these.
+	plainCloak = { "INVTYPE_CLOAK", nil },
+	plainCloak2 = { "INVTYPE_CLOAK", nil },
+	cloak = { "INVTYPE_CLOAK", { ITEM_MOD_AGILITY_SHORT = 2 } },
+	-- Starter belts: armor only, which Mainline's GetItemStats leaves out; the tooltip has it.
+	raggedBelt = { "INVTYPE_WAIST", nil },
+	wornBelt = { "INVTYPE_WAIST", nil },
+	flimsyBelt = { "INVTYPE_WAIST", nil },
+	club = { "INVTYPE_WEAPON", nil },
 }
 -- Weapon and armor class IDs, as Enum.ItemClass has them.
 Enum = { ItemClass = { Weapon = 2, Armor = 4 } }
@@ -32,9 +41,17 @@ C_Item = {
 	GetItemStats = function(link) return items[link][2] end,
 	GetDetailedItemLevelInfo = function(link) return levels[link] end,
 	GetItemQualityColor = function(quality) return unpack(qualityColors[quality]) end,
+	IsItemDataCachedByID = function(link) return link ~= "uncached" end,
 }
-local equipped = { [16] = "sword10", [1] = "helmA", [11] = "ring5", [12] = "ring9" }
+local equipped = { [16] = "sword10", [1] = "helmA", [11] = "ring5", [12] = "ring9", [15] = "plainCloak", [6] = "raggedBelt" }
 GetInventoryItemLink = function(_, slot) return equipped[slot] end
+local function lines(...)
+	local data = { lines = {} }
+	for _, text in ipairs({ ... }) do data.lines[#data.lines + 1] = { leftText = text, leftColor = { r = 1, g = 1, b = 1 } } end
+	return data
+end
+local tooltips = { raggedBelt = lines("Ragged Leather Belt", "Waist", "18 Armor", "Durability 14 / 16") }
+C_TooltipInfo = { GetInventoryItem = function(_, slot) return tooltips[equipped[slot]] end }
 
 t.load("EverlookUpgrades")
 t.fire("PLAYER_LOGIN")
@@ -60,6 +77,13 @@ check(upgrade("helmB", redRight) == false, "red right-side text (armor type): no
 check(upgrade("shirt") == false and upgrade("potion") == false, "shirts and non-gear are never marked")
 check(upgrade("uncached") == nil, "missing item data waits for a refresh")
 check(upgrade(nil) == false, "an empty bag slot isn't an upgrade")
+check(upgrade("cloak") == true, "worn gear with no stats: anything with stats beats it")
+check(upgrade("plainCloak2") == false, "no stats against no stats: loaded, and not an upgrade")
+check(upgrade("wornBelt", lines("Worn Leather Belt", "Waist", "22 Armor", "Durability 18 / 18")) == true,
+	"armor only: more armor on the tooltip is an upgrade")
+check(upgrade("flimsyBelt", lines("Flimsy Belt", "Waist", "12 Armor")) == false, "armor only: less armor isn't")
+check(upgrade("club", lines("Club", "One-Hand", "(12.5 damage per second)")) == true,
+	"weapon with no DPS stat: the tooltip's DPS line counts")
 
 -- Item level on gear.
 check(U.db.itemLevel, "item level starts on")
@@ -77,7 +101,7 @@ C_Container = {
 	GetContainerItemLink = function(_, slot) return bagSlots[slot] and bagSlots[slot].link end,
 	GetContainerItemInfo = function(_, slot) return bagSlots[slot] and { quality = bagSlots[slot].quality } end,
 }
-C_TooltipInfo = { GetBagItem = function() return usable end }
+C_TooltipInfo.GetBagItem = function() return usable end
 function t.Widget:SetAtlas(atlas) self.atlas = atlas end
 function t.Widget:GetBagID() return 0 end
 function t.Widget:GetID() return self.slot end
@@ -140,5 +164,20 @@ for _ = 1, 5 do t.fire("BAG_UPDATE_DELAYED") end
 t.runSchedule()
 check(scored == 30, "a burst of bag updates is one pass")
 U.RefreshButton = refreshButton
+
+-- One button that throws doesn't hold up the rest of the bag.
+local errors = 0
+geterrorhandler = function() return function() errors = errors + 1 end end
+for slot = 4, 30 do buttons[slot].EverlookItemLevel:Hide() end
+local getLink = C_Container.GetContainerItemLink
+C_Container.GetContainerItemLink = function(bag, slot)
+	if slot == 2 then error("broken slot") end
+	return getLink(bag, slot)
+end
+t.fire("BAG_UPDATE_DELAYED")
+t.runSchedule()
+check(buttons[30].EverlookItemLevel:IsShown(), "a button that errors is skipped, and the pass reaches the end")
+check(errors == 1, "and its error is reported once")
+C_Container.GetContainerItemLink = getLink
 
 t.done()

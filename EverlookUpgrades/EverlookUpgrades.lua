@@ -11,6 +11,7 @@ local Upgrades = Everlook:NewAddon("EverlookUpgrades", {
 EverlookQA:Expect("EverlookUpgrades", {
 	"C_Item.GetItemStats",
 	"C_Item.GetItemInfoInstant",
+	"C_Item.IsItemDataCachedByID",
 	"GetInventoryItemLink",
 	"C_Container.GetContainerItemLink",
 	"C_Container.GetContainerItemInfo",
@@ -20,6 +21,7 @@ EverlookQA:Expect("EverlookUpgrades", {
 	"Enum.ItemClass.Armor",
 	"C_TooltipInfo.GetBagItem",
 	"C_TooltipInfo.GetQuestItem",
+	"C_TooltipInfo.GetInventoryItem",
 	"ContainerFrameCombinedBags.EnumerateValidItems",
 	"ContainerFrameCombinedBags.UpdateItems",
 	"ContainerFrame1.EnumerateValidItems",
@@ -33,6 +35,8 @@ EverlookQA:Expect("EverlookUpgrades", {
 	"debugprofilestop",
 }, {
 	"C_Texture.GetAtlasInfo",
+	"ARMOR_TEMPLATE",
+	"DPS_TEMPLATE",
 })
 
 local RANGED_SLOT = INVSLOT_RANGED or 16
@@ -74,16 +78,46 @@ local WEAPONS = {
 	INVTYPE_THROWN = true,
 }
 
--- nil when the item's data hasn't loaded yet.
-local function score(link, weapon)
+-- A game format string such as "%s Armor" as a pattern that captures its number.
+local function numberPattern(template)
+	local first, last = template:find("%%[%d%.]*[sdf]")
+	if not first then return nil end -- a template this can't read, such as a positional %1$s
+	local function escape(text) return (text:gsub("[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0")) end
+	return "^" .. escape(template:sub(1, first - 1)) .. "([%d%.,]+)" .. escape(template:sub(last + 1)) .. "$"
+end
+
+-- The first tooltip line that matches the pattern, as a number.
+local function tooltipNumber(tooltipData, pattern)
+	if not tooltipData or not pattern then return nil end
+	for _, line in ipairs(tooltipData.lines or {}) do
+		local text = line.leftText and line.leftText:match(pattern)
+		if text then return tonumber((text:gsub(",", ""))) end
+	end
+	return nil
+end
+
+-- Mainline's GetItemStats leaves out armor, and can leave out DPS, so those come from the tooltip.
+local ARMOR = numberPattern(ARMOR_TEMPLATE or "%s Armor")
+local DPS = numberPattern(DPS_TEMPLATE or "(%s damage per second)")
+
+-- nil when the item's data hasn't loaded yet. GetItemStats returns nothing for a loaded item with no
+-- stats (white and starter gear), so those score on what the tooltip shows. getTooltip is called only
+-- when the stats lack armor or DPS.
+local function score(link, weapon, getTooltip)
 	local stats = C_Item.GetItemStats(link)
-	if not stats then return nil end
+	if not stats then
+		if not C_Item.IsItemDataCachedByID(link) then return nil end
+		stats = {}
+	end
 	if weapon then
-		return stats.ITEM_MOD_DAMAGE_PER_SECOND_SHORT or 0
+		return stats.ITEM_MOD_DAMAGE_PER_SECOND_SHORT or tooltipNumber(getTooltip(), DPS) or 0
 	end
 	local total = 0
 	for _, value in pairs(stats) do
 		total = total + value
+	end
+	if not stats.RESISTANCE0_NAME then
+		total = total + (tooltipNumber(getTooltip(), ARMOR) or 0)
 	end
 	return total
 end
@@ -113,7 +147,12 @@ function Upgrades:IsUpgrade(link, getTooltip)
 	if not slots then return false end
 
 	local weapon = WEAPONS[equipLoc]
-	local candidate = score(link, weapon)
+	local tooltip, fetched
+	local function candidateTooltip()
+		if not fetched then tooltip, fetched = getTooltip(), true end
+		return tooltip
+	end
+	local candidate = score(link, weapon, candidateTooltip)
 	if not candidate then
 		pending = true
 		return nil
@@ -124,7 +163,9 @@ function Upgrades:IsUpgrade(link, getTooltip)
 		local equipped = GetInventoryItemLink("player", slot)
 		local value = -1 -- empty slot: anything is an upgrade
 		if equipped then
-			value = score(equipped, weapon)
+			value = score(equipped, weapon, function()
+				return C_TooltipInfo and C_TooltipInfo.GetInventoryItem("player", slot)
+			end)
 			if not value then
 				pending = true
 				return nil
@@ -135,7 +176,7 @@ function Upgrades:IsUpgrade(link, getTooltip)
 		end
 	end
 
-	return candidate > weakest and usable(getTooltip())
+	return candidate > weakest and usable(candidateTooltip())
 end
 
 local function setArrow(button, show)
@@ -193,6 +234,56 @@ local function setItemLevel(button, text, r, g, b)
 	label:Show()
 end
 
+-- TEMP: a record of what the bag pass sees, saved in EverlookDB.EverlookUpgrades.debug so the next
+-- reload writes it to disk. Remove once the missing-arrow bug is found.
+local function describeStats(link)
+	local ok, stats = pcall(C_Item.GetItemStats, link)
+	if not ok then return "error: " .. tostring(stats) end
+	if not stats then return "nil (cached=" .. tostring(C_Item.IsItemDataCachedByID(link)) .. ")" end
+	local parts = {}
+	for key, value in pairs(stats) do parts[#parts + 1] = key .. "=" .. tostring(value) end
+	table.sort(parts)
+	return "{" .. table.concat(parts, " ") .. "}"
+end
+
+local function describeLines(data)
+	if not data then return { "no tooltip data" } end
+	local out = {}
+	for i, line in ipairs(data.lines or {}) do
+		local function color(c) return c and string.format("%.2f,%.2f,%.2f", c.r or -1, c.g or -1, c.b or -1) or "-" end
+		out[i] = string.format("[type=%s] %s (%s) | %s (%s)", tostring(line.type), tostring(line.leftText), color(line.leftColor),
+			tostring(line.rightText), color(line.rightColor))
+	end
+	return out
+end
+
+local fresh = false
+local function record()
+	local db = Upgrades.db
+	if not db then return nil end
+	if not fresh then db.debug, fresh = { items = {}, errors = {}, passes = 0 }, true end
+	return db.debug
+end
+
+function Upgrades:RecordButton(bag, slot, link, result)
+	local debug = record()
+	if not debug or not link then return end
+	local equipLoc = select(4, C_Item.GetItemInfoInstant(link))
+	if not SLOTS[equipLoc] then return end
+	local entry = { link = link, equipLoc = equipLoc, result = tostring(result), stats = describeStats(link) }
+	pcall(function() entry.lines = describeLines(C_TooltipInfo.GetBagItem(bag, slot)) end)
+	entry.equipped = {}
+	for _, s in ipairs(SLOTS[equipLoc]) do
+		local worn = GetInventoryItemLink("player", s)
+		if worn then
+			local e = { link = worn, stats = describeStats(worn) }
+			pcall(function() e.lines = describeLines(C_TooltipInfo.GetInventoryItem("player", s)) end)
+			entry.equipped[#entry.equipped + 1] = e
+		end
+	end
+	debug.items[bag .. ":" .. slot] = entry
+end
+
 -- Bags --------------------------------------------------------------------
 
 local function bagFrames()
@@ -231,6 +322,7 @@ function Upgrades:RefreshButton(button)
 		end)
 	end
 	setArrow(button, show)
+	pcall(self.RecordButton, self, bag, slot, link, show) -- TEMP
 
 	if self.db.itemLevel then
 		local info = C_Container.GetContainerItemInfo(bag, slot)
@@ -251,6 +343,16 @@ end
 -- The same pass, a few buttons a frame on the shared budget. Each button can scan a tooltip, so a
 -- full bag at once could take several milliseconds. A trigger mid-pass starts it over from the top.
 local pass -- { buttons, index } while a pass is under way
+local reported = false
+
+local function reportOnce(err)
+	local debug = record() -- TEMP
+	if debug and #debug.errors < 10 then debug.errors[#debug.errors + 1] = tostring(err) end
+	if reported then return end
+	reported = true
+	local handler = geterrorhandler and geterrorhandler()
+	if handler then handler(err) end
+end
 local bagsDirty = false
 
 local bagTask = Everlook.Schedule.Task("upgrades.bags", {
@@ -260,12 +362,20 @@ local bagTask = Everlook.Schedule.Task("upgrades.bags", {
 		if bagsDirty or not pass then
 			bagsDirty, pending = false, false
 			pass = { buttons = bagButtons(), index = 1 }
+			local debug = record() -- TEMP
+			if debug then
+				debug.passes = debug.passes + 1
+				debug.lastPass = { time = date and date("%H:%M:%S"), buttons = #pass.buttons, atlas = tostring(C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo("bags-greenarrow") ~= nil),
+					armorTemplate = tostring(ARMOR_TEMPLATE), dpsTemplate = tostring(DPS_TEMPLATE) }
+			end
 		end
 		local began = debugprofilestop and debugprofilestop()
 		local buttons = pass.buttons
 		while pass.index <= #buttons do
-			Upgrades:RefreshButton(buttons[pass.index])
+			-- A button that fails is skipped, not retried, so it can't hold up the rest of the bag.
+			local ok, err = pcall(Upgrades.RefreshButton, Upgrades, buttons[pass.index])
 			pass.index = pass.index + 1
+			if not ok then reportOnce(err) end
 			if not began or debugprofilestop() - began >= limitMs then break end
 		end
 		if pass.index <= #buttons then return true end
