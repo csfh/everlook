@@ -34,7 +34,17 @@ ObjectiveTrackerLineFont = font("Font", FRIZ, 12)
 local inherits = font("FontString", nil, nil, GameFontNormal)
 local ownFont = font("FontString", FRIZ, 10)
 local trackerLine = font("FontString", nil, nil, ObjectiveTrackerLineFont)
-local frames = { { regions = { inherits, ownFont, trackerLine } } }
+-- An action button's hotkey label: a binding, or the range dot when no key is bound.
+RANGE_INDICATOR = "●"
+local hotkey = font("FontString", nil, nil, GameFontNormal)
+hotkey.text = RANGE_INDICATOR
+function hotkey:GetText() return self.text end
+local actionButton = { HotKey = hotkey, UpdateHotkeys = function() end }
+ActionBarButtonEventsFrame = {
+	ForEachFrame = function(_, fn) fn(actionButton) end,
+	RegisterFrame = function() end,
+}
+local frames = { { regions = { inherits, ownFont, trackerLine, hotkey } } }
 for _, frame in ipairs(frames) do
 	function frame:GetRegions() return unpack(self.regions) end
 end
@@ -90,6 +100,26 @@ check(ownFont.path == EXPRESSWAY and inherits.path == EXPRESSWAY, "text in the i
 check(ObjectiveTrackerLineFont.sets == 0 and trackerLine.sets == 0, "objective tracker fonts are left alone")
 check(PlayerName.path == MANROPE, "unit frame names get Manrope")
 check(hooks.InitializePartyMemberFrames and hooks.DefaultCompactUnitFrameSetup, "party and raid-style frames are hooked")
+
+check(hotkey.path == FRIZ, "a hotkey label showing the range dot keeps the game's font, which draws it")
+hotkey.text = "S4"
+hooks.UpdateHotkeys(actionButton)
+check(hotkey.path == EXPRESSWAY, "a key bound to the button: its label gets Expressway")
+hotkey.text = RANGE_INDICATOR
+hooks.UpdateHotkeys(actionButton)
+check(hotkey.path == FRIZ, "the binding removed: the dot is back in the game's font")
+t.combat = true
+hotkey.text = "S5"
+hooks.UpdateHotkeys(actionButton)
+check(hotkey.path == FRIZ, "a key bound in combat: the label waits")
+local passSets = GameFontNormal.sets
+t.combat = false
+t.fire("PLAYER_REGEN_ENABLED")
+t.runSchedule()
+check(hotkey.path == EXPRESSWAY and GameFontNormal.sets == passSets,
+	"after combat that label alone gets Expressway, without a whole new pass")
+hotkey.text = RANGE_INDICATOR
+hooks.UpdateHotkeys(actionButton)
 
 local compactName = font("FontString", FRIZ, 11)
 hooks.DefaultCompactUnitFrameSetup({ name = compactName })

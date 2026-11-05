@@ -30,6 +30,9 @@ EverlookQA:Expect("EverlookFonts", {
 	"TargetFrame",
 	"PartyFrame.InitializePartyMemberFrames",
 	"DefaultCompactUnitFrameSetup",
+}, {
+	"RANGE_INDICATOR",
+	"ActionBarButtonEventsFrame.ForEachFrame",
 })
 
 local INTERFACE_FONT = "Interface\\AddOns\\EverlookFonts\\assets\\expressway.ttf"
@@ -248,6 +251,63 @@ local function hookNameFrames()
 	end
 end
 
+-- An action button with no key bound shows RANGE_INDICATOR ("●", Blizzard_ActionBar/Shared/
+-- ActionButton.lua, 12.0.0) in its hotkey label while out of range. Neither font draws that
+-- character, and the game compares the label's text with it, so the label keeps the game's font
+-- while it shows the dot instead of the text changing.
+local function showsRangeDot(text)
+	if type(RANGE_INDICATOR) ~= "string" or type(text.GetText) ~= "function" then return false end
+	local value = text:GetText()
+	return not (issecretvalue and issecretvalue(value)) and value == RANGE_INDICATOR
+end
+
+-- The file the game gave this text, before this addon set it or the font it inherits.
+local function gameFile(text)
+	if originals[text] then return originals[text][1] end
+	local path, size, flags = text:GetFont()
+	return originalOf(text, path, size, flags)[1]
+end
+
+-- UpdateHotkeys writes the label when bindings change, so the label's font follows its new text.
+-- A label changed in combat waits for combat to end, alone, instead of a whole new pass.
+local waitingLabels = {}
+
+local function restyleLabel(label)
+	if not passed or empty(passed) then return end
+	if not ready() then
+		waitingLabels[label] = true
+		return
+	end
+	local file = passed.interface
+	if showsRangeDot(label) then file = gameFile(label) end
+	replace(label, file, passed.offset)
+end
+
+local function hotkeyChanged(button)
+	if type(button.HotKey) == "table" then restyleLabel(button.HotKey) end
+end
+
+local function restyleWaitingLabels()
+	local labels = waitingLabels
+	waitingLabels = {}
+	for label in pairs(labels) do restyleLabel(label) end
+end
+
+local function hookButton(button)
+	if hooked[button] or type(button) ~= "table" or type(button.UpdateHotkeys) ~= "function" then return end
+	hooksecurefunc(button, "UpdateHotkeys", hotkeyChanged)
+	hooked[button] = true
+end
+
+local function hookActionButtons()
+	local manager = ActionBarButtonEventsFrame
+	if hooked.actionButtons or type(manager) ~= "table" or type(manager.ForEachFrame) ~= "function"
+		or type(manager.RegisterFrame) ~= "function" then return end
+	hooksecurefunc(manager, "RegisterFrame", function(_, button) hookButton(button) end)
+	manager:ForEachFrame(hookButton)
+	hooked.actionButtons = true
+end
+
 local function setGlobals(keys, font)
 	for _, key in ipairs(keys) do
 		if type(_G[key]) == "string" then
@@ -285,7 +345,9 @@ local function restyleRegions(pass, ...)
 		local region = select(index, ...)
 		if region.GetObjectType and region:GetObjectType() == "FontString"
 			and not follows(region, pass.kept) and not follows(region, pass.peopleFonts) then
-			replace(region, pass.names[region] and nameFont(pass) or pass.interface, pass.offset)
+			local file = pass.names[region] and nameFont(pass) or pass.interface
+			if showsRangeDot(region) then file = gameFile(region) end
+			replace(region, file, pass.offset)
 			pass.names[region] = nil
 		end
 	end
@@ -300,6 +362,7 @@ local function beginPass()
 	passed = choice
 	stale = false
 	hookNameFrames()
+	hookActionButtons()
 	if choice.interface then setGlobals(INTERFACE_GLOBALS, INTERFACE_FONT) end
 	if choice.people then setGlobals(NAME_GLOBALS, PEOPLE_FONT) end
 	local peopleFonts = {}
@@ -457,6 +520,7 @@ function Fonts:OnEnable()
 	end)
 	-- What combat blocked happens once it ends.
 	self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
+		restyleWaitingLabels()
 		if stale or job then self:Apply() end
 	end)
 end
