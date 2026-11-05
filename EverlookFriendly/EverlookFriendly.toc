@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: Friendly
+## Notes: Whispers a thank-you to players outside your group who buff you.
+## Version: 0.1.0
+## Dependencies: Everlook, EverlookPreferences, EverlookQA
+## Group: Everlook
+## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
+
+EverlookFriendly.lua
