@@ -17,7 +17,7 @@ EverlookPreferences = Preferences
 -- The folders under Everlook, in this order. Each addon names its folder when it makes its page;
 -- pages inside a folder sort alphabetically.
 Preferences.FOLDERS = {
-	{ name = "Quests", about = "Accepting and turning in quests." },
+	{ name = "Quests", about = "Accepting and turning in quests, and skipping gossip." },
 	{ name = "Bags & Vendors", about = "Repairs, junk, mail, containers, looting and gear upgrades." },
 	{ name = "Action Bars", about = "Hotkey labels, spell ranks and swing timers." },
 	{ name = "Chat & Social", about = "Chat labels, invites, summons, resurrections and duels." },

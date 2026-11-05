@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: Skip Gossip
+## Notes: Goes straight to an NPC's only option, such as a vendor's shop, when there are no quests to talk about. Hold Shift to read it.
+## Version: 0.1.0
+## Dependencies: Everlook, EverlookPreferences, EverlookQA
+## Group: Everlook
+## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
+
+EverlookSkipGossip.lua
