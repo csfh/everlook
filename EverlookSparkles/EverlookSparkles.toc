@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: Sparkles
+## Notes: Keeps the sparkles on lootable corpses and objects when the game's outlines are off.
+## Version: 0.1.0
+## Dependencies: Everlook, EverlookPreferences, EverlookQA
+## Group: Everlook
+## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
+
+sparkles.lua

@@ -6,4 +6,4 @@
 ## Group: Everlook
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
 
-EverlookAutoQuest.lua
+auto_quest.lua

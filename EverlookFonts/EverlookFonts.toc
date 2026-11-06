@@ -1,9 +1,9 @@
 ## Interface: 16001
 ## Title: Fonts
-## Notes: Expressway for the interface and Manrope for chat and names, with a size adjustment.
+## Notes: Five font tokens, Heading, Body, Small, Chat and Number, each a font from thirteen and a size, for the game's text and Everlook's.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
 
-EverlookFonts.lua
+fonts.lua

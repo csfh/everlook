@@ -90,6 +90,18 @@ return function(root)
 		return setmetatable({ name = name, events = {}, scripts = {}, shown = false }, widgetMeta)
 	end
 
+	-- A font object: CopyFontObject takes another's file, size and flags.
+	CreateFont = function(name)
+		local font = { name = name, path = nil, size = nil, flags = "" }
+		function font:GetFont() return self.path, self.size, self.flags end
+		function font:SetFont(path, size, flags) self.path, self.size, self.flags = path, size, flags end
+		function font:CopyFontObject(other) self.path, self.size, self.flags = other:GetFont() end
+		function font:GetObjectType() return "Font" end
+		function font:GetName() return self.name end
+		if name then _G[name] = font end
+		return font
+	end
+
 	CreateFrame = function(_, name)
 		local widget = t.widget(name)
 		if name then _G[name] = widget end
@@ -142,30 +154,56 @@ return function(root)
 			setting.slider = options
 			t.log("slider " .. setting.key)
 		end,
+		CreateDropdown = function(_, setting, options)
+			setting.options = options
+			t.log("dropdown " .. setting.key)
+		end,
+		CreateControlTextContainer = function()
+			local container = { data = {} }
+			function container:Add(value, label) table.insert(self.data, { value = value, label = label }) end
+			function container:GetData() return self.data end
+			return container
+		end,
 		SetOnValueChangedCallback = function(variable, callback)
 			t.settings[variable].onChange = callback
 		end,
 		RegisterCanvasLayoutSubcategory = function(_, frame, name)
 			t.log("canvas " .. name)
-			return { name = name, frame = frame }
+			return t.category(name)
 		end,
 		OpenToCategory = function(id) t.log("open " .. id) end,
 	}
 	MinimalSliderWithSteppersMixin = { Label = { Left = 1, Right = 2 } }
 
-	-- Categories remember their parent; layouts log the headers added to them.
+	-- Categories remember their parent and have an ID each, from 1 (the Everlook page); layouts log
+	-- the headers added to them.
+	local lastID = 0
 	function t.category(name, parent)
-		local category = { name = name, parent = parent, GetID = function() return 1 end }
+		lastID = lastID + 1
+		local id = lastID
+		local category = { name = name, parent = parent, GetID = function() return id end }
 		function category:SetShouldSortAlphabetically(should) self.sorted = should end
 		return category
 	end
 	t.headers = {} -- [page name] = { header texts in order }
+	t.rows = {} -- [page name] = { every initializer in order }
 	function t.layout(name)
 		t.headers[name] = t.headers[name] or {}
-		return { AddInitializer = function(_, initializer) table.insert(t.headers[name], initializer.header) end }
+		t.rows[name] = t.rows[name] or {}
+		return { AddInitializer = function(_, initializer)
+			if initializer.header then table.insert(t.headers[name], initializer.header) end
+			table.insert(t.rows[name], initializer)
+		end }
 	end
-	CreateSettingsListSectionHeaderInitializer = function(text) return { header = text } end
-	C_AddOns = { GetAddOnMetadata = function(_, field) if field == "Version" then return "0.1.0" end end }
+	CreateSettingsListSectionHeaderInitializer = function(text, tooltip) return { header = text, tooltip = tooltip } end
+	CreateSettingsButtonInitializer = function(name, buttonText, buttonClick, tooltip, addSearchTags)
+		assert(addSearchTags ~= nil, "CreateSettingsButtonInitializer needs addSearchTags")
+		return { button = name, buttonText = buttonText, click = buttonClick, tooltip = tooltip, search = addSearchTags }
+	end
+	C_AddOns = { GetAddOnMetadata = function(name, field)
+		if field == "Version" then return "0.1.0" end
+		if field == "Notes" then return "Notes of " .. name end
+	end }
 
 	-- Settings by variable name ("AddonName_key"). t.change does what the Options window does
 	-- when the player changes one: stores the value and fires the change callback.

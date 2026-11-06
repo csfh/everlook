@@ -15,15 +15,22 @@ function field(toc, key) {
 
 // The settings folders, in the order /el shows them (EverlookPreferences.FOLDERS).
 function folderOrder() {
-  const source = readFileSync(join(root, "EverlookPreferences", "EverlookPreferences.lua"), "utf8");
+  const source = readFileSync(join(root, "EverlookPreferences", "preferences.lua"), "utf8");
   const list = source.slice(source.indexOf("Preferences.FOLDERS"), source.indexOf("}\n", source.indexOf("Preferences.FOLDERS")));
   return [...list.matchAll(/name = "([^"]+)", about = "([^"]+)"/g)].map(([, name, about]) => ({ name, about }));
 }
 
-// The folder an addon puts its page in: the last quoted argument of its NewPage or NewCanvasPage call.
-function settingsFolder(folder) {
+// The folder an addon puts its page in: the last quoted argument of its NewPage or NewCanvasPage call,
+// in the Lua files its TOC lists.
+function settingsFolder(folder, toc) {
+  const files = toc
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.endsWith(".lua") && !line.startsWith("#"));
   // Comment lines are skipped: Preferences' own usage example names a folder.
-  const source = readFileSync(join(root, folder, `${folder}.lua`), "utf8")
+  const source = files
+    .map((file) => readFileSync(join(root, folder, ...file.split("\\")), "utf8"))
+    .join("\n")
     .split("\n")
     .filter((line) => !line.trim().startsWith("--"))
     .join("\n");
@@ -44,7 +51,7 @@ function modules() {
         name: field(toc, "Title"),
         notes: field(toc, "Notes"),
         version: field(toc, "Version"),
-        settings: settingsFolder(folder),
+        settings: settingsFolder(folder, toc),
       };
     })
     .sort((left, right) => left.name.localeCompare(right.name));

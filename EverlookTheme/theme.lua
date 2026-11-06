@@ -1,0 +1,236 @@
+-- The theme: a flat look for some of the game's own frames, each a dark solid with one thin line
+-- along its bottom in the player's class color, and no artwork. This file holds the style, the
+-- panel it draws, and the engine that applies a surface; each surface (chat.lua, status_bars.lua,
+-- tooltips.lua, level_badges.lua) is one record handed to Theme:Surface. AGENTS.md's "Restyling
+-- the game's frames" holds the rules: the game's frames only have textures hidden and frames of
+-- this addon's own drawn on them, and turning a surface off gives back every texture it hid.
+local _, ns = ...
+
+local Theme = Everlook:NewAddon("EverlookTheme", {
+	label = "Theme",
+	defaults = {
+		chat = false,
+		statusBars = false,
+		tooltips = false,
+		levelBadges = false,
+	},
+})
+ns.Theme = Theme
+
+-- What the engine and the style need; each surface adds its own in its record.
+local NEEDS = { "hooksecurefunc", "CreateFrame", "InCombatLockdown", "PixelUtil.SetWidth", "PixelUtil.SetHeight",
+	"UnitClass", "C_ClassColor.GetClassColor" }
+local OPTIONAL = { "issecretvalue" }
+
+-- True for a value the game keeps secret (12.0).
+function Theme.Secret(value)
+	return issecretvalue ~= nil and issecretvalue(value)
+end
+
+-- A frame or texture this addon may work with: a table the game hasn't made forbidden.
+function Theme.Usable(frame)
+	return type(frame) == "table" and not (frame.IsForbidden and frame:IsForbidden())
+end
+
+------------------------------------------------------------------------------------------------
+-- Panels: the one shape the theme draws
+
+-- The style: a dark solid under a surface's content and one accent line along its bottom edge,
+-- in the player's class color made darker. A surface that isn't the one in use (a chat tab not
+-- selected) has a gray line instead. Colors are r, g, b, a.
+Theme.BACKGROUND = { 0.03, 0.03, 0.035, 0.92 }
+Theme.ACCENT_IDLE = { 0.3, 0.3, 0.32, 1 }
+-- The class color at this brightness: the same hue, calmer against the dark solid.
+Theme.ACCENT_BRIGHTNESS = 0.65
+-- For a client that can't name the class: a neutral light gray, darkened the same way.
+local NO_CLASS = { 0.8, 0.8, 0.8 }
+-- The line's thickness in interface units, and never thinner than one screen pixel.
+Theme.LINE = 1
+
+-- The accent: the player's class color (C_ClassColor.GetClassColor, 12.0.0), darkened.
+function Theme.Accent()
+	local _, class = UnitClass("player")
+	local color = class and C_ClassColor.GetClassColor(class)
+	local r, g, b = NO_CLASS[1], NO_CLASS[2], NO_CLASS[3]
+	if color then r, g, b = color.r, color.g, color.b end
+	local k = Theme.ACCENT_BRIGHTNESS
+	return { r * k, g * k, b * k, 1 }
+end
+
+local panels = {} -- every panel made, to size its line again when the interface scale changes
+
+-- The line is whole screen pixels, worked out from the panel's scale on screen.
+local function sizeLine(panel)
+	if panel.line then PixelUtil.SetHeight(panel.line, Theme.LINE, 1) end
+end
+
+-- Colors a panel's line.
+function Theme.Paint(panel, color)
+	if panel.line then panel.line:SetVertexColor(color[1], color[2], color[3], color[4]) end
+end
+
+-- A panel on `parent`, for the caller to anchor. `fill` gives it the dark solid and `line` the
+-- accent along its bottom edge, just inside it. It draws at its parent's frame level, so on a
+-- frame with text of its own (a tab, a tooltip) the solid stays under the text by its layer.
+function Theme.Panel(parent, fill, line)
+	local panel = CreateFrame("Frame", nil, parent)
+	panel:SetUsingParentLevel(true)
+	if fill then
+		panel.fill = panel:CreateTexture(nil, "BACKGROUND")
+		panel.fill:SetAllPoints()
+		panel.fill:SetColorTexture(unpack(Theme.BACKGROUND))
+	end
+	if line then
+		panel.line = panel:CreateTexture(nil, "BORDER")
+		panel.line:SetColorTexture(1, 1, 1, 1)
+		panel.line:SetPoint("BOTTOMLEFT")
+		panel.line:SetPoint("BOTTOMRIGHT")
+		sizeLine(panel)
+		Theme.Paint(panel, Theme.Accent())
+	end
+	panels[#panels + 1] = panel
+	return panel
+end
+
+function Theme:SizeLines()
+	for _, made in ipairs(panels) do sizeLine(made) end
+end
+
+------------------------------------------------------------------------------------------------
+-- The engine
+--
+-- A surface record:
+--   key          its setting, one of the defaults above
+--   label, help  its checkbox on the settings page
+--   needs        the game names it uses, for EverlookQA; optional, the ones with a fallback
+--   frames()     the game frames it restyles, found fresh each time it applies
+--   style(frame) restyles one frame, with Theme.HideArt and Theme.Draw only
+--   combat       true if it draws on protected frames: then it applies only out of combat
+--   after()      runs after every apply, in combat too (only on this addon's own frames)
+--   enable()     its hooks and events, once at login; events through Theme:On, never RegisterEvent
+-- Surfaces are applied, and appear on the settings page, in the TOC's order.
+
+Theme.surfaces = {}
+local byKey = {}
+
+function Theme:Surface(record)
+	self.surfaces[#self.surfaces + 1] = record
+	byKey[record.key] = record
+end
+
+function Theme:IsOn(key)
+	return self.db ~= nil and self.db[key] == true
+end
+
+-- The game's own textures a surface hid, and how: "hide" (Hide, Show to undo) for art the game
+-- fades by alpha, "alpha" (SetAlpha 0, 1 to undo) for art the game shows and hides itself.
+local hidden = {} -- [key] = { [texture] = "hide" | "alpha" }
+
+function Theme.HideArt(key, texture, how)
+	if not Theme.Usable(texture) then return end
+	hidden[key] = hidden[key] or {}
+	hidden[key][texture] = how
+	if how == "hide" then texture:Hide() else texture:SetAlpha(0) end
+end
+
+local function restoreArt(key)
+	for texture, how in pairs(hidden[key] or {}) do
+		if how == "hide" then texture:Show() else texture:SetAlpha(1) end
+	end
+	hidden[key] = nil
+end
+
+-- The frames a surface drew, keyed by the game frame they're on, so turning it off hides them.
+local drawn = {} -- [key] = { [host] = frame }
+
+-- The frame `key` drew on `host`, made by `make` the first time, and shown.
+function Theme.Draw(key, host, make)
+	drawn[key] = drawn[key] or {}
+	local frame = drawn[key][host]
+	if not frame then
+		frame = make()
+		drawn[key][host] = frame
+	end
+	frame:Show()
+	return frame
+end
+
+-- The frame `key` drew on `host`, if any.
+function Theme.Drawn(key, host)
+	return drawn[key] and drawn[key][host]
+end
+
+-- Every game frame `key` drew on, and what it drew there.
+function Theme.Hosts(key)
+	return pairs(drawn[key] or {})
+end
+
+-- Everlook keeps one handler per event per addon, so the engine and every surface share an event
+-- through here: each `fn(event, ...)` runs, in the order they were added.
+local handlers = {} -- [event] = { fn, ... }
+
+function Theme:On(event, fn)
+	if not handlers[event] then
+		local list = {}
+		handlers[event] = list
+		self:RegisterEvent(event, function(...)
+			for _, handler in ipairs(list) do handler(...) end
+		end)
+	end
+	table.insert(handlers[event], fn)
+end
+
+local waiting = {} -- [key] = true for a surface on protected frames held back by combat
+
+function Theme:Apply(key)
+	local record = byKey[key]
+	for _, made in pairs(drawn[key] or {}) do made:Hide() end
+	if not self:IsOn(key) then return restoreArt(key) end
+	if record.combat and InCombatLockdown() then
+		waiting[key] = true
+	else
+		waiting[key] = nil
+		for _, frame in ipairs(record.frames()) do
+			if Theme.Usable(frame) then record.style(frame) end
+		end
+	end
+	if record.after then record.after() end
+end
+
+function Theme:ApplyAll()
+	for _, record in ipairs(self.surfaces) do self:Apply(record.key) end
+end
+
+------------------------------------------------------------------------------------------------
+
+function Theme:OnInitialize()
+	local needs, optional = {}, {}
+	for _, name in ipairs(NEEDS) do needs[#needs + 1] = name end
+	for _, name in ipairs(OPTIONAL) do optional[#optional + 1] = name end
+	for _, record in ipairs(self.surfaces) do
+		for _, name in ipairs(record.needs or {}) do needs[#needs + 1] = name end
+		for _, name in ipairs(record.optional or {}) do optional[#optional + 1] = name end
+	end
+	-- Called here, once every surface file has loaded, as EverlookQA keeps one list per addon.
+	EverlookQA:Expect("EverlookTheme", needs, optional)
+
+	local page = EverlookPreferences:NewPage(self, "Interface")
+	for _, record in ipairs(self.surfaces) do page:Checkbox(record.key, record.label, record.help) end
+end
+
+function Theme:OnEnable()
+	for _, record in ipairs(self.surfaces) do
+		if record.enable then record.enable() end
+	end
+	self:On("PLAYER_REGEN_ENABLED", function()
+		for key in pairs(waiting) do self:Apply(key) end
+	end)
+	-- A screen pixel is a different number of units after either; the lines stay one pixel.
+	self:On("UI_SCALE_CHANGED", function() self:SizeLines() end)
+	self:On("DISPLAY_SIZE_CHANGED", function() self:SizeLines() end)
+	self:ApplyAll()
+end
+
+function Theme:OnSettingChanged(key)
+	if byKey[key] then self:Apply(key) end
+end

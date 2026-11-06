@@ -46,4 +46,4 @@ MIT. See [LICENSE](LICENSE). Copyright (c) 2026 Christoffer Hallas.
 
 If you send a pull request or other contribution, you agree to the [CLA](CLA.md).
 
-The fonts in `EverlookFonts/assets/` keep their own licences, bundled beside them: Manrope under the SIL Open Font License 1.1, and Expressway under the Typodermic freeware licence.
+The fonts in `EverlookFonts/assets/` keep their own licences, bundled beside them: Manrope, Inter, Roboto Condensed, Fira Sans, Barlow Semi Condensed, Noto Sans, Source Sans 3 and PT Sans Narrow under the SIL Open Font License 1.1, and Expressway under the Typodermic freeware licence.

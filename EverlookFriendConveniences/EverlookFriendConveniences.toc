@@ -6,4 +6,4 @@
 ## Group: Everlook
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
 
-EverlookFriendConveniences.lua
+friend_conveniences.lua

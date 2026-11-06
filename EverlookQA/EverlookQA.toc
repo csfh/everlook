@@ -7,4 +7,4 @@
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
 
 # stubs.lua is for the offline tests only. Never list it here.
-EverlookQA.lua
+qa.lua

@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: Auction Warning
+## Notes: Asks before you post an auction that would bring in less than a vendor pays.
+## Version: 0.1.0
+## Dependencies: Everlook, EverlookPreferences, EverlookQA
+## Group: Everlook
+## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
+
+auction_warning.lua

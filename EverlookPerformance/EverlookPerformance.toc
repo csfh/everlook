@@ -6,5 +6,5 @@
 ## Group: Everlook
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
 
-EverlookPerformance.lua
-Hitches.lua
+performance.lua
+hitches.lua

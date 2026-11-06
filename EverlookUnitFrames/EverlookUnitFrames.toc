@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: Unit Frames
+## Notes: Class-colored health, class icon portraits, shorter bar text and a name size for the game's unit frames.
+## Version: 0.1.0
+## Dependencies: Everlook, EverlookPreferences, EverlookQA
+## Group: Everlook
+## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
+
+unit_frames.lua

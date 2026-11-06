@@ -1,9 +1,10 @@
 ## Interface: 16001
 ## Title: Everlook
-## Notes: The core every Everlook addon builds on: events, saved settings and the frame-budget scheduler.
+## Notes: The core every Everlook addon builds on: events, saved settings, the frame-budget scheduler and the font tokens.
 ## Version: 0.1.0
 ## SavedVariables: EverlookDB
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
 
-Everlook.lua
-Schedule.lua
+everlook.lua
+schedule.lua
+font_tokens.lua

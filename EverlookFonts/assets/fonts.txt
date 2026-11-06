@@ -17,3 +17,52 @@ Included licence: manrope_license.txt (SIL Open Font License, Version 1.1)
 
 Manrope draws Latin, Cyrillic, Greek and Vietnamese. Keep the licence with
 every copy.
+
+Inter Regular, version 4.001 (release v4.1)
+Copyright 2016 The Inter Project Authors. The font is unmodified.
+
+Source: https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip (extras/ttf/Inter-Regular.ttf)
+Included licence: inter_license.txt (SIL Open Font License, Version 1.1)
+
+Roboto Condensed Regular, version 3.016
+Copyright 2011 The Roboto Project Authors. The font is unmodified.
+
+Source: https://github.com/googlefonts/roboto-3-classic/releases/download/v3.016/Roboto_v3.016.zip (hinted/static/RobotoCondensed-Regular.ttf)
+Included licence: roboto_condensed_license.txt (SIL Open Font License, Version 1.1)
+
+Fira Sans Regular, version 4.301
+Copyright 2012-2018 The Mozilla Foundation, Telefonica S.A., Carrois Corporate GbR and bBox Type GmbH. The font is unmodified.
+
+Source: https://github.com/bBoxType/FiraSans/blob/f54eeb31/Fira_Sans_4_3/Fonts/Fira_Sans_TTF_4301/Normal/Roman/FiraSans-Regular.ttf
+Included licence: fira_sans_license.txt (SIL Open Font License, Version 1.1)
+
+Barlow Semi Condensed Regular
+Copyright 2017 The Barlow Project Authors. The font is unmodified.
+
+Source: https://github.com/jpt/barlow/blob/dc2940e2/fonts/ttf/BarlowSemiCondensed-Regular.ttf
+Included licence: barlow_semi_condensed_license.txt (SIL Open Font License, Version 1.1)
+
+Noto Sans Regular, version 2.015 (release NotoSans-v2.015)
+Copyright 2022 The Noto Project Authors. The font is unmodified.
+
+Source: https://github.com/notofonts/latin-greek-cyrillic/releases/download/NotoSans-v2.015/NotoSans-v2.015.zip (NotoSans/hinted/ttf/NotoSans-Regular.ttf)
+Included licence: noto_sans_license.txt (SIL Open Font License, Version 1.1)
+
+Source Sans 3 Regular, version 3.052 (release 3.052R)
+Copyright 2010-2022 Adobe, with Reserved Font Name 'Source'. The font is unmodified.
+
+Source: https://github.com/adobe-fonts/source-sans/releases/download/3.052R/TTF-source-sans-3.052R.zip (TTF/SourceSans3-Regular.ttf)
+Included licence: source_sans_3_license.txt (SIL Open Font License, Version 1.1)
+
+PT Sans Narrow Regular, version 2.003
+Copyright 2010 ParaType Ltd. The font is unmodified.
+
+Source: https://github.com/google/fonts/blob/d8d0d998/ofl/ptsansnarrow/PT_Sans-Narrow-Web-Regular.ttf
+Included licence: pt_sans_narrow_license.txt (SIL Open Font License, Version 1.1)
+
+ParaType has no source repository; it offers the font from its own website.
+This is the copy Google Fonts ships, under the licence ParaType released it with.
+
+Inter, Roboto Condensed, Fira Sans, Noto Sans and Source Sans 3 draw Latin,
+Cyrillic and Greek. PT Sans Narrow draws Latin and Cyrillic. Barlow Semi
+Condensed draws Latin only. Keep each licence with every copy.

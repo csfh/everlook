@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: UI Scale
+## Notes: Keeps the interface pixel-perfect, so borders and lines stay sharp, at a size you pick or near the game's UI Scale.
+## Version: 0.1.0
+## Dependencies: Everlook, EverlookPreferences, EverlookQA
+## Group: Everlook
+## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
+
+ui_scale.lua
