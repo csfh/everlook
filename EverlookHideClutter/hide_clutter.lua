@@ -6,10 +6,15 @@ local HideClutter = Everlook:NewAddon("EverlookHideClutter", {
 		errorMessages = false,
 		raidWarnings = false,
 		stanceBar = false,
+		gryphons = false,
+		actionBarPage = false,
 	},
 })
 
 -- Game functions this addon needs; EverlookQA checks they exist.
+-- UpdateEndCaps and UpdateSystemSettingHideBarScrolling are how the bar shows the gryphons and
+-- the page switcher again (MainActionBar.lua, EditModeSystemTemplates.lua, forever 1.60.1).
+-- Without them, hiding once and showing once is the fallback.
 EverlookQA:Expect("EverlookHideClutter", {
 	"TalkingHeadFrame",
 	"ZoneTextFrame",
@@ -20,6 +25,12 @@ EverlookQA:Expect("EverlookHideClutter", {
 	"UnregisterStateDriver",
 	"securecallfunction",
 	"InCombatLockdown",
+	"MainActionBar.EndCaps",
+	"MainActionBar.ActionBarPageNumber",
+	"hooksecurefunc",
+}, {
+	"MainActionBar.UpdateEndCaps",
+	"MainActionBar.UpdateSystemSettingHideBarScrolling",
 })
 
 -- Each element is shown by its own Blizzard frame, in answer to events that frame registers.
@@ -34,6 +45,8 @@ local ELEMENTS = {
 
 local stopped = {} -- [key] = the events we unregistered, to register again
 local stanceHidden
+local gryphonsHidden, pageHidden
+local gryphonsHooked, pageHooked
 
 function HideClutter:OnInitialize()
 	local page = EverlookPreferences:NewPage(self, "Interface")
@@ -43,6 +56,10 @@ function HideClutter:OnInitialize()
 	page:Checkbox("raidWarnings", "Hide raid warnings", "Stop raid warnings on screen. They still show in chat.")
 	page:Checkbox("stanceBar", "Hide the stance bar",
 		"Hide the bar for stances, stealth, auras and aspects. Waits until combat ends.")
+	page:Checkbox("gryphons", "Hide the gryphons",
+		"Hide the gryphons, or the wyverns, at the ends of the main action bar.")
+	page:Checkbox("actionBarPage", "Hide the action bar page switcher",
+		"Hide the page number and arrows beside the main action bar.")
 end
 
 function HideClutter:OnEnable()
@@ -95,9 +112,62 @@ local function applyStance(wanted)
 	end
 end
 
+-- The bar shows the gryphons again from UpdateEndCaps whenever it lays its art out. Hiding the
+-- parent EndCaps covers both ends; the hook hides them again after that call.
+local function hookGryphons(bar)
+	if gryphonsHooked or not (hooksecurefunc and bar.UpdateEndCaps) then return end
+	hooksecurefunc(bar, "UpdateEndCaps", function(self)
+		if HideClutter.db.gryphons and self.EndCaps then self.EndCaps:Hide() end
+	end)
+	gryphonsHooked = true
+end
+
+local function applyGryphons(wanted)
+	local bar = MainActionBar
+	if not (bar and bar.EndCaps) then return end
+	hookGryphons(bar)
+	if wanted then
+		bar.EndCaps:Hide()
+		gryphonsHidden = true
+	elseif gryphonsHidden then
+		gryphonsHidden = nil
+		if bar.UpdateEndCaps then bar:UpdateEndCaps(bar.hideBarArt) else bar.EndCaps:Show() end
+	end
+end
+
+-- UpdateSystemSettingHideBarScrolling shows the page number unless Edit Mode's own
+-- "Hide bar scrolling" is on. The hook hides it again after that call.
+local function hookPage(bar)
+	if pageHooked or not (hooksecurefunc and bar.UpdateSystemSettingHideBarScrolling) then return end
+	hooksecurefunc(bar, "UpdateSystemSettingHideBarScrolling", function(self)
+		if HideClutter.db.actionBarPage and self.ActionBarPageNumber then self.ActionBarPageNumber:Hide() end
+	end)
+	pageHooked = true
+end
+
+local function applyPage(wanted)
+	local bar = MainActionBar
+	local page = bar and bar.ActionBarPageNumber
+	if not page then return end
+	hookPage(bar)
+	if wanted then
+		page:Hide()
+		pageHidden = true
+	elseif pageHidden then
+		pageHidden = nil
+		if bar.UpdateSystemSettingHideBarScrolling then
+			bar:UpdateSystemSettingHideBarScrolling()
+		else
+			page:Show()
+		end
+	end
+end
+
 function HideClutter:Apply()
 	for key, element in pairs(ELEMENTS) do
 		applyElement(key, element, self.db[key] == true)
 	end
 	applyStance(self.db.stanceBar == true)
+	applyGryphons(self.db.gryphons == true)
+	applyPage(self.db.actionBarPage == true)
 end

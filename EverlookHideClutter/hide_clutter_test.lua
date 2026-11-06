@@ -19,6 +19,29 @@ UIErrorsFrame = blizzardFrame("UI_ERROR_MESSAGE")
 RaidWarningFrame = blizzardFrame("CHAT_MSG_RAID_WARNING")
 
 StanceBar = { Update = function() t.log("stance update") end }
+
+-- MainActionBar.lua and EditModeSystemTemplates.lua (forever 1.60.1) show these again
+-- after the bar lays itself out. hideBarArt and hideBarScrolling are the game's own choices.
+MainActionBar = t.widget("MainActionBar")
+MainActionBar.EndCaps = t.widget("EndCaps")
+MainActionBar.EndCaps:Show()
+MainActionBar.ActionBarPageNumber = t.widget("ActionBarPageNumber")
+MainActionBar.ActionBarPageNumber:Show()
+function MainActionBar:UpdateEndCaps(forceHide)
+	t.log("end caps " .. tostring(forceHide))
+	self.EndCaps:SetShown(not forceHide)
+end
+function MainActionBar:UpdateSystemSettingHideBarScrolling()
+	t.log("page scrolling")
+	self.ActionBarPageNumber:SetShown(not t.hideBarScrolling)
+end
+hooksecurefunc = function(target, name, fn)
+	local original = target[name]
+	target[name] = function(self, ...)
+		original(self, ...)
+		fn(self, ...)
+	end
+end
 RegisterStateDriver = function(_, state, value) t.log("driver " .. state .. " " .. value) end
 UnregisterStateDriver = function(_, state) t.log("undriver " .. state) end
 securecallfunction = function(fn, ...) return fn(...) end
@@ -27,7 +50,8 @@ t.load("EverlookHideClutter")
 t.fire("PLAYER_LOGIN")
 local H = Everlook:GetAddon("EverlookHideClutter")
 
-check(H.db.talkingHead and not H.db.zoneText and not H.db.errorMessages and not H.db.raidWarnings and not H.db.stanceBar,
+check(H.db.talkingHead and not H.db.zoneText and not H.db.errorMessages and not H.db.raidWarnings
+	and not H.db.stanceBar and not H.db.gryphons and not H.db.actionBarPage,
 	"only the talking head starts hidden")
 check(not TalkingHeadFrame:IsEventRegistered("TALKINGHEAD_REQUESTED"), "login hides the talking head")
 check(UIErrorsFrame:IsEventRegistered("UI_ERROR_MESSAGE"), "errors still show")
@@ -64,5 +88,41 @@ t.reset()
 t.change("EverlookHideClutter_stanceBar", true)
 check(#t.calls == 0, "no state drivers on the client: the bar is left alone")
 RegisterStateDriver = driver
+
+check(MainActionBar.EndCaps:IsShown() and MainActionBar.ActionBarPageNumber:IsShown(),
+	"gryphons and the page switcher start shown")
+t.change("EverlookHideClutter_gryphons", true)
+t.change("EverlookHideClutter_actionBarPage", true)
+check(not MainActionBar.EndCaps:IsShown() and not MainActionBar.ActionBarPageNumber:IsShown(),
+	"turning them on hides both")
+t.reset()
+MainActionBar:UpdateEndCaps(false)
+MainActionBar:UpdateSystemSettingHideBarScrolling()
+check(not MainActionBar.EndCaps:IsShown() and not MainActionBar.ActionBarPageNumber:IsShown()
+	and has("end caps false") and has("page scrolling"),
+	"the bar showing them again leaves them hidden")
+MainActionBar.hideBarArt = true
+t.hideBarScrolling = true
+t.change("EverlookHideClutter_gryphons", false)
+t.change("EverlookHideClutter_actionBarPage", false)
+check(not MainActionBar.EndCaps:IsShown() and not MainActionBar.ActionBarPageNumber:IsShown(),
+	"turning them off lets the game's own hide stand")
+MainActionBar.hideBarArt = false
+t.hideBarScrolling = false
+t.change("EverlookHideClutter_gryphons", true)
+t.change("EverlookHideClutter_actionBarPage", true)
+t.change("EverlookHideClutter_gryphons", false)
+t.change("EverlookHideClutter_actionBarPage", false)
+check(MainActionBar.EndCaps:IsShown() and MainActionBar.ActionBarPageNumber:IsShown(),
+	"turning them off shows them when the game would")
+
+local bar = MainActionBar
+MainActionBar = nil
+t.change("EverlookHideClutter_gryphons", true)
+t.change("EverlookHideClutter_actionBarPage", true)
+MainActionBar = bar
+t.fire("PLAYER_ENTERING_WORLD")
+check(not MainActionBar.EndCaps:IsShown() and not MainActionBar.ActionBarPageNumber:IsShown(),
+	"a bar that loads later is hidden on the next apply")
 
 t.done()
