@@ -65,14 +65,16 @@ code fails on secret values.
   | Owner | What only it changes |
   | --- | --- |
   | `EverlookTheme` | Art textures, the panels it draws, and the bottom bars' Edit Mode layout |
-  | `EverlookFonts` | Fonts, and the font tokens' fonts; never sizes (those are the game's, UI Scale's, and each addon's for its own text) |
+  | `EverlookFonts` | The font tokens' fonts, and the game's font globals: its font objects and the engine's font paths, each at its own size. It never walks frames or sets a text's font |
+  | `EverlookActionShortcuts` | The action bar hotkey labels: their text, font, size, outline and shadow |
   | `EverlookUnitFrames` | Portraits and unit frame layout |
   | `EverlookChat` | Chat messages, and the chat windows' font, outline and shadow (their size is the tab's) |
 
   Where two of them work on the same frame, each touches only its own part or its own child
   frames.
 - Everlook's own text takes a font token: `text:SetFontObject(Everlook.Font.Body)` (Heading, Body,
-  Small, Chat or Number; `Everlook/font_tokens.lua`). Only EverlookFonts sets a token.
+  Small, Chat or Number; `Everlook/font_tokens.lua`). Only EverlookFonts sets a token's font. Any
+  addon may give text it owns another token, size, outline or shadow, as a setting of its own.
 - A font setting shows at once. When a setting or a token changes the font, size or outline of an
   addon's text, the addon gives each font string its font object again and sets its text afresh,
   since a font string doesn't always redraw when its font object changes. It follows token

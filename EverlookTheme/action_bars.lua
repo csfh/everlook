@@ -2,8 +2,8 @@
 -- line along its bottom, gray while its slot is empty, with the scene showing between the tiles.
 -- The bar's frame, the dividers and each button's slot art are hidden; the icon and everything
 -- that tells the button's state (highlight, pushed, checked, flash, proc glow, cooldowns) stay the
--- game's. The gryphons are EverlookHideClutter's switch, and the key labels are EverlookFonts'
--- and EverlookActionShortcuts'.
+-- game's. The gryphons are EverlookHideClutter's switch, and the key labels are
+-- EverlookActionShortcuts'.
 local _, ns = ...
 local Theme = ns.Theme
 local KEY = "actionBars"

@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: Action Shortcuts
-## Notes: Shortens Shift and Alt in action bar hotkey labels, so s-4 reads S4.
+## Notes: Shortens Shift and Alt in action bar hotkey labels, so s-4 reads S4, and sets their font, size, outline and shadow.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

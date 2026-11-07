@@ -4,8 +4,8 @@
 -- table); without it, each token is the game's own font for its role. The sizes are a fixed scale
 -- that keeps Everlook's text in proportion: an addon picks the token whose size suits its text.
 --
--- The game's own text doesn't use these objects: EverlookFonts gives it the token's font file and
--- leaves each text its own size.
+-- The game's own text doesn't use these objects: EverlookFonts gives the game's font objects the
+-- token's font file, each at its own size, and the game's text follows them.
 
 Everlook.FONT_TOKENS = { "Heading", "Body", "Small", "Chat", "Number" }
 

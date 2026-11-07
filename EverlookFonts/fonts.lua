@@ -1,21 +1,20 @@
 -- Chooses the font of Everlook's five font tokens (Everlook/font_tokens.lua): Heading, Body,
--- Small, Chat and Number. Everlook's own text uses the tokens, at the core's fixed scale. The game's
--- own text takes the font of the token its role belongs to and keeps its own size: sizes are the
--- game's, UI Scale's and each addon's for its own text, never this addon's. Waits while you're in
--- combat, and going back to the game's font puts back the fonts it found. The font files and their
--- licences are in assets/ (see assets/fonts.txt).
+-- Small, Chat and Number, and gives the game's font globals, its font objects and the engine's font
+-- paths, the font of the token their role belongs to, each at its own size. That is all it changes:
+-- it never walks frames or sets a text's font. Text that follows a font object changes with it; an
+-- addon that wants another token, size, outline or shadow for its own text, or for a game text it
+-- owns, sets that itself. Waits while you're in combat, and going back to the game's font puts back
+-- the fonts it found. The font files and their licences are in assets/ (see assets/fonts.txt).
 local defaults = {}
 for _, token in ipairs(Everlook.FONT_TOKENS) do defaults[token:lower() .. "Face"] = "game" end
 local Fonts = Everlook:NewAddon("EverlookFonts", { label = "Fonts", defaults = defaults })
 
--- Game functions this addon needs; EverlookQA checks they exist. Fonts and frames that load on
--- demand or may not exist on every client (nameplate fonts, the objective tracker fonts, FocusFrame,
--- UNIT_NAME_FONT_ROMAN) are left out: the code checks for them before use.
+-- Game functions this addon needs; EverlookQA checks they exist. Fonts that load on demand or may
+-- not exist on every client (nameplate fonts, the objective tracker fonts, UNIT_NAME_FONT_ROMAN)
+-- are left out: the code checks for them before use.
 EverlookQA:Expect("EverlookFonts", {
-	"hooksecurefunc",
 	"InCombatLockdown",
 	"GetLocale",
-	"EnumerateFrames",
 	"debugprofilestop",
 	"STANDARD_TEXT_FONT",
 	"DAMAGE_TEXT_FONT",
@@ -23,13 +22,8 @@ EverlookQA:Expect("EverlookFonts", {
 	"ChatFontNormal",
 	"GameTooltipHeaderText",
 	"CHAT_FRAMES",
-	"PlayerName",
-	"TargetFrame",
-	"PartyFrame.InitializePartyMemberFrames",
-	"DefaultCompactUnitFrameSetup",
+	"NumberFontNormalSmallGray",
 }, {
-	"RANGE_INDICATOR",
-	"ActionBarButtonEventsFrame.ForEachFrame",
 	"GetFonts",
 })
 
@@ -77,13 +71,6 @@ local function choices()
 	return list
 end
 
--- True for a file this addon sets.
-local function ours(path)
-	for _, face in ipairs(FACES) do
-		if path == face.file or path == face.russian then return true end
-	end
-	return false
-end
 -- Each game font is a family with one member per alphabet, and SetFont replaces only the member
 -- for the client's own alphabet. On a Korean or Chinese client that member is one neither font
 -- can draw, so those clients keep every font and size.
@@ -110,6 +97,12 @@ local CHAT_FONT_NAMES = {
 	SystemFont_LargeNamePlate = true, SystemFont_LargeNamePlateFixed = true, SystemFont_NamePlateCastBar = true,
 }
 local NUMBER_FONT_NAMES = { TextStatusBarText = true, TextStatusBarTextLarge = true }
+-- Fonts that keep the game's file. Hotkey labels (action buttons, pet battles, the objective
+-- tracker's item buttons) use NumberFontNormalSmallGray, and a button with no key bound shows
+-- RANGE_INDICATOR ("●", Blizzard_ActionBar/Shared/ActionButton.lua, 12.0.0) in it while out of range,
+-- which none of the fonts draw. It's pinned to the game's file even if a font it inherits changes.
+-- Action Shortcuts gives the action bar's labels a token of the player's choice.
+local GAME_FONT_NAMES = { NumberFontNormalSmallGray = true }
 local HEADING_SIZE, SMALL_SIZE = 16, 10
 
 -- The token for a game font or text: `name` is a font object's name (nil for a text of its own),
@@ -139,9 +132,7 @@ local originals = setmetatable({}, { __mode = "k" })
 -- gave it. It outlives a restore, as the role doesn't change.
 local tokens = setmetatable({}, { __mode = "k" })
 local constants = {}
-local compactNames = setmetatable({}, { __mode = "k" })
-local hooked = {}
--- A full pass walks every font and frame, so it runs only when something may have changed:
+-- A pass walks every font object, so it runs only when something may have changed:
 -- another addon loaded, a pass was blocked by combat, or a choice changed.
 local stale = true
 local passed
@@ -186,35 +177,26 @@ local function fontObjectOf(object)
 	return object:GetFontObject()
 end
 
--- A font object's or text's token. A text that inherits a font object has that font's token, read
--- each time, as the game gives a reused text (a list's rows) another font; a text with a font of
--- its own, or a font object, is sorted once by what the game gave it.
+-- A font object's token, sorted once by its name and what the game gave it.
 local function tokenOf(object)
-	local parent = object:GetObjectType() == "FontString" and fontObjectOf(object)
-	if parent then return tokenOf(parent) end
 	if tokens[object] then return tokens[object] end
-	local token
-	do
-		local original = originals[object]
-		local path, size = object:GetFont()
-		if original then path, size = original[1], original[2] end
-		local name = object:GetObjectType() == "Font" and type(object.GetName) == "function" and object:GetName() or nil
-		token = Fonts.TokenFor(name, path, size)
-	end
-	tokens[object] = token
-	return token
+	local original = originals[object]
+	local path, size = object:GetFont()
+	if original then path, size = original[1], original[2] end
+	local name = type(object.GetName) == "function" and object:GetName() or nil
+	tokens[object] = Fonts.TokenFor(name, path, size)
+	return tokens[object]
 end
 
--- Text that inherits one of these fonts changes along with it. SetFont on the text itself would
--- pin it at its current font and size.
+-- A font that inherits one of these changes along with it.
 local function follows(object, fonts)
 	if fonts[object] then return true end
 	local parent = fontObjectOf(object)
 	return parent ~= nil and fonts[parent] == true
 end
 
--- The record of the font a text inherits, when the text shows that font as this addon replaced
--- it, at this pass's size or the one before (a pass reaches fonts before their text).
+-- The record of the font a font inherits, when it shows that font as this addon replaced it, at
+-- this pass's size or the one before.
 local function replacedParent(object, path, size)
 	local parent = fontObjectOf(object)
 	local inherited = parent and originals[parent]
@@ -223,7 +205,7 @@ local function replacedParent(object, path, size)
 	end
 end
 
--- Text that inherits a font this addon already replaced reports the replacement, so what it had
+-- A font that inherits one this addon already replaced reports the replacement, so what it had
 -- before is the font it inherited.
 local function originalOf(object, path, size, flags)
 	local inherited = replacedParent(object, path, size)
@@ -231,7 +213,7 @@ local function originalOf(object, path, size, flags)
 	return { path, size, flags }
 end
 
--- Text another addon resized since this one set it keeps that size as its own. Text set back to
+-- A font another addon resized since this one set it keeps that size as its own. A font set back to
 -- the font it inherits has that font's own again, so the adjustment isn't added twice.
 local function rebase(original, object, path, size)
 	local inherited = replacedParent(object, path, size)
@@ -242,8 +224,8 @@ local function rebase(original, object, path, size)
 	end
 end
 
--- `font` is the file to give the text, or nil for the one it had before this addon set it.
--- Text this addon hasn't set stays as it is while nothing would change it.
+-- `font` is the file to give the font, or nil for the one it had before this addon set it.
+-- A font this addon hasn't set stays as it is while nothing would change it.
 local function replace(object, font)
 	if not object or not object.GetFont or not object.SetFont then return end
 	if object.IsForbidden and object:IsForbidden() then return end
@@ -261,7 +243,7 @@ local function replace(object, font)
 	original.font = font or original[1]
 	original.earlierSize = original.lastSize
 	original.lastSize = original[2]
-	-- A later pass leaves text it already set where it is.
+	-- A later pass leaves a font it already set where it is.
 	if seenBefore and path == original.font and size == original.lastSize then return end
 	object:SetFont(original.font, original.lastSize, flags)
 end
@@ -278,130 +260,11 @@ local function chatFrames()
 	return list
 end
 
--- Unit frame names inherit GameFontNormalSmall, which much other text shares, so each name gets
--- its own font.
-local function nameTexts()
-	local list = {}
-	local function add(text)
-		if type(text) == "table" then list[#list + 1] = text end
-	end
-	add(PlayerName)
-	add(PetName)
-	for _, key in ipairs({ "TargetFrame", "FocusFrame" }) do
-		local frame = _G[key]
-		if type(frame) == "table" then
-			local content = frame.TargetFrameContent
-			local main = type(content) == "table" and content.TargetFrameContentMain
-			if type(main) == "table" then add(main.Name) end
-			if type(frame.totFrame) == "table" then add(frame.totFrame.Name) end
-		end
-	end
-	local pool = type(PartyFrame) == "table" and PartyFrame.PartyMemberFramePool
-	if type(pool) == "table" and type(pool.EnumerateActive) == "function" then
-		for member in pool:EnumerateActive() do
-			add(member.Name)
-			if type(member.PetFrame) == "table" then add(member.PetFrame.Name) end
-		end
-	end
-	for text in pairs(compactNames) do add(text) end
-	return list
-end
-
-local function ready()
-	return not inCombat() and not unsupported()
-end
-
--- Player and unit names are the Chat token's.
-local function nameFont(choice)
-	return choice.files.Chat
-end
-
-local function refreshNames()
-	if not ready() then
-		stale = true
-		return
-	end
-	local choice = wanted()
-	for _, text in ipairs(nameTexts()) do replace(text, nameFont(choice)) end
-end
-
--- Party members and raid-style frames are made after login, so their names change as each one
--- is set up.
-local function hookNameFrames()
-	if not hooked.party and type(PartyFrame) == "table" and type(PartyFrame.InitializePartyMemberFrames) == "function" then
-		hooksecurefunc(PartyFrame, "InitializePartyMemberFrames", refreshNames)
-		hooked.party = true
-	end
-	if not hooked.compact and type(DefaultCompactUnitFrameSetup) == "function" then
-		hooksecurefunc("DefaultCompactUnitFrameSetup", function(frame)
-			if type(frame) ~= "table" or type(frame.name) ~= "table" then return end
-			compactNames[frame.name] = true
-			if not ready() then
-				stale = true
-				return
-			end
-			local choice = wanted()
-			replace(frame.name, nameFont(choice))
-		end)
-		hooked.compact = true
-	end
-end
-
--- An action button with no key bound shows RANGE_INDICATOR ("●", Blizzard_ActionBar/Shared/
--- ActionButton.lua, 12.0.0) in its hotkey label while out of range. Neither font draws that
--- character, and the game compares the label's text with it, so the label keeps the game's font
--- while it shows the dot instead of the text changing.
-local function showsRangeDot(text)
-	if type(RANGE_INDICATOR) ~= "string" or type(text.GetText) ~= "function" then return false end
-	local value = text:GetText()
-	return not (issecretvalue and issecretvalue(value)) and value == RANGE_INDICATOR
-end
-
--- The file the game gave this text, before this addon set it or the font it inherits.
-local function gameFile(text)
-	if originals[text] then return originals[text][1] end
-	local path, size, flags = text:GetFont()
-	return originalOf(text, path, size, flags)[1]
-end
-
--- UpdateHotkeys writes the label when bindings change, so the label's font follows its new text.
--- A label changed in combat waits for combat to end, alone, instead of a whole new pass.
-local waitingLabels = {}
-
-local function restyleLabel(label)
-	if not passed or empty(passed) then return end
-	if not ready() then
-		waitingLabels[label] = true
-		return
-	end
-	local file = passed.files[tokenOf(label)]
-	if showsRangeDot(label) then file = gameFile(label) end
-	replace(label, file)
-end
-
-local function hotkeyChanged(button)
-	if type(button.HotKey) == "table" then restyleLabel(button.HotKey) end
-end
-
-local function restyleWaitingLabels()
-	local labels = waitingLabels
-	waitingLabels = {}
-	for label in pairs(labels) do restyleLabel(label) end
-end
-
-local function hookButton(button)
-	if hooked[button] or type(button) ~= "table" or type(button.UpdateHotkeys) ~= "function" then return end
-	hooksecurefunc(button, "UpdateHotkeys", hotkeyChanged)
-	hooked[button] = true
-end
-
-local function hookActionButtons()
-	local manager = ActionBarButtonEventsFrame
-	if hooked.actionButtons or type(manager) ~= "table" or type(manager.ForEachFrame) ~= "function"
-		or type(manager.RegisterFrame) ~= "function" then return end
-	hooksecurefunc(manager, "RegisterFrame", function(_, button) hookButton(button) end)
-	manager:ForEachFrame(hookButton)
-	hooked.actionButtons = true
+-- The file the game gave a font, before this addon set it or the font it inherits.
+local function gameFile(object)
+	if originals[object] then return originals[object][1] end
+	local path, size, flags = object:GetFont()
+	return originalOf(object, path, size, flags)[1]
 end
 
 local function setGlobals(keys, font)
@@ -426,9 +289,9 @@ local function restore()
 	constants = {}
 end
 
--- A pass over every frame is about thirteen thousand frames and close to a hundred milliseconds,
--- which would stall one frame. It runs as a task on Everlook.Schedule, a slice per frame within the
--- shared budget, `job` holding where it is.
+-- A pass over every font object can take more than a frame's share, the more so without GetFonts.
+-- It runs as a task on Everlook.Schedule, a slice per frame within the shared budget, `job` holding
+-- where it is.
 local job
 
 -- Milliseconds, or nil when the client has no profiling clock (then a pass runs in one go).
@@ -436,113 +299,17 @@ local function clock()
 	if debugprofilestop then return debugprofilestop() end
 end
 
-local function restyleRegions(pass, ...)
-	for index = 1, select("#", ...) do
-		local region = select(index, ...)
-		if region.GetObjectType and region:GetObjectType() == "FontString"
-			and not follows(region, pass.kept) and not follows(region, pass.tokens) then
-			local file = pass.names[region] and nameFont(pass) or pass.files[tokenOf(region)]
-			if showsRangeDot(region) then file = gameFile(region) end
-			replace(region, file)
-			pass.names[region] = nil
-		end
-	end
-end
-
--- TEMP: a record of what the font pass does to the unit frames and chat windows, saved in
--- EverlookDB.EverlookFonts.debug so the next reload or logout writes it to disk. Remove once the
--- unit frame font report is settled.
-local debugRecord
-local function record()
-	local db = Fonts.db
-	if not db then return nil end
-	if not debugRecord then
-		debugRecord = { locale = GetLocale(), started = 0, fontsDone = 0, framesDone = 0, finished = 0,
-			errors = {}, fonts = {}, snapshots = {} }
-		db.debug = debugRecord
-	end
-	return debugRecord
-end
-
-local function isSecret(value)
-	return issecretvalue ~= nil and issecretvalue(value) == true
-end
-
-local function describeFont(object)
-	if type(object) ~= "table" or type(object.GetFont) ~= "function" then return tostring(object) end
-	local path, size, flags = object:GetFont()
-	if isSecret(path) or isSecret(size) then return "secret font" end
-	local parent = fontObjectOf(object)
-	local parentName = parent and parent.GetName and parent:GetName()
-	local file = type(path) == "string" and (path:match("[^\\/]+$") or path) or tostring(path)
-	local text = ""
-	if type(object.GetText) == "function" then
-		local value = object:GetText()
-		if isSecret(value) then text = " [secret text]" elseif value then text = " \"" .. tostring(value):sub(1, 20) .. "\"" end
-	end
-	return string.format("%s %s %s <%s>%s", file, tostring(size), tostring(flags), tostring(parentName), text)
-end
-
-local function nameOf(object)
-	if type(object.GetDebugName) == "function" then return object:GetDebugName() end
-	if type(object.GetName) == "function" then return tostring(object:GetName()) end
-	return tostring(object)
-end
-
-local function snapshot(label)
-	local debug = record()
-	if not debug or #debug.snapshots >= 6 then return end
-	local shot = { label = label, combat = inCombat(), fonts = {}, texts = {}, chat = {} }
-	-- Each chat window's font and the font object it follows, to settle whether chat gets the
-	-- Chat token's file and keeps it.
-	shot.chat.ChatFontNormal = describeFont(ChatFontNormal)
-	for _, frame in ipairs(chatFrames()) do shot.chat[nameOf(frame)] = describeFont(frame) end
-	for _, name in ipairs({ "GameFontNormalSmall", "GameFontHighlightSmall", "TextStatusBarText",
-		"GameNormalNumberFont", "SystemFont_Shadow_Small", "SystemFont_Outline_Small" }) do
-		shot.fonts[name] = describeFont(_G[name])
-	end
-	local count = 0
-	local function scan(frame, depth)
-		if count >= 240 or depth > 8 or type(frame) ~= "table" or type(frame.GetRegions) ~= "function" then return end
-		if frame.IsForbidden and frame:IsForbidden() then return end
-		for _, region in ipairs({ frame:GetRegions() }) do
-			if count < 240 and region.GetObjectType and region:GetObjectType() == "FontString" then
-				count = count + 1
-				shot.texts[count] = nameOf(region) .. " = " .. describeFont(region)
-			end
-		end
-		if type(frame.GetChildren) == "function" then
-			for _, child in ipairs({ frame:GetChildren() }) do scan(child, depth + 1) end
-		end
-	end
-	for _, name in ipairs({ "PlayerFrame", "PetFrame", "TargetFrame", "FocusFrame", "PartyFrame",
-		"CompactPartyFrame", "Boss1TargetFrame" }) do
-		local before = count
-		scan(_G[name], 0)
-		shot.texts[#shot.texts + 1] = "-- " .. name .. ": " .. (count - before) .. " texts"
-		count = count + 1
-	end
-	debug.snapshots[#debug.snapshots + 1] = shot
-end
-
 -- Sets the globals and the font objects, which is quick, and returns the pass.
 local function beginPass()
-	local debug = record() -- TEMP
-	if debug then debug.started, debug.combatAtStart = debug.started + 1, inCombat() end
 	local choice = wanted()
 	-- After a font choice changed, the pass starts from the fonts the game had, so the family
 	-- turned off takes back all it set, globals and chat windows too.
 	if passed and not sameFiles(passed, choice) then restore() end
 	passed = choice
 	stale = false
-	hookNameFrames()
-	hookActionButtons()
 	for token, keys in pairs(GLOBALS) do
 		if choice.files[token] then setGlobals(keys, choice.files[token]) end
 	end
-	-- Everlook's own text follows its token, which EverlookFonts sets whole.
-	local ownTokens = {}
-	for _, token in ipairs(Everlook.FONT_TOKENS) do ownTokens[Everlook.Font[token]] = true end
 	-- Tracker text follows shared fonts that its text size option points at other fonts. Chat
 	-- lines follow their window's own copy of ChatFontNormal.
 	local kept = {}
@@ -552,7 +319,7 @@ local function beginPass()
 	for name in pairs(CHAT_FONT_NAMES) do
 		if _G[name] then chatFonts[_G[name]] = true end
 	end
-	-- Chat windows are EverlookChat's (AGENTS.md's ownership table), so the walk leaves them be.
+	-- Chat windows are EverlookChat's (AGENTS.md's ownership table), so their fonts are left be.
 	for _, frame in ipairs(chatFrames()) do
 		local own = fontObjectOf(frame)
 		if own and not chatFonts[own] then kept[own] = true end
@@ -572,12 +339,7 @@ local function beginPass()
 			if kind == "table" or kind == "userdata" then candidates[#candidates + 1] = object end
 		end
 	end
-	local names = {}
-	for _, text in ipairs(nameTexts()) do names[text] = true end
-	return {
-		files = choice.files,
-		kept = kept, tokens = ownTokens, names = names, frame = false, candidates = candidates, at = 0,
-	}
+	return { files = choice.files, kept = kept, candidates = candidates, at = 0 }
 end
 
 -- Replaces the font objects among the listed globals until limitMs is up, and says whether any
@@ -590,49 +352,18 @@ local function walkFonts(pass, limitMs)
 		local object = candidates[pass.at]
 		if object.GetObjectType and (not object.IsForbidden or not object:IsForbidden())
 			and object:GetObjectType() == "Font" and not follows(object, pass.kept) and not isToken(object) then
-			replace(object, pass.files[tokenOf(object)])
+			local name = type(object.GetName) == "function" and object:GetName()
+			if name and GAME_FONT_NAMES[name] then
+				replace(object, gameFile(object))
+			else
+				replace(object, pass.files[tokenOf(object)])
+			end
 		end
 		-- Reading the clock costs next to nothing; checking after each one keeps a slice in its limit.
 		if began and clock() - began >= limitMs then return true end
 	end
 	pass.candidates = nil
-	if debugRecord then debugRecord.fontsDone = debugRecord.fontsDone + 1 end -- TEMP
 	return false
-end
-
--- Walks frames until limitMs is up, and says whether any are left.
-local function walk(pass, limitMs)
-	local began = clock()
-	local frame
-	if pass.frame == false then frame = EnumerateFrames() else frame = EnumerateFrames(pass.frame) end
-	while frame do
-		if not frame.IsForbidden or not frame:IsForbidden() then
-			restyleRegions(pass, frame:GetRegions())
-		end
-		pass.frame = frame
-		frame = EnumerateFrames(frame)
-		if frame and began and clock() - began >= limitMs then return true end
-	end
-	pass.frame = nil
-	if debugRecord then debugRecord.framesDone = debugRecord.framesDone + 1 end -- TEMP
-	return false
-end
-
-local lateShot = false -- TEMP
-local function finish(pass)
-	if debugRecord then -- TEMP
-		debugRecord.finished = debugRecord.finished + 1
-		local files = {}
-		for _, token in ipairs(Everlook.FONT_TOKENS) do files[#files + 1] = token .. " " .. tostring(pass.files[token]) end
-		debugRecord.choice = table.concat(files, " / ")
-		pcall(snapshot, "pass finished")
-		if not lateShot and C_Timer and C_Timer.After then
-			lateShot = true
-			C_Timer.After(30, function() pcall(snapshot, "30 s after a pass") end)
-		end
-	end
-	-- Party members and raid-style frames hang under frames this walk can miss.
-	for text in pairs(pass.names) do replace(text, nameFont(pass)) end
 end
 
 -- One slice of the pass. True while work is left; combat pauses it. A request that came in during
@@ -647,36 +378,18 @@ local function slice(limitMs)
 		if not stale and same(passed, wanted()) then return false end
 		job = beginPass()
 	end
-	local limit = limitMs or 0
-	local began = clock()
-	if job.candidates and walkFonts(job, limit) then return true end
-	if walk(job, began and math.max(0, limit - (clock() - began)) or limit) then return true end
-	finish(job)
+	if walkFonts(job, limitMs or 0) then return true end
 	job = nil
 	return stale or not same(passed, wanted())
 end
 
 -- Font objects belong to the game's own frames, so the pass waits out combat.
--- TEMP: the scheduler counts a step's errors without saving them, so the record keeps the first few
--- and where the walk was, then passes the error on.
-local function recordedSlice(limitMs)
-	local ok, result = pcall(slice, limitMs)
-	if ok then return result end
-	local debug = record()
-	if debug and #debug.errors < 10 then
-		local at = job and job.frame and nameOf(job.frame) or "-"
-		debug.errors[#debug.errors + 1] = tostring(result) .. " | after frame " .. at
-			.. " | fonts left " .. tostring(job and job.candidates and (#job.candidates - job.at) or 0)
-	end
-	error(result, 0)
-end
-
-local fontsTask = Everlook.Schedule.Task("fonts", { step = recordedSlice, combat = "pause" })
+local fontsTask = Everlook.Schedule.Task("fonts", { step = slice, combat = "pause" })
 
 -- Without a profiling clock the pass can't be sliced, so it runs in one go.
 local function runNow()
 	local guard = 0
-	while recordedSlice(1e9) and guard < 1000 and not inCombat() do guard = guard + 1 end
+	while slice(1e9) and guard < 1000 and not inCombat() do guard = guard + 1 end
 end
 
 local function restoreAll()
@@ -711,8 +424,8 @@ local ROLES = {
 	Heading = "titles: windows, quests, sections and tooltip headers",
 	Body = "most of the interface's text",
 	Small = "small print: labels, captions and timers",
-	Chat = "the chat input, chat bubbles, nameplates and unit frame names (Chat sets the chat windows' font)",
-	Number = "numbers: health and power, damage, cooldowns, counts and key bindings",
+	Chat = "the chat input, chat bubbles and nameplates (Chat sets the chat windows' font)",
+	Number = "numbers: health and power, damage, cooldowns and counts (Action Shortcuts sets the hotkey labels')",
 }
 
 function Fonts:OnInitialize()
@@ -726,28 +439,20 @@ function Fonts:OnInitialize()
 end
 
 function Fonts:OnEnable()
-	-- Another addon's text appears as it loads.
+	-- Another addon's fonts appear as it loads.
 	self:RegisterEvent("ADDON_LOADED", function()
 		stale = true
 		self:Apply()
 	end)
-	-- Zone changes and instance loading screens add no new text, so only login or a reload
-	-- walks everything again.
+	-- Zone changes and instance loading screens add no new fonts, so only login or a reload
+	-- walks them again.
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", function(_, isLogin, isReload)
 		if not isLogin and not isReload then return end
 		stale = true
 		self:Apply()
 	end)
-	-- TEMP: the unit frames once a target is chosen.
-	self:RegisterEvent("PLAYER_TARGET_CHANGED", function()
-		if debugRecord and not debugRecord.targetShot then
-			debugRecord.targetShot = true
-			pcall(snapshot, "first target")
-		end
-	end)
 	-- What combat blocked happens once it ends.
 	self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
-		restyleWaitingLabels()
 		if stale or job then self:Apply() end
 	end)
 end
