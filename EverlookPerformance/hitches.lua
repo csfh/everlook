@@ -11,7 +11,9 @@ local MAX_HITCHES = 50
 local TOP_EVENTS = 12
 local TOP_ADDONS = 5
 
-local counts = {} -- [event] = times it fired since the last frame; reset to 0, never replaced
+-- [event] = times it fired since the last frame, and the events that fired, in order. Both are emptied
+-- each frame, never replaced, so the reset costs the events of one frame, not every event ever seen.
+local counts, fired = {}, {}
 local loading, settleUntil = false, 0
 local lastKB
 local current -- the entry a run of long frames is merged into
@@ -47,9 +49,7 @@ end
 -- The busiest events since the last frame, as "EVENT xN", most first.
 local function topEvents()
 	local list = {}
-	for event, count in pairs(counts) do
-		if count > 0 then list[#list + 1] = { event, count } end
-	end
+	for i, event in ipairs(fired) do list[i] = { event, counts[event] } end
 	table.sort(list, function(a, b) return a[2] > b[2] end)
 	local out = {}
 	for i = 1, math.min(#list, TOP_EVENTS) do
@@ -110,7 +110,10 @@ function Performance:RecordFrame(elapsed)
 		current = nil
 	end
 	lastKB = kb
-	for event in pairs(counts) do counts[event] = 0 end
+	for i = #fired, 1, -1 do
+		counts[fired[i]] = nil
+		fired[i] = nil
+	end
 end
 
 function Performance:StartHitches()
@@ -119,7 +122,9 @@ function Performance:StartHitches()
 	self.hitchFrame = frame
 	frame:RegisterAllEvents()
 	frame:SetScript("OnEvent", function(_, event)
-		counts[event] = (counts[event] or 0) + 1
+		local count = counts[event]
+		if not count then fired[#fired + 1] = event end
+		counts[event] = (count or 0) + 1
 		if event == "LOADING_SCREEN_ENABLED" then
 			loading = true
 		elseif event == "LOADING_SCREEN_DISABLED" then
