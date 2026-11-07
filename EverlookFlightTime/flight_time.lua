@@ -159,7 +159,7 @@ function FlightTime:Update()
 	if known and self.db.remaining then
 		text = text .. "  (~" .. duration(known.seconds - elapsed) .. " left)"
 	end
-	self.label:SetText(text)
+	self.text:SetText(text)
 	self.frame:Show()
 end
 
@@ -178,7 +178,7 @@ function FlightTime:OnEnable()
 	local label = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	label:SetPoint("CENTER")
 	frame:Hide()
-	self.frame, self.label = frame, label
+	self.frame, self.text = frame, label
 	self.poller = CreateFrame("Frame", "EverlookFlightTimePoller")
 
 	if not hooked then

@@ -29,9 +29,10 @@ local frame = EverlookFlightTimeFrame
 local function tick(at) now = at poller.scripts.OnUpdate(poller, 0.3) end
 
 check(F.db.show and F.db.remaining, "timer and time remaining start on")
+check(F.label == "Flight Time", "its name stays its name: the settings catalog sorts by it")
 check(hooks.TakeTaxiNode ~= nil, "hooks TakeTaxiNode")
 tick(1000)
-check(frame:IsShown() and F.label.text == "Stormwind  0:10", "a reload in the air keeps timing from takeoff")
+check(frame:IsShown() and F.text.text == "Stormwind  0:10", "a reload in the air keeps timing from takeoff")
 
 -- Landing records the route.
 onTaxi = false
@@ -45,12 +46,12 @@ hooks.TakeTaxiNode(2)
 onTaxi = true
 tick(2000)
 tick(2030)
-check(F.label.text == "Stormwind  0:30  (~0:30 left)", "a known route shows the time left")
+check(F.text.text == "Stormwind  0:30  (~0:30 left)", "a known route shows the time left")
 check(F.db.current and F.db.current.started == 2000, "the flight in progress is saved for a reload")
 
 t.change("EverlookFlightTime_remaining", false)
 tick(2040)
-check(F.label.text == "Stormwind  0:40", "time left can be turned off")
+check(F.text.text == "Stormwind  0:40", "time left can be turned off")
 t.change("EverlookFlightTime_remaining", true)
 
 onTaxi = false
