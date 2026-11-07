@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: Quest Rank
+## Notes: Keeps the quests you're working on at the top of the quest tracker and tracks every quest with recent activity until the tracker is full. Alt-click a quest's title to pin it to the top.
+## Version: 0.1.0
+## Dependencies: Everlook, EverlookPreferences, EverlookQA
+## Group: Everlook
+## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
+
+quest_rank.lua
