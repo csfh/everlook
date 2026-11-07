@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: Pointer
-## Notes: A ring around the mouse pointer that takes the color of what you point at, grows in combat and fills as you cast.
+## Notes: A ring around the mouse pointer that takes the color of what you point at, grows and turns red in combat and fills as you cast.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

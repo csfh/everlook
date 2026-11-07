@@ -8,6 +8,7 @@ local Pointer = Everlook:NewAddon("EverlookPointer", {
 		reactionColor = false,
 		combat = false,
 		combatSize = 1.4,
+		combatRed = false,
 		cast = false,
 		hideDragging = true,
 	},
@@ -49,6 +50,7 @@ function Pointer.RingFile(size, width)
 end
 local WHITE = { 1, 1, 1 }
 local DEAD = { 0.5, 0.5, 0.5 }
+local RED = { 1, 0, 0 } -- the game's hostile red (UnitSelectionColor)
 local CAST = { 1, 0.82, 0 } -- the gold of the game's cast bar
 local CAST_SCALE = 1.3 -- the cast ring sits just outside the pointer ring
 
@@ -80,6 +82,8 @@ function Pointer:OnInitialize()
 		"Makes the ring bigger and pulse while you're in combat. Needs Ring around the pointer.")
 	page:Slider("combatSize", "Combat size", "How much bigger the ring gets in combat. Needs Grow and pulse in combat.",
 		1.1, 2, 0.1, EverlookPreferences.Percent)
+	page:Checkbox("combatRed", "Red in combat",
+		"Turns the ring red while you're in combat, whatever is under the pointer. Needs Ring around the pointer.")
 	page:Checkbox("hideDragging", "Hide while dragging the camera",
 		"Hides the ring while you hold a mouse button to turn the camera, as the game hides the pointer, and shows it again on the pointer when you let go. Needs Ring around the pointer.")
 	page:Checkbox("cast", "Show cast progress",
@@ -161,11 +165,14 @@ function Pointer:FollowUnit()
 	if self.tinted and not UnitExists("mouseover") then self:Tint() end
 end
 
--- The game's selection color for the unit under the pointer, gray if it's dead, else white.
+-- Red in combat while that's on; else the game's selection color for the unit under the pointer,
+-- gray if it's dead, else white.
 function Pointer:Tint()
 	local color = WHITE
 	self.tinted = false
-	if self.db.reactionColor and UnitExists("mouseover") then
+	if self.db.combatRed and inCombat then
+		color = RED
+	elseif self.db.reactionColor and UnitExists("mouseover") then
 		local dead = UnitIsDead("mouseover")
 		if not secret(dead) and dead then
 			color = DEAD
@@ -276,11 +283,17 @@ function Pointer:OnEnable()
 	inCombat = InCombatLockdown() and true or false
 	self:RegisterEvent("PLAYER_REGEN_DISABLED", function()
 		inCombat = true
-		if frame and self.db.ring then self:Shape() end
+		if frame and self.db.ring then
+			self:Shape()
+			self:Tint()
+		end
 	end)
 	self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
 		inCombat = false
-		if frame and self.db.ring then self:Shape() end
+		if frame and self.db.ring then
+			self:Shape()
+			self:Tint()
+		end
 	end)
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", function()
 		if frame and self.db.ring then self:Tint() end

@@ -100,6 +100,25 @@ check(P.ringTexture.texture == P.RingFile(64 * 1.4, 3), "and its band keeps its 
 t.fire("PLAYER_REGEN_ENABLED")
 check(frame.width == 64, "out of combat: back to its size")
 
+-- Red in combat.
+check(P.db.combatRed == false, "red in combat starts off")
+mouseover = { 0, 1, 0 }
+t.fire("UPDATE_MOUSEOVER_UNIT")
+t.fire("PLAYER_REGEN_DISABLED")
+check(color() == "0,1,0", "off: in combat the ring keeps the unit's color")
+change("combatRed", true)
+check(color() == "1,0,0", "on: in combat the ring is red over a friendly unit")
+t.fire("UPDATE_MOUSEOVER_UNIT")
+mouseover = nil
+frame.scripts.OnUpdate()
+check(color() == "1,0,0", "and stays red as the pointer moves on and off units")
+t.fire("PLAYER_REGEN_ENABLED")
+check(color() == "1,1,1", "out of combat: back to white")
+t.fire("PLAYER_REGEN_DISABLED")
+change("combatRed", false)
+check(color() == "1,1,1", "turned off in combat: white again")
+t.fire("PLAYER_REGEN_ENABLED")
+
 -- Dragging the camera.
 local mouselooking = false
 IsMouselooking = function() return mouselooking end
