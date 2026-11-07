@@ -1,13 +1,17 @@
 ## Interface: 16001
 ## Title: Theme
-## Notes: A flat look, dark solid backgrounds with a muted gold line, for the chat windows, the experience and reputation bars and tooltips, and a level badge on every unit frame.
+## Notes: A flat look, dark solid backgrounds with a muted gold line, for the chat windows, the experience and reputation bars, the action bars, the micro menu and bag bar, and tooltips, with the bottom bars lined up in one Edit Mode layout, and a level badge on every unit frame.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook
 ## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
 
 theme.lua
+bottom_layout.lua
 chat.lua
 status_bars.lua
+action_bars.lua
+micro_menu.lua
+bags_bar.lua
 tooltips.lua
 level_badges.lua

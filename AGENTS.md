@@ -46,6 +46,10 @@ code fails on secret values.
   Blizzard function, calls `SetScript` on a game frame, writes a field onto one, or calls
   Blizzard's styling functions (`NineSliceUtil.ApplyLayout`). It never opens or closes a Blizzard
   panel. What it drew is kept in its own tables, keyed by the game frame.
+- Where Edit Mode systems sit and how big they are changes only through an Everlook character
+  layout written with `C_EditMode` (as data, never through `EditModeManagerFrame`), out of combat
+  and with Edit Mode closed; the game places the frames from it (`EverlookTheme/bottom_layout.lua`).
+  Turned off, it makes the game's default layout active, and only when Everlook's is the one in use.
 - In `EverlookTheme`, each surface is one file that hands a record to `Theme:Surface` (its fields
   are listed in `theme.lua`), with its own `_test.lua` built on `test_setup.lua`. Add it to the
   TOC after `theme.lua` and its setting to the defaults there.
@@ -60,7 +64,7 @@ code fails on secret values.
 
   | Owner | What only it changes |
   | --- | --- |
-  | `EverlookTheme` | Art textures, and the panels it draws |
+  | `EverlookTheme` | Art textures, the panels it draws, and the bottom bars' Edit Mode layout |
   | `EverlookFonts` | Fonts, and the font tokens' fonts; never sizes (those are the game's, UI Scale's, and each addon's for its own text) |
   | `EverlookUnitFrames` | Portraits and unit frame layout |
   | `EverlookChat` | Chat messages, and the chat windows' font, outline and shadow (their size is the tab's) |

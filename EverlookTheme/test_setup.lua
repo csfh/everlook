@@ -106,6 +106,11 @@ PixelUtil = {
 MainStatusTrackingBarContainer = t.widget("MainStatusTrackingBarContainer")
 MainStatusTrackingBarContainer.BarFrameTexture = shownTexture()
 
+-- The main action bar (MainActionBar.xml); action_bars_test.lua gives it buttons.
+MainActionBar = t.widget("MainActionBar")
+MainActionBar.BorderArt = shownTexture()
+MainActionBar.EndCaps = { LeftEndCap = shownTexture(), RightEndCap = shownTexture() }
+
 -- A tooltip, styled by SharedTooltip_SetBackdropStyle.
 GameTooltip.NineSlice = t.widget()
 GameTooltip.NineSlice.shown = true
@@ -134,6 +139,16 @@ end } }
 local levels = { player = 20, party1 = 17 }
 UnitExists = function(unit) return levels[unit] ~= nil end
 UnitLevel = function(unit) return levels[unit] end
+
+-- EventRegistry's callbacks (CallbackRegistry.lua): a test triggers them with EventRegistry:Trigger.
+EventRegistry = { callbacks = {} }
+function EventRegistry:RegisterCallback(event, fn, owner)
+	self.callbacks[event] = self.callbacks[event] or {}
+	table.insert(self.callbacks[event], { fn, owner })
+end
+function EventRegistry:Trigger(event, ...)
+	for _, entry in ipairs(self.callbacks[event] or {}) do entry[1](entry[2], ...) end
+end
 
 t.load("EverlookTheme")
 t.fire("PLAYER_LOGIN")

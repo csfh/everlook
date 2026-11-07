@@ -1,7 +1,7 @@
 -- The theme: a flat look for some of the game's own frames, each a dark solid with one thin line
 -- along its bottom in a muted gold, and no artwork. This file holds the style, the
 -- panel it draws, and the engine that applies a surface; each surface (chat.lua, status_bars.lua,
--- tooltips.lua, level_badges.lua) is one record handed to Theme:Surface. AGENTS.md's "Restyling
+-- action_bars.lua, micro_menu.lua, bags_bar.lua, tooltips.lua, level_badges.lua) is one record handed to Theme:Surface. AGENTS.md's "Restyling
 -- the game's frames" holds the rules: the game's frames only have textures hidden and frames of
 -- this addon's own drawn on them, and turning a surface off gives back every texture it hid.
 local _, ns = ...
@@ -11,6 +11,11 @@ local Theme = Everlook:NewAddon("EverlookTheme", {
 	defaults = {
 		chat = false,
 		statusBars = false,
+		actionBars = false,
+		microMenu = false,
+		bagsBar = false,
+		-- The bottom bars lined up through an Everlook Edit Mode layout (bottom_layout.lua).
+		bottomLayout = false,
 		tooltips = false,
 		levelBadges = false,
 		-- How much of the scene the solids cover, 0 to 1.
@@ -128,18 +133,21 @@ end
 
 -- The game's own textures a surface hid, and how: "hide" (Hide, Show to undo) for art the game
 -- fades by alpha, "alpha" (SetAlpha 0, 1 to undo) for art the game shows and hides itself.
+-- A faded texture the game keeps below full alpha names that alpha as `restore`.
 local hidden = {} -- [key] = { [texture] = "hide" | "alpha" }
+local restoreAlpha = {} -- [texture] = the alpha the game gives it, when not 1
 
-function Theme.HideArt(key, texture, how)
+function Theme.HideArt(key, texture, how, restore)
 	if not Theme.Usable(texture) then return end
 	hidden[key] = hidden[key] or {}
 	hidden[key][texture] = how
+	restoreAlpha[texture] = restore
 	if how == "hide" then texture:Hide() else texture:SetAlpha(0) end
 end
 
 local function restoreArt(key)
 	for texture, how in pairs(hidden[key] or {}) do
-		if how == "hide" then texture:Show() else texture:SetAlpha(1) end
+		if how == "hide" then texture:Show() else texture:SetAlpha(restoreAlpha[texture] or 1) end
 	end
 	hidden[key] = nil
 end
@@ -169,6 +177,37 @@ function Theme.Hosts(key)
 	return pairs(drawn[key] or {})
 end
 
+-- A tile on a button: the dark solid under the button's own art and the line over it, drawn by
+-- `key` and inset by `inset` units on each side (0 when nil). The action, micro and bag buttons use it.
+function Theme.Tile(key, button, inset)
+	return Theme.Draw(key, button, function()
+		local tile = Theme.Panel(button, true, true)
+		inset = inset or 0
+		tile:SetPoint("TOPLEFT", button, "TOPLEFT", inset, -inset)
+		tile:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -inset, inset)
+		-- Icons sit in the BACKGROUND or ARTWORK layer: the solid goes under them all and the line
+		-- over them, so an icon covers neither.
+		tile.fill:SetDrawLayer("BACKGROUND", -8)
+		tile.line:SetDrawLayer("OVERLAY")
+		return tile
+	end)
+end
+
+-- The dividers a bar lays out between its buttons (MainActionBarMixin:UpdateDividers,
+-- BagsBarMixin:UpdateDividers): NineSlice frames from the bar's two pools, so every piece of each
+-- is hidden. The game shows the divider frames themselves.
+function Theme.HideDividers(key, bar)
+	for _, pool in ipairs({ bar.HorizontalDividersPool or false, bar.VerticalDividersPool or false }) do
+		if pool and pool.EnumerateActive then
+			for divider in pool:EnumerateActive() do
+				if Theme.Usable(divider) and divider.GetRegions then
+					for _, region in ipairs({ divider:GetRegions() }) do Theme.HideArt(key, region, "hide") end
+				end
+			end
+		end
+	end
+end
+
 -- Everlook keeps one handler per event per addon, so the engine and every surface share an event
 -- through here: each `fn(event, ...)` runs, in the order they were added.
 local handlers = {} -- [event] = { fn, ... }
@@ -189,7 +228,16 @@ local waiting = {} -- [key] = true for a surface on protected frames held back b
 function Theme:Apply(key)
 	local record = byKey[key]
 	for _, made in pairs(drawn[key] or {}) do made:Hide() end
-	if not self:IsOn(key) then return restoreArt(key) end
+	if not self:IsOn(key) then
+		-- What it drew is hidden at once, but the game's own art on protected frames comes back
+		-- only after combat, as touching it is what the combat rule holds back.
+		if record.combat and InCombatLockdown() then
+			waiting[key] = true
+			return
+		end
+		waiting[key] = nil
+		return restoreArt(key)
+	end
 	if record.combat and InCombatLockdown() then
 		waiting[key] = true
 	else
@@ -215,11 +263,20 @@ function Theme:OnInitialize()
 		for _, name in ipairs(record.needs or {}) do needs[#needs + 1] = name end
 		for _, name in ipairs(record.optional or {}) do optional[#optional + 1] = name end
 	end
+	for _, name in ipairs(self.BottomLayout.NEEDS) do optional[#optional + 1] = name end
 	-- Called here, once every surface file has loaded, as EverlookQA keeps one list per addon.
 	EverlookQA:Expect("EverlookTheme", needs, optional)
 
 	local page = EverlookPreferences:NewPage(self, "Interface")
 	for _, record in ipairs(self.surfaces) do page:Checkbox(record.key, record.label, record.help) end
+	page:Checkbox("bottomLayout", "Line up the bottom bars",
+		"Keeps an Edit Mode layout named Everlook, a copy of yours, and switches to it: Action Bar 4 and 5 on "
+		.. "top, Action Bar 2 and 3 under them, then the main bar, micro menu and bags, and the experience bar "
+		.. "along the bottom, all with the same edges, even gaps and smaller square buttons. Turn on Action "
+		.. "Bar 4 and 5 under Settings, Action Bars to fill the top row. A watched reputation takes the experience bar's place. It "
+		.. "waits for combat to end and Edit Mode to close. While it is on, changes you make to the bottom bars "
+		.. "in that layout are put back. Turned off, it switches back to the game's own layout if you are "
+		.. "still on Everlook's.")
 	page:Slider("backgroundOpacity", "Background opacity",
 		"How much of the scene the dark backgrounds cover, on every surface above.", 0.1, 1, 0.05, EverlookPreferences.Percent)
 end
@@ -234,10 +291,12 @@ function Theme:OnEnable()
 	-- A screen pixel is a different number of units after either; the lines stay one pixel.
 	self:On("UI_SCALE_CHANGED", function() self:SizeLines() end)
 	self:On("DISPLAY_SIZE_CHANGED", function() self:SizeLines() end)
+	self.BottomLayout.Enable()
 	self:ApplyAll()
 end
 
 function Theme:OnSettingChanged(key)
 	if key == "backgroundOpacity" then return self:FillAll() end
+	if key == "bottomLayout" then return self.BottomLayout.Apply(true) end
 	if byKey[key] then self:Apply(key) end
 end

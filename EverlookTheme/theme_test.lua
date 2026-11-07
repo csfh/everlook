@@ -60,8 +60,14 @@ Theme:Apply("probe")
 t.combat = false
 t.fire("PLAYER_REGEN_ENABLED")
 check(heard == 1 and styled == 2, "two handlers on one event both run: a surface can't take the engine's")
+t.combat = true
 Theme.db.probe = false
 Theme:Apply("probe")
+check(target.alpha == 0 and not Theme.Drawn("probe", host2).shown,
+	"off in combat: what it drew is hidden at once, the game's art on protected frames waits")
+t.combat = false
+t.fire("PLAYER_REGEN_ENABLED")
+check(target.alpha == 1 and styled == 2, "and comes back after combat, without styling again")
 Theme:OnSettingChanged("nothing")
 check(true, "a setting that isn't a surface is ignored")
 

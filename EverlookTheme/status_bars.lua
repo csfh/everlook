@@ -118,14 +118,38 @@ local function activeBar(container)
 	return fallback, fallbackIndex
 end
 
+-- Where the track sits: on the status bar, or, while the bottom layout is in use
+-- (bottom_layout.lua), across the row's full width, centred on the bar the way the layout centres
+-- the row. That width can't be an Edit Mode size, which moves in 5% steps.
+local function shapeTrack(panel, status)
+	local row = Theme.BottomRow()
+	panel:ClearAllPoints()
+	if row then
+		panel:SetPoint("TOP", status, "TOP")
+		panel:SetPoint("BOTTOM", status, "BOTTOM")
+		panel:SetWidth(row.width)
+	else
+		panel:SetAllPoints(status)
+	end
+end
+
+-- The track's width, for the fill: the row's while the layout is in use, else the status bar's.
+local function trackWidth(status)
+	local row = Theme.BottomRow()
+	if row then return row.width end
+	local width = status:GetWidth()
+	if Theme.Secret(width) or type(width) ~= "number" then return nil end
+	return width
+end
+
 local function paint(container)
 	local panel = Theme.Drawn(KEY, container)
 	if not panel or not Theme:IsOn(KEY) then return end
 	local bar, index = activeBar(container)
 	local status = bar and bar.StatusBar
 	if not status or not status.GetWidth then return end
-	local width = status:GetWidth()
-	if Theme.Secret(width) or type(width) ~= "number" then return end
+	local width = trackWidth(status)
+	if not width then return end
 	local share = portion(status)
 	if not share then return end
 	local fill = fillColor(bar, index)
@@ -134,6 +158,11 @@ local function paint(container)
 	local prediction = bar.ExhaustionLevelFillBar
 	local restedWidth = prediction and prediction:IsShown() and prediction.GetWidth and prediction:GetWidth()
 	if Theme.Secret(restedWidth) or type(restedWidth) ~= "number" then restedWidth = nil end
+	-- The game's rested reach is measured on its own bar; the track may be wider.
+	local barWidth = status:GetWidth()
+	if restedWidth and type(barWidth) == "number" and not Theme.Secret(barWidth) and barWidth > 0 then
+		restedWidth = restedWidth * width / barWidth
+	end
 	if restedWidth and restedWidth > width then restedWidth = width end
 	local ahead = COLORS.restedAhead
 	panel.rested:SetColorTexture(ahead[1], ahead[2], ahead[3], ahead[4])
@@ -302,9 +331,12 @@ Theme:Surface({
 		local bar = activeBar(container)
 		local status = bar and bar.StatusBar
 		if not Theme.Usable(status) then return end
-		Theme.Draw(KEY, container, function()
+		-- With the bottom layout, the second bar sits under the main one, which shows the bar
+		-- the game ranks highest, so only the main one is drawn: a watched reputation takes the
+		-- experience bar's place.
+		if Theme.BottomRow() and container == SecondaryStatusTrackingBarContainer then return end
+		local panel = Theme.Draw(KEY, container, function()
 			local panel = Theme.Panel(container, true, true)
-			panel:SetAllPoints(status)
 			-- The rested reach under the fill, so it shows only ahead of the value. Paint colors both.
 			panel.rested = panel:CreateTexture(nil, "ARTWORK")
 			panel.rested:SetPoint("TOPLEFT")
@@ -314,6 +346,7 @@ Theme:Surface({
 			panel.progress:SetPoint("BOTTOMLEFT")
 			return panel
 		end)
+		shapeTrack(panel, status)
 		paint(container)
 	end,
 })

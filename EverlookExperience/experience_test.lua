@@ -52,6 +52,16 @@ bar.OverlayFrame = t.widget()
 bar.OverlayFrame.Text = t.widget()
 bar.OverlayFrame.Text.alpha = 1
 MainStatusTrackingBarContainer = { bars = { [4] = bar } }
+-- The same bar in the second container, where the game puts it under a watched reputation.
+local second = t.widget()
+second.StatusBar, second.OverlayFrame = t.widget(), t.widget()
+second.OverlayFrame.Text = t.widget()
+SecondaryStatusTrackingBarContainer = { bars = { [4] = second } }
+-- EverlookTheme's bottom layout, as far as this addon reads it.
+local themeRow
+local theme = { BottomRow = function() return themeRow end }
+function theme:BottomRowChanged() end
+Everlook.addons.EverlookTheme = theme
 
 local made = {}
 local createFrame = CreateFrame
@@ -157,6 +167,21 @@ t.tickers[1].fn()
 check(f.text.text == "6.3k/h, 1h 23m to level", "per hour since login, and the time to level")
 t.change("EverlookExperience_rate", false)
 check(t.tickers[1].cancelled and not f:IsShown(), "off: the timer stops and the line is gone")
+
+-- EverlookTheme's bottom layout in use: the line is as wide as the theme's track, and the bar in
+-- the second container, under a watched reputation, shows nothing.
+t.change("EverlookExperience_numbers", true)
+local underneath
+for _, made_ in ipairs(made) do if made_.parent == second.OverlayFrame then underneath = made_ end end
+themeRow = { width = 1150 }
+theme:BottomRowChanged()
+check(f.width == 1150 and f.points[1][1] == "TOP" and f.points[2][1] == "BOTTOM",
+	"with the bottom layout: the line spans the theme's track, centred on the bar")
+check(underneath and not underneath:IsShown(), "and the experience bar under a reputation writes nothing over it")
+themeRow = nil
+theme:BottomRowChanged()
+check(f.allPoints == bar.StatusBar and underneath:IsShown(), "without it: back on the bar, both bars written")
+t.change("EverlookExperience_numbers", false)
 
 -- At the level cap the game shows no bar, and the line has nothing to say.
 t.change("EverlookExperience_numbers", true)

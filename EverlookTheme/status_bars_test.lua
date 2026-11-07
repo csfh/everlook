@@ -105,6 +105,19 @@ rested:Hide()
 status:SetValue(25)
 check(not panel.rested:IsShown(), "no rested art, no rested fill")
 
+-- With the bottom layout in use, the track spans the row and the fill is measured on it.
+local row = Theme.BottomRow
+Theme.BottomRow = function() return { width = 1150 } end
+t.change("EverlookTheme_statusBars", false)
+t.change("EverlookTheme_statusBars", true)
+status:SetValue(50)
+check(panel.width == 1150 and panel.points[#panel.points][1] == "BOTTOM" and panel.progress.width == 575,
+	"with the bottom layout: the track is the row's width, centred on the bar, and filled across it")
+Theme.BottomRow = row
+t.change("EverlookTheme_statusBars", false)
+t.change("EverlookTheme_statusBars", true)
+check(panel.allPoints == status and panel.progress.width == 100, "without it: back on the bar")
+
 t.change("EverlookTheme_statusBars", false)
 check(barArt:IsShown() and status.Background:IsShown() and fill.alpha == 1 and rested.alpha == 1
 	and not panel:IsShown(), "off: the game's bar is back and the flat panel is gone")

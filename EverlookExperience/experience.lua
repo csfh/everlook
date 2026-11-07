@@ -209,6 +209,15 @@ local function anyOn()
 	return false
 end
 
+local containerOf = setmetatable({}, { __mode = "k" }) -- [bar] = the status bar container holding it
+
+-- EverlookTheme's bottom layout while it's in use (EverlookTheme/bottom_layout.lua): the theme's
+-- track then spans the whole row, and the second status bar sits hidden under the first.
+local function bottomRow()
+	local theme = Everlook:GetAddon("EverlookTheme")
+	return theme and theme.BottomRow and theme.BottomRow() or nil
+end
+
 local function bars()
 	local list = {}
 	local index = StatusTrackingBarInfo and StatusTrackingBarInfo.BarsEnum
@@ -217,6 +226,7 @@ local function bars()
 		local bar = type(container) == "table" and type(container.bars) == "table" and container.bars[index]
 		if type(bar) == "table" and type(bar.OverlayFrame) == "table" and type(bar.StatusBar) == "table"
 			and not (bar.IsForbidden and bar:IsForbidden()) then
+			containerOf[bar] = container
 			list[#list + 1] = bar
 		end
 	end
@@ -258,9 +268,30 @@ local function placeReady(frame)
 	frame.ready:Show()
 end
 
+-- On the bar, or as wide as the theme's track while the bottom layout is in use, so the ready fill
+-- starts where the theme's fill ends.
+local function shape(frame, bar, row)
+	frame:ClearAllPoints()
+	if row then
+		frame:SetPoint("TOP", bar.StatusBar, "TOP")
+		frame:SetPoint("BOTTOM", bar.StatusBar, "BOTTOM")
+		frame:SetWidth(row.width)
+	else
+		frame:SetAllPoints(bar.StatusBar)
+	end
+end
+
 local function paint(bar)
 	local frame = drawn[bar]
 	if not frame then return end
+	local row = bottomRow()
+	-- Under a watched reputation, which then takes the experience bar's place, the line would be
+	-- written over the reputation bar.
+	if row and containerOf[bar] == SecondaryStatusTrackingBarContainer then
+		frame:Hide()
+		return
+	end
+	shape(frame, bar, row)
 	placeReady(frame)
 	muteGameText(bar, anyOn())
 	if not anyOn() then
@@ -275,7 +306,6 @@ end
 
 local function make(bar)
 	local frame = CreateFrame("Frame", nil, bar.OverlayFrame)
-	frame:SetAllPoints(bar.StatusBar)
 	frame.ready = frame:CreateTexture(nil, "BACKGROUND")
 	frame.ready:SetColorTexture(READY_COLOR[1], READY_COLOR[2], READY_COLOR[3], READY_COLOR[4])
 	frame.ready:Hide()
@@ -342,6 +372,11 @@ function Experience:OnEnable()
 	self.ApplyFont()
 	-- A token's font can change after the line's was set.
 	hooksecurefunc(Everlook, "SetFontToken", function() self.ApplyFont() end)
+	-- The theme's bottom layout coming into or out of use moves the track this line sits on.
+	local theme = Everlook:GetAddon("EverlookTheme")
+	if theme and theme.BottomRowChanged then
+		hooksecurefunc(theme, "BottomRowChanged", function() self:Refresh() end)
+	end
 	self.NoteGain()
 	self:RegisterEvent("PLAYER_XP_UPDATE", function()
 		self.NoteGain()
