@@ -16,6 +16,10 @@ local Theme = Everlook:NewAddon("EverlookTheme", {
 		bagsBar = false,
 		-- The bottom bars lined up through an Everlook Edit Mode layout (bottom_layout.lua).
 		bottomLayout = false,
+		-- The chat window moved down to the experience bar's level, in the same layout.
+		chatDown = false,
+		-- Layout parts turned off and not yet put back (bottom_layout.lua).
+		layoutTurnedOff = {},
 		tooltips = false,
 		levelBadges = false,
 		-- How much of the scene the solids cover, 0 to 1.
@@ -275,8 +279,11 @@ function Theme:OnInitialize()
 		.. "along the bottom, all with the same edges, even gaps and smaller square buttons. Turn on Action "
 		.. "Bar 4 and 5 under Settings, Action Bars to fill the top row. A watched reputation takes the experience bar's place. It "
 		.. "waits for combat to end and Edit Mode to close. While it is on, changes you make to the bottom bars "
-		.. "in that layout are put back. Turned off, it switches back to the game's own layout if you are "
-		.. "still on Everlook's.")
+		.. "in that layout are put back. Turned off, the bars go back to the game's defaults; with Move the "
+		.. "chat down off too, it switches back to the game's own layout if you are still on Everlook's.")
+	page:Checkbox("chatDown", "Move the chat down",
+		"Moves the chat window down until its input line is level with the experience bar, in the same "
+		.. "Everlook Edit Mode layout. Turned off, the chat goes back to where the game's own layout has it.")
 	page:Slider("backgroundOpacity", "Background opacity",
 		"How much of the scene the dark backgrounds cover, on every surface above.", 0.1, 1, 0.05, EverlookPreferences.Percent)
 end
@@ -297,6 +304,9 @@ end
 
 function Theme:OnSettingChanged(key)
 	if key == "backgroundOpacity" then return self:FillAll() end
-	if key == "bottomLayout" then return self.BottomLayout.Apply(true) end
+	if key == "bottomLayout" or key == "chatDown" then
+		if not self:IsOn(key) then self.BottomLayout.TurnedOff(key) end
+		return self.BottomLayout.Apply(true)
+	end
 	if byKey[key] then self:Apply(key) end
 end

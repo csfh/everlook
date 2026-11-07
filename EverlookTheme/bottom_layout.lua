@@ -13,6 +13,9 @@
 local _, ns = ...
 local Theme = ns.Theme
 local KEY = "bottomLayout"
+-- The chat window moved down, its own switch, written into the same layout (the game has one
+-- layout in use at a time).
+local CHAT = "chatDown"
 
 local Layout = { NAME = "Everlook" }
 Theme.BottomLayout = Layout
@@ -165,22 +168,105 @@ end
 -- The game may hand offsets back rounded, so a tenth of a unit counts as the same place.
 local function near(a, b) return type(a) == "number" and type(b) == "number" and math.abs(a - b) < 0.1 end
 
--- Puts a system at a point of UIParent's bottom edge, out of the default position; true when it changed.
-local function place(item, point, x, y)
+-- Puts a system at a point of UIParent's bottom edge (or `relativePoint` of it), out of the default
+-- position; true when it changed.
+local function place(item, point, x, y, relativePoint)
+	relativePoint = relativePoint or "BOTTOM"
 	local anchor = item.anchorInfo or {}
 	local same = item.isInDefaultPosition == false and anchor.point == point and anchor.relativeTo == "UIParent"
-		and anchor.relativePoint == "BOTTOM" and near(anchor.offsetX, x) and near(anchor.offsetY, y)
+		and anchor.relativePoint == relativePoint and near(anchor.offsetX, x) and near(anchor.offsetY, y)
 		and (item.anchorInfo2 == nil or next(item.anchorInfo2) == nil)
 	if same then return false end
-	item.anchorInfo = { point = point, relativeTo = "UIParent", relativePoint = "BOTTOM", offsetX = x, offsetY = y }
+	item.anchorInfo = { point = point, relativeTo = "UIParent", relativePoint = relativePoint, offsetX = x, offsetY = y }
 	item.anchorInfo2 = nil
 	item.isInDefaultPosition = false
 	return true
 end
 
--- Writes the plan into a layout's bottom systems; true when anything changed. A system the
--- layout lacks is left out.
-function Layout.Write(layout, plan, c)
+-- Two values the same, tables compared field by field, numbers to a tenth.
+local function same(a, b)
+	if type(a) == "number" and type(b) == "number" then return near(a, b) end
+	if type(a) ~= "table" or type(b) ~= "table" then return a == b end
+	for key, value in pairs(a) do
+		if not same(value, b[key]) then return false end
+	end
+	for key in pairs(b) do
+		if a[key] == nil then return false end
+	end
+	return true
+end
+
+-- Puts a system back as the game's default layout has it; true when it changed.
+local function reset(layout, defaults, system, index)
+	local item, default = systemOf(layout, system, index), defaults and systemOf(defaults, system, index)
+	if not (item and default) then return false end
+	local changed = false
+	for _, key in ipairs({ "anchorInfo", "settings", "isInDefaultPosition" }) do
+		if not same(item[key], default[key]) then
+			item[key] = copy(default[key])
+			changed = true
+		end
+	end
+	if item.anchorInfo2 ~= nil and next(item.anchorInfo2) ~= nil then
+		item.anchorInfo2 = nil
+		changed = true
+	end
+	return changed
+end
+
+-- The systems the bottom block writes, as { system, index }.
+local function bottomSystems(c)
+	local bars = c.barIndex
+	local list = {}
+	for _, index in ipairs({ bars.MainBar, bars.Bar2, bars.Bar3, bars.RightBar1, bars.RightBar2, bars.StanceBar,
+		bars.PossessActionBar, bars.PetActionBar }) do
+		list[#list + 1] = { c.actionBar, index }
+	end
+	list[#list + 1] = { c.vehicle, nil }
+	if c.totems then list[#list + 1] = { c.totems, nil } end
+	list[#list + 1] = { c.microMenu, nil }
+	list[#list + 1] = { c.bags, nil }
+	list[#list + 1] = { c.status, c.statusIndex.StatusTrackingBar1 }
+	list[#list + 1] = { c.status, c.statusIndex.StatusTrackingBar2 }
+	return list
+end
+
+-- Writes what is switched on into the layout and puts what is switched off back as the game's
+-- default layout has it; true when anything changed. `want` is { plan = the bottom block's plan or
+-- nil, chat = { x, y } or nil }, `defaults` the game's default layout. A system the layout lacks is
+-- left out.
+-- A part whose switch is off is left as it was copied from the player's layout, unless it was
+-- turned off this session (`want.resetBottom`, `want.resetChat`): only then does it go back to the
+-- game's defaults, since only then did Everlook move it.
+function Layout.Write(layout, want, c, defaults)
+	local changed = false
+	if want.plan then
+		changed = Layout.WriteBottom(layout, want.plan, c)
+	elseif want.resetBottom then
+		for _, entry in ipairs(bottomSystems(c)) do
+			changed = reset(layout, defaults, entry[1], entry[2]) or changed
+		end
+	end
+	local chat = c.chat and systemOf(layout, c.chat, nil)
+	if chat and want.chat then
+		changed = place(chat, "BOTTOMLEFT", want.chat.x, want.chat.y, "BOTTOMLEFT") or changed
+	elseif chat and want.resetChat then
+		changed = reset(layout, defaults, c.chat, nil) or changed
+	end
+	return changed
+end
+
+-- The parts turned off, to put back as the game's defaults at the next write. Saved, as that write
+-- may come in a later session.
+local function turnedOff()
+	if not Theme.db then return {} end
+	Theme.db.layoutTurnedOff = Theme.db.layoutTurnedOff or {}
+	return Theme.db.layoutTurnedOff
+end
+function Layout.TurnedOff(key) turnedOff()[key] = true end
+
+-- Writes the plan into a layout's bottom systems; true when anything changed.
+function Layout.WriteBottom(layout, plan, c)
 	local changed = false
 	local function mark(value) changed = changed or value end
 	local gap, half = Theme.GAP, plan.half
@@ -262,6 +348,7 @@ function Layout.Constants()
 	return {
 		actionBar = system.ActionBar, microMenu = system.MicroMenu, bags = system.Bags,
 		status = system.StatusTrackingBar, vehicle = system.VehicleLeaveButton, totems = system.TotemActionBar,
+		chat = system.ChatFrame,
 		barIndex = enum.EditModeActionBarSystemIndices, barSetting = enum.EditModeActionBarSetting,
 		microSetting = enum.EditModeMicroMenuSetting, bagsSetting = enum.EditModeBagsSetting,
 		statusSetting = enum.EditModeStatusTrackingBarSetting,
@@ -325,6 +412,53 @@ function Layout.Measure()
 	}
 end
 
+-- The input line reaches this far below the chat frame when it can't be measured: 32 tall from 4
+-- above the window's bottom (ChatFrameEditBox.xml, FloatingChatFrame.xml).
+local EDIT_DEPTH = 28
+
+-- How far the chat window's lowest part reaches below the chat frame Edit Mode places: the input
+-- line, shown or not (with the IM style it shows only while typing), or the theme's solid under it
+-- (chat.lua), whichever is lower. Nothing while the chat frame isn't laid out.
+function Layout.ChatDepth()
+	local frame, edit = ChatFrame1, ChatFrame1EditBox
+	if not (Theme.Usable(frame) and frame.GetBottom) then return nil end
+	local bottom = frame:GetBottom()
+	if type(bottom) ~= "number" then return nil end
+	local depth = 0
+	local editBottom = Theme.Usable(edit) and edit.GetBottom and edit:GetBottom()
+	if type(editBottom) == "number" then depth = bottom - editBottom else depth = EDIT_DEPTH end
+	local solid = edit and Theme.Drawn("chat", edit)
+	local solidBottom = solid and solid:IsShown() and solid.GetBottom and solid:GetBottom()
+	if type(solidBottom) == "number" then depth = math.max(depth, bottom - solidBottom) end
+	return depth
+end
+
+-- How far the experience track sits above its container's bottom: the flat track is drawn on the
+-- status bar inside it (STATUS_BAR_SIZE_ADJUSTMENT). Measured, 0 when it can't be.
+local function trackInset()
+	local container = MainStatusTrackingBarContainer
+	if not (Theme.Usable(container) and container.GetBottom and type(container.bars) == "table") then return 0 end
+	local bottom = container:GetBottom()
+	for _, bar in pairs(container.bars) do
+		local status = Theme.Usable(bar) and bar.StatusBar
+		local statusBottom = Theme.Usable(status) and status.GetBottom and status:GetBottom()
+		if type(bottom) == "number" and type(statusBottom) == "number" then return math.max(0, statusBottom - bottom) end
+	end
+	return 0
+end
+
+-- Where the chat frame goes: down, so its lowest part is level with the experience track's bottom
+-- while the bottom block is on (GAP above the screen's edge, plus the track's inset), at GAP when it
+-- is off, at the x the game's default layout gives it.
+local function chatSpot(defaults, c)
+	local depth = Layout.ChatDepth()
+	if not depth then return nil end
+	local default = defaults and c.chat and systemOf(defaults, c.chat, nil)
+	local x = default and default.anchorInfo and default.anchorInfo.offsetX or 35
+	local level = Theme.GAP + (Theme:IsOn(KEY) and trackInset() or 0)
+	return { x = x, y = level + depth }
+end
+
 ------------------------------------------------------------------------------------------------
 -- Switching.
 
@@ -372,10 +506,18 @@ local writes, MAX_WRITES = 0, 3
 local function switchOn()
 	local c, info, presets = ready()
 	if not c then return false end
-	local geometry = Layout.Measure()
-	if not geometry then return false, "unmeasured" end
-	local plan = Layout.Plan(geometry)
-	if not plan then return true end
+	local defaults = presets[C_EditMode.GetEditModeDefaultLayout()]
+	local plan, chat
+	if Theme:IsOn(KEY) then
+		local geometry = Layout.Measure()
+		if not geometry then return false, "unmeasured" end
+		plan = Layout.Plan(geometry)
+	end
+	if Theme:IsOn(CHAT) then
+		chat = chatSpot(defaults, c)
+		if not chat then return false, "unmeasured" end
+	end
+	if not plan and not chat then return true end
 	local ours, index = Layout.Ours(info, presets)
 	if ensured and (not ours or info.activeLayout ~= index) then
 		follow(plan, info, presets)
@@ -406,8 +548,10 @@ local function switchOn()
 	-- Once this session has written the layout, it writes again only when its own numbers change,
 	-- never because the game hands back what was saved a little differently, and a few times at
 	-- most: each save makes the game send EDIT_MODE_LAYOUTS_UPDATED, which comes back here.
-	local signature = string.format("%d %d %.1f %.1f %.1f", plan.padding, plan.percent, plan.width, plan.microX, plan.microY)
-	if not created and (signature == written or writes >= MAX_WRITES) then
+	local signature = (plan and string.format("%d %d %.1f %.1f %.1f", plan.padding, plan.percent, plan.width,
+		plan.microX, plan.microY) or "-") .. " " .. (chat and string.format("%.1f %.1f", chat.x, chat.y) or "-")
+	local waiting = turnedOff()
+	if not created and not waiting[KEY] and not waiting[CHAT] and (signature == written or writes >= MAX_WRITES) then
 		ensured = true
 		if info.activeLayout ~= index then
 			C_EditMode.SetActiveLayout(index)
@@ -416,7 +560,10 @@ local function switchOn()
 		follow(plan, info, presets)
 		return true
 	end
-	local changed = Layout.Write(ours, plan, c)
+	local off = turnedOff()
+	local changed = Layout.Write(ours, { plan = plan, chat = chat, resetBottom = off[KEY],
+		resetChat = off[CHAT] }, c, defaults)
+	off[KEY], off[CHAT] = nil, nil
 	written, writes = signature, writes + 1
 	ensured = true
 	if created then
@@ -458,8 +605,10 @@ local RETRIES = 10
 local offAsked = true
 
 function Layout.Apply(asked)
+	-- The cap is for rewrites the game's events set off; a switch the player flips always writes.
+	if asked then writes = 0 end
 	local done, why
-	if Theme:IsOn(KEY) then
+	if Theme:IsOn(KEY) or Theme:IsOn(CHAT) then
 		done, why = switchOn()
 	elseif asked or offAsked or pending then
 		done, why = switchOff()
@@ -498,7 +647,7 @@ function Layout.Enable()
 	end
 end
 
-Layout.KEY = KEY
+Layout.KEY, Layout.CHAT = KEY, CHAT
 Layout.NEEDS = { "C_EditMode.GetLayouts", "C_EditMode.SaveLayouts", "C_EditMode.SetActiveLayout",
 	"C_EditMode.OnLayoutAdded", "C_EditMode.GetEditModeDefaultLayout",
 	"EditModePresetLayoutManager.GetCopyOfPresetLayouts", "Constants.EditModeConsts.EditModeMaxLayoutsPerType",
@@ -507,4 +656,5 @@ Layout.NEEDS = { "C_EditMode.GetLayouts", "C_EditMode.SaveLayouts", "C_EditMode.
 	"Enum.EditModeActionBarSetting.IconPadding", "Enum.EditModeMicroMenuSetting.Size",
 	"Enum.EditModeBagsSetting.BagSlotPadding", "Enum.EditModeStatusTrackingBarSetting.Size",
 	"Enum.EditModeStatusTrackingBarSystemIndices", "MicroMenu", "BagsBar", "MainMenuBarBagManager.EnumerateBagButtons",
-	"MainStatusTrackingBarContainer", "EditModeManagerFrame.IsEditModeActive" }
+	"MainStatusTrackingBarContainer", "EditModeManagerFrame.IsEditModeActive", "Enum.EditModeSystem.ChatFrame",
+	"ChatFrame1", "ChatFrame1EditBox" }

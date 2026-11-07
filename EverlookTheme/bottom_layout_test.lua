@@ -42,7 +42,7 @@ check(Layout.Plan({ microCenters = { 16 }, microHeight = 40, bagWidths = { 45 },
 -- The game ------------------------------------------------------------------------------------------
 Enum = Enum or {}
 Enum.EditModeSystem = { ActionBar = 0, MicroMenu = 4, Bags = 5, StatusTrackingBar = 6, VehicleLeaveButton = 9, UnitFrame = 1,
-	TotemActionBar = 10 }
+	TotemActionBar = 10, ChatFrame = 11 }
 Enum.EditModeLayoutType = { Preset = 0, Account = 1, Character = 2 }
 Enum.EditModeActionBarSystemIndices = { MainBar = 1, Bar2 = 2, Bar3 = 3, RightBar1 = 4, RightBar2 = 5, StanceBar = 11,
 	PetActionBar = 12, PossessActionBar = 13 }
@@ -61,6 +61,12 @@ local function system(kind, index, settings)
 		anchorInfo = { point = "BOTTOM", relativeTo = "UIParent", relativePoint = "BOTTOM", offsetX = 0, offsetY = 0 } }
 end
 local S = Enum.EditModeSystem
+-- The chat window, where the game's default layout has it (EditModePresetLayouts.lua).
+function chatSystem()
+	local item = system(S.ChatFrame, nil)
+	item.anchorInfo = { point = "BOTTOMLEFT", relativeTo = "UIParent", relativePoint = "BOTTOMLEFT", offsetX = 35, offsetY = 145 }
+	return item
+end
 local B = Enum.EditModeActionBarSystemIndices
 local function modern()
 	return { layoutName = "Modern", layoutType = 0, systems = {
@@ -71,7 +77,7 @@ local function modern()
 		system(S.VehicleLeaveButton, nil), system(S.TotemActionBar, nil),
 		system(S.MicroMenu, nil, { [2] = 6 }), system(S.Bags, nil, { [2] = 5 }),
 		system(S.StatusTrackingBar, 1, { [0] = 10 }), system(S.StatusTrackingBar, 2, { [0] = 10 }),
-		system(S.UnitFrame, 1, { [7] = 3 }),
+		system(S.UnitFrame, 1, { [7] = 3 }), chatSystem(),
 	} }
 end
 EditModePresetLayoutManager = { GetCopyOfPresetLayouts = function()
@@ -248,6 +254,64 @@ local saves = 0
 for _, call in ipairs(calls) do if call == "save" then saves = saves + 1 end end
 check(saved.activeLayout == 3 and saves == 0, "toggled many times, it still switches to Everlook's layout and saves nothing new")
 t.change("EverlookTheme_bottomLayout", false)
+
+-- The chat ------------------------------------------------------------------------------------------
+-- The chat frame's bottom 200 units up; its input line reaches 30 below it.
+function t.Widget:GetBottom() return self.bottom end
+ChatFrame1.bottom, ChatFrame1EditBox.bottom, ChatFrame1EditBox.shown = 200, 170, true
+saved = { layouts = {}, activeLayout = 1 }
+calls = {}
+t.change("EverlookTheme_chatDown", true)
+layout = ours()
+local chat = layout and find(layout, S.ChatFrame, nil)
+check(chat and not chat.isInDefaultPosition and chat.anchorInfo.point == "BOTTOMLEFT"
+	and chat.anchorInfo.relativePoint == "BOTTOMLEFT" and chat.anchorInfo.offsetX == 35 and near(chat.anchorInfo.offsetY, gap + 30),
+	"chat on its own: the chat goes down until its input line is a gap above the screen's edge, level with the experience bar")
+check(find(layout, S.ActionBar, B.Bar2).isInDefaultPosition and setting(find(layout, S.ActionBar, B.MainBar), 4) == 2,
+	"and with the bottom block off, the bars stay as the game's default layout has them")
+check(Theme.BottomRow() == nil, "the tiles don't follow a row that isn't laid out")
+t.change("EverlookTheme_bottomLayout", true)
+layout = ours()
+check(not find(layout, S.ActionBar, B.Bar2).isInDefaultPosition and not find(layout, S.ChatFrame, nil).isInDefaultPosition,
+	"both on: the block and the chat in one layout")
+t.change("EverlookTheme_chatDown", false)
+layout = ours()
+check(find(layout, S.ChatFrame, nil).isInDefaultPosition and find(layout, S.ChatFrame, nil).anchorInfo.offsetY == 145
+	and not find(layout, S.ActionBar, B.Bar2).isInDefaultPosition and saved.activeLayout == 3,
+	"chat off, block on: the chat goes back to the game's default spot, the block stays")
+t.change("EverlookTheme_chatDown", true)
+t.change("EverlookTheme_bottomLayout", false)
+layout = ours()
+check(find(layout, S.ActionBar, B.Bar2).isInDefaultPosition and setting(find(layout, S.ActionBar, B.Bar2), 4) == 2
+	and not find(layout, S.ChatFrame, nil).isInDefaultPosition and saved.activeLayout == 3,
+	"block off, chat on: the bars go back to the game's defaults, the chat stays down")
+t.change("EverlookTheme_chatDown", false)
+check(saved.activeLayout == 1, "both off: back to the game's default layout")
+
+-- The player's own layout: a chat they moved and bars with their own padding. A switch that is off
+-- leaves its part as they had it.
+local function mine()
+	local layout = modern()
+	layout.layoutName, layout.layoutType = "Mine", 2
+	local chatItem = find(layout, S.ChatFrame, nil)
+	chatItem.anchorInfo.offsetX, chatItem.anchorInfo.offsetY, chatItem.isInDefaultPosition = 300, 400, false
+	find(layout, S.ActionBar, B.Bar2).settings[1].value = 9
+	return layout
+end
+Theme.db.layoutTurnedOff = {}
+saved = { layouts = { mine() }, activeLayout = 3 }
+t.change("EverlookTheme_bottomLayout", true)
+layout = ours()
+check(find(layout, S.ChatFrame, nil).anchorInfo.offsetY == 400 and find(layout, S.ChatFrame, nil).anchorInfo.offsetX == 300,
+	"block on only: the chat stays where the player had it")
+t.change("EverlookTheme_bottomLayout", false)
+Theme.db.layoutTurnedOff = {}
+saved = { layouts = { mine() }, activeLayout = 3 }
+t.change("EverlookTheme_chatDown", true)
+layout = ours()
+check(setting(find(layout, S.ActionBar, B.Bar2), 4) == 9, "chat on only: the bars keep the player's own padding")
+t.change("EverlookTheme_chatDown", false)
+check(Theme.db.layoutTurnedOff.chatDown == true, "a part turned off waits, saved, to be put back at the next write")
 
 -- A full list ----------------------------------------------------------------------------------------
 saved = { layouts = {}, activeLayout = 1 }
