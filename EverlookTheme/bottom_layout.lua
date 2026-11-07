@@ -630,7 +630,7 @@ end
 
 -- Everlook's layout came into or out of use. Only the micro menu tiles and the status bar track
 -- follow the row, so only they are applied again. EverlookExperience hooks this with
--- hooksecurefunc to move its line with the track, so the name and the colon call stay as they are.
+-- hooksecurefunc by name to move its line with the track, so the name stays as it is.
 function Theme:BottomRowChanged()
 	for _, key in ipairs({ "microMenu", "statusBars" }) do
 		if self:IsOn(key) then self:Apply(key) end
