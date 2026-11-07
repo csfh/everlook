@@ -24,7 +24,7 @@ Preferences.FOLDERS = {
 	{ name = "Unit Frames", about = "Health colors, class portraits, bar text and name size on the game's unit frames." },
 	{ name = "Chat & Social", about = "Chat labels, invites, summons, resurrections and duels." },
 	{ name = "Tooltips", about = "Extra tooltip lines, and where the tooltip sits." },
-	{ name = "Interface", about = "Fonts, the theme, UI scale, the pointer and screen clutter." },
+	{ name = "Interface", about = "Fonts, the theme, the experience bar, UI scale, the pointer and screen clutter." },
 	{ name = "Graphics", about = "Graphics quality, ground clutter and loot sparkles." },
 	{ name = "World & Camera", about = "Camera distance, cinematics and flight times." },
 	{ name = "Developer", about = "Loading speed, the frame-time chart and the game-function check." },

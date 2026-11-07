@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: Experience Bar
+## Notes: Stats on the experience bar: your experience and rested, quests ready to turn in, experience per hour and time to level, and gains to level.
+## Version: 0.1.0
+## Dependencies: Everlook, EverlookPreferences, EverlookQA
+## Group: Everlook
+## IconTexture: Interface\AddOns\Everlook\assets\logo.tga
+
+experience.lua
