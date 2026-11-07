@@ -19,7 +19,7 @@ check(tab.Left.alpha == 0 and tab.ActiveMiddle.alpha == 0 and editArt[1].alpha =
 	"the tab's and the input line's art is faded")
 FCFTab_UpdateColors(tab, true)
 local tabPanel = panelOn(tab)
-check(tabPanel and tabPanel.fill and tabPanel.line.vertex[1] == Theme.Accent()[1], "a selected tab has the class-colored line")
+check(tabPanel and tabPanel.fill and tabPanel.line.vertex[1] == Theme.ACCENT[1], "a selected tab has the gold line")
 local windowPanel, editPanel = panelOn(chat), panelOn(edit)
 check(windowPanel and windowPanel.allPoints == chatBackground and windowPanel.fill and windowPanel.line
 	and not chatBackground.shown, "the window's own background gives way to the dark solid, with the line along its bottom")

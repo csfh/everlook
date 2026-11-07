@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: Theme
-## Notes: A flat look, dark solid backgrounds with a line in your class color, for the chat windows, the experience and reputation bars and tooltips, and a level badge on every unit frame.
+## Notes: A flat look, dark solid backgrounds with a muted gold line, for the chat windows, the experience and reputation bars and tooltips, and a level badge on every unit frame.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

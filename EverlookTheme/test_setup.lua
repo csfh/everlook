@@ -132,11 +132,6 @@ PartyFrame = { PartyMemberFramePool = { EnumerateActive = function()
 	end
 end } }
 local levels = { player = 20, party1 = 17 }
--- A Mage: the class color is RAID_CLASS_COLORS.MAGE.
-UnitClass = function() return "Mage", "MAGE" end
-C_ClassColor = { GetClassColor = function(class)
-	if class == "MAGE" then return { r = 0.25, g = 0.78, b = 0.92 } end
-end }
 UnitExists = function(unit) return levels[unit] ~= nil end
 UnitLevel = function(unit) return levels[unit] end
 

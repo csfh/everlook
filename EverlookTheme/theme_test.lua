@@ -7,25 +7,21 @@ local function near(x, y) return math.abs(x - y) < 1e-6 end
 local host = t.widget()
 local panel = Theme.Panel(host, true, true)
 check(panel.parent == host and panel.parentLevel == true, "a panel is a frame of its own, drawn at its parent's level")
-check(panel.fill and panel.fill.colorTexture[4] == Theme.BACKGROUND[4], "with a fill it has the dark solid")
+check(panel.fill and panel.fill.colorTexture[1] == Theme.BACKGROUND[1], "with a fill it has the dark solid")
 check(panel.line and panel.line.texture == nil and panel.line.atlas == nil, "and one line, no artwork")
 check(panel.line.points[1][1] == "BOTTOMLEFT" and panel.line.points[2][1] == "BOTTOMRIGHT" and #panel.line.points == 2,
 	"the line runs along the bottom edge")
-check(panel.line.height == 1, "the line is the line's thickness")
-check(near(panel.line.vertex[1], 0.25 * Theme.ACCENT_BRIGHTNESS) and near(panel.line.vertex[3], 0.92 * Theme.ACCENT_BRIGHTNESS),
-	"in the player's class color, darker")
+check(panel.line.height == 2, "the line is the line's thickness, two units")
+check(near(panel.line.vertex[1], 0.65) and near(panel.line.vertex[2], 0.533) and near(panel.line.vertex[3], 0),
+	"in the muted gold, the same for every character")
 local plain = Theme.Panel(host, false, false)
 check(plain.fill == nil and plain.line == nil, "without either it draws nothing")
 local line = Theme.LINE
 Theme.LINE = 0.1
 t.fire("UI_SCALE_CHANGED")
-check(panel.line.height == 0.5, "the line is never thinner than a screen pixel, and follows the scale")
+check(panel.line.height == 1, "the line is never thinner than two screen pixels, and follows the scale")
 Theme.LINE = line
 t.fire("UI_SCALE_CHANGED")
-local unnamed = UnitClass
-UnitClass = function() return nil, nil end
-check(Theme.Accent()[1] > 0 and Theme.Accent()[1] < 1, "a client that can't name the class gets a gray line")
-UnitClass = unnamed
 
 -- The engine -------------------------------------------------------------------------------------
 -- A surface of the test's own, on protected frames, run through the engine the way chat.lua and
@@ -68,5 +64,13 @@ Theme.db.probe = false
 Theme:Apply("probe")
 Theme:OnSettingChanged("nothing")
 check(true, "a setting that isn't a surface is ignored")
+
+-- The solids' opacity is a setting, half by default, and moving it changes every solid at once.
+check(Theme.db.backgroundOpacity == 0.5 and panel.fill.colorTexture[4] == 0.5, "the solids start at 50% opacity")
+t.change("EverlookTheme_backgroundOpacity", 0.8)
+check(panel.fill.colorTexture[4] == 0.8 and panel.fill.colorTexture[1] == Theme.BACKGROUND[1], "moving the slider sets every solid's opacity")
+local opacity = t.settings.EverlookTheme_backgroundOpacity.slider
+check(opacity.min == 0.1 and opacity.max == 1 and opacity.format(0.5) == "50%", "the slider runs from 10% to 100%")
+t.change("EverlookTheme_backgroundOpacity", 0.5)
 
 t.done()

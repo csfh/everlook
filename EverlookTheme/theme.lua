@@ -1,5 +1,5 @@
 -- The theme: a flat look for some of the game's own frames, each a dark solid with one thin line
--- along its bottom in the player's class color, and no artwork. This file holds the style, the
+-- along its bottom in a muted gold, and no artwork. This file holds the style, the
 -- panel it draws, and the engine that applies a surface; each surface (chat.lua, status_bars.lua,
 -- tooltips.lua, level_badges.lua) is one record handed to Theme:Surface. AGENTS.md's "Restyling
 -- the game's frames" holds the rules: the game's frames only have textures hidden and frames of
@@ -13,13 +13,14 @@ local Theme = Everlook:NewAddon("EverlookTheme", {
 		statusBars = false,
 		tooltips = false,
 		levelBadges = false,
+		-- How much of the scene the solids cover, 0 to 1.
+		backgroundOpacity = 0.5,
 	},
 })
 ns.Theme = Theme
 
 -- What the engine and the style need; each surface adds its own in its record.
-local NEEDS = { "hooksecurefunc", "CreateFrame", "InCombatLockdown", "PixelUtil.SetWidth", "PixelUtil.SetHeight",
-	"UnitClass", "C_ClassColor.GetClassColor" }
+local NEEDS = { "hooksecurefunc", "CreateFrame", "InCombatLockdown", "PixelUtil.SetWidth", "PixelUtil.SetHeight" }
 local OPTIONAL = { "issecretvalue" }
 
 -- True for a value the game keeps secret (12.0).
@@ -36,32 +37,22 @@ end
 -- Panels: the one shape the theme draws
 
 -- The style: a dark solid under a surface's content and one accent line along its bottom edge,
--- in the player's class color made darker. A surface that isn't the one in use (a chat tab not
--- selected) has a gray line instead. Colors are r, g, b, a.
-Theme.BACKGROUND = { 0.03, 0.03, 0.035, 0.92 }
+-- in a muted gold, the same for every character. A surface that isn't the one in use (a chat tab
+-- not selected) has a gray line instead. Colors are r, g, b, a; the solid's opacity is a setting.
+Theme.BACKGROUND = { 0.05, 0.05, 0.06 }
 Theme.ACCENT_IDLE = { 0.3, 0.3, 0.32, 1 }
--- The class color at this brightness: the same hue, calmer against the dark solid.
-Theme.ACCENT_BRIGHTNESS = 0.65
--- For a client that can't name the class: a neutral light gray, darkened the same way.
-local NO_CLASS = { 0.8, 0.8, 0.8 }
--- The line's thickness in interface units, and never thinner than one screen pixel.
-Theme.LINE = 1
-
--- The accent: the player's class color (C_ClassColor.GetClassColor, 12.0.0), darkened.
-function Theme.Accent()
-	local _, class = UnitClass("player")
-	local color = class and C_ClassColor.GetClassColor(class)
-	local r, g, b = NO_CLASS[1], NO_CLASS[2], NO_CLASS[3]
-	if color then r, g, b = color.r, color.g, color.b end
-	local k = Theme.ACCENT_BRIGHTNESS
-	return { r * k, g * k, b * k, 1 }
-end
+-- The accent: the gold of the game's own headings (1, 0.82, 0) at 0.65 brightness, calmer
+-- against the dark solid.
+Theme.ACCENT = { 0.65, 0.533, 0, 1 }
+-- The line's thickness in interface units, and never thinner than two screen pixels.
+Theme.LINE = 2
+Theme.LINE_PIXELS = 2
 
 local panels = {} -- every panel made, to size its line again when the interface scale changes
 
 -- The line is whole screen pixels, worked out from the panel's scale on screen.
 local function sizeLine(panel)
-	if panel.line then PixelUtil.SetHeight(panel.line, Theme.LINE, 1) end
+	if panel.line then PixelUtil.SetHeight(panel.line, Theme.LINE, Theme.LINE_PIXELS) end
 end
 
 -- Colors a panel's line.
@@ -78,7 +69,7 @@ function Theme.Panel(parent, fill, line)
 	if fill then
 		panel.fill = panel:CreateTexture(nil, "BACKGROUND")
 		panel.fill:SetAllPoints()
-		panel.fill:SetColorTexture(unpack(Theme.BACKGROUND))
+		panel.fill:SetColorTexture(Theme.BACKGROUND[1], Theme.BACKGROUND[2], Theme.BACKGROUND[3], Theme:Opacity())
 	end
 	if line then
 		panel.line = panel:CreateTexture(nil, "BORDER")
@@ -86,7 +77,7 @@ function Theme.Panel(parent, fill, line)
 		panel.line:SetPoint("BOTTOMLEFT")
 		panel.line:SetPoint("BOTTOMRIGHT")
 		sizeLine(panel)
-		Theme.Paint(panel, Theme.Accent())
+		Theme.Paint(panel, Theme.ACCENT)
 	end
 	panels[#panels + 1] = panel
 	return panel
@@ -94,6 +85,19 @@ end
 
 function Theme:SizeLines()
 	for _, made in ipairs(panels) do sizeLine(made) end
+end
+
+function Theme:Opacity()
+	return self.db and self.db.backgroundOpacity or self.defaults.backgroundOpacity
+end
+
+-- Every solid at the opacity now set.
+function Theme:FillAll()
+	for _, made in ipairs(panels) do
+		if made.fill then
+			made.fill:SetColorTexture(Theme.BACKGROUND[1], Theme.BACKGROUND[2], Theme.BACKGROUND[3], self:Opacity())
+		end
+	end
 end
 
 ------------------------------------------------------------------------------------------------
@@ -216,6 +220,8 @@ function Theme:OnInitialize()
 
 	local page = EverlookPreferences:NewPage(self, "Interface")
 	for _, record in ipairs(self.surfaces) do page:Checkbox(record.key, record.label, record.help) end
+	page:Slider("backgroundOpacity", "Background opacity",
+		"How much of the scene the dark backgrounds cover, on every surface above.", 0.1, 1, 0.05, EverlookPreferences.Percent)
 end
 
 function Theme:OnEnable()
@@ -232,5 +238,6 @@ function Theme:OnEnable()
 end
 
 function Theme:OnSettingChanged(key)
+	if key == "backgroundOpacity" then return self:FillAll() end
 	if byKey[key] then self:Apply(key) end
 end

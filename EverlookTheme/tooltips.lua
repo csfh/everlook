@@ -1,4 +1,4 @@
--- Tooltips: every tooltip the game styles gives its art to the dark solid with the class-colored
+-- Tooltips: every tooltip the game styles gives its art to the dark solid with the gold
 -- line along its bottom. Embedded tooltips, drawn inside another, are left alone.
 local _, ns = ...
 local Theme = ns.Theme
@@ -23,7 +23,7 @@ end
 Theme:Surface({
 	key = KEY,
 	label = "Flat tooltips",
-	help = "Gives tooltips a dark solid background and a line in your class color along the bottom in place of their art.",
+	help = "Gives tooltips a dark solid background and a gold line along the bottom in place of their art.",
 	needs = { "SharedTooltip_SetBackdropStyle" },
 	optional = { "GameTooltip" },
 	-- Tooltips seen before stay themed; the rest are themed as the game styles them.

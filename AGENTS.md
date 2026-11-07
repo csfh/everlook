@@ -69,6 +69,13 @@ code fails on secret values.
   frames.
 - Everlook's own text takes a font token: `text:SetFontObject(Everlook.Font.Body)` (Heading, Body,
   Small, Chat or Number; `Everlook/font_tokens.lua`). Only EverlookFonts sets a token.
+- An accent line Everlook draws is 2 interface units thick and never thinner than 2 screen
+  pixels, as `Theme.LINE` and `Theme.LINE_PIXELS` set it: `Theme.Panel` draws it, and a line of
+  an addon's own is sized with `PixelUtil.SetHeight(line, 2, 2)`. One pixel reads as a hairline.
+- Every dark background Everlook draws is `Theme.BACKGROUND` at the background opacity token,
+  `Theme:Opacity()`: the Theme page's one "Background opacity" slider, shared by every surface.
+  `Theme.Panel` draws it and `Theme:FillAll` repaints it when the slider moves. A lighter or
+  darker background is that slider's job, for every surface at once.
 - Lua errors and taint land in `_forever_/Logs/General.log`, as "execution tainted by
   '<addon>'". Read it after the first session with a new surface switched on.
 

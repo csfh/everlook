@@ -1,5 +1,5 @@
 -- Chat: the chat windows, their tabs and the input line. Each window becomes the dark solid with
--- the class-colored line along its bottom, the divider above the input line; the input line is a
+-- the gold line along its bottom, the divider above the input line; the input line is a
 -- solid with no line, and each tab a small solid whose line is the accent when it is selected.
 local _, ns = ...
 local Theme = ns.Theme
@@ -18,7 +18,7 @@ local EDIT_ART = { "Left", "Right", "Mid", "FocusLeft", "FocusRight", "FocusMid"
 
 local function paintTab(tab, selected)
 	local panel = Theme.Drawn(KEY, tab)
-	if panel then Theme.Paint(panel, selected and Theme.Accent() or Theme.ACCENT_IDLE) end
+	if panel then Theme.Paint(panel, selected and Theme.ACCENT or Theme.ACCENT_IDLE) end
 end
 
 local function styleTab(tab)
@@ -73,7 +73,7 @@ end
 Theme:Surface({
 	key = KEY,
 	label = "Flat chat windows",
-	help = "Replaces the chat windows' art with a line in your class color between the messages and the input line, "
+	help = "Replaces the chat windows' art with a gold line between the messages and the input line, "
 		.. "and gives the windows, their tabs and the input line a dark solid background. "
 		.. "The window's own color and opacity give way to it, and it no longer fades.",
 	needs = { "CHAT_FRAMES", "FCFTab_UpdateColors" },
