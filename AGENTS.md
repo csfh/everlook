@@ -97,4 +97,3 @@ code fails on secret values.
   or renaming a folder; `/reload` is enough for edits.
 - `cd www && npm ci && npm run build` builds the site. It reads every TOC's Title and Notes and
   each addon's settings folder.
-- CI (`.github/workflows/tests.yml`) runs the tests and the site build on every pull request.
