@@ -2,6 +2,7 @@ local Friendly = Everlook:NewAddon("EverlookFriendly", {
 	label = "Friendly",
 	defaults = {
 		thankBuffs = true,
+		greetCampfire = false,
 	},
 })
 
@@ -18,6 +19,12 @@ EverlookQA:Expect("EverlookFriendly", {
 	"IsGUIDInGroup",
 	"IsShiftKeyDown",
 	"GetTime",
+	"hooksecurefunc",
+	"SitStandOrDescendStart",
+	"C_UnitAuras.GetPlayerAuraBySpellID",
+	"IsMounted",
+	"IsFlying",
+	"IsSwimming",
 }, {
 	"C_ChatInfo.InChatMessagingLockdown",
 	"issecretvalue",
@@ -41,6 +48,15 @@ local thanked = {} -- [guid] = GetTime() of the last one
 -- One buff can land as several auras, some naming the caster and some not. An unknown caster's
 -- thank-you is dropped when a named player's buff landed this close to it: they were thanked.
 local lastNamed -- GetTime() a named stranger's buff last landed
+
+-- Sitting by a campfire: /hello after this long, once every QUIET seconds at most.
+local GREET_DELAY = 5
+-- The aura a campfire puts on everyone near it.
+local COZY_FIRE = 7353
+-- The game can't say whether you sit, so this follows /sit, /stand, the sit key and moving.
+local sitting = false
+local sitCount = 0 -- moves on with every sit and stand, so a timer from an earlier sit does nothing
+local greeted -- GetTime() of the last /hello
 local settled = 0 -- GetTime() after which auras count again
 
 local function secret(value)
@@ -106,6 +122,33 @@ function Friendly:Thank(guid)
 	end
 end
 
+local function byFire()
+	local aura = C_UnitAuras.GetPlayerAuraBySpellID(COZY_FIRE)
+	return not secret(aura) and aura ~= nil
+end
+
+function Friendly:Stand()
+	sitting = false
+	sitCount = sitCount + 1
+end
+
+function Friendly:Sit()
+	sitting = true
+	sitCount = sitCount + 1
+	if not self.db.greetCampfire then return end
+	local count = sitCount
+	C_Timer.After(GREET_DELAY, function() self:Greet(count) end)
+end
+
+function Friendly:Greet(count)
+	if count ~= sitCount or not sitting or not self.db.greetCampfire or IsShiftKeyDown() or lockedDown() then return end
+	if greeted and GetTime() - greeted < QUIET then return end
+	if not byFire() then return end
+	greeted = GetTime()
+	-- "none" greets everyone around you, not your target.
+	C_ChatInfo.PerformEmote("HELLO", "none")
+end
+
 function Friendly:UNIT_AURA(_, unit, updateInfo)
 	if unit ~= "player" or not self.db.thankBuffs or not updateInfo or secret(updateInfo) then return end
 	if GetTime() < settled then return end
@@ -129,6 +172,9 @@ function Friendly:OnInitialize()
 		"Whisper \"" .. MESSAGE .. "\" to a player outside your group " .. DELAY .. " seconds after they buff you, once every "
 			.. QUIET / 60 .. " minutes at most. When the game can't say who it was, /say it in an instance, or /thank"
 			.. " everyone around you outside one. Hold Shift to skip.")
+	page:Checkbox("greetCampfire", "Greet when you sit by a campfire",
+		"Wave /hello to everyone around you " .. GREET_DELAY .. " seconds after you sit down by a campfire, once every "
+			.. QUIET / 60 .. " minutes at most. Hold Shift to skip.")
 end
 
 function Friendly:PLAYER_ENTERING_WORLD()
@@ -138,4 +184,16 @@ end
 function Friendly:OnEnable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("UNIT_AURA")
+	self:RegisterEvent("PLAYER_STARTED_MOVING", "Stand")
+	self:RegisterEvent("PLAYER_REGEN_DISABLED", "Stand")
+	-- /sit and /stand typed in chat.
+	hooksecurefunc(C_ChatInfo, "PerformEmote", function(emote)
+		if secret(emote) then return end
+		if emote == "SIT" then self:Sit() elseif emote == "STAND" then self:Stand() end
+	end)
+	-- The sit key sits or stands you up in turn; mounted, flying or swimming it moves you down instead.
+	hooksecurefunc("SitStandOrDescendStart", function()
+		if IsMounted() or IsFlying() or IsSwimming() then return end
+		if sitting then self:Stand() else self:Sit() end
+	end)
 end

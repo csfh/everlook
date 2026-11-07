@@ -37,6 +37,23 @@ local function runTimers()
 	for _, timer in ipairs(due) do timer.fn() end
 end
 
+-- Hooks run after the function, as in the game.
+hooksecurefunc = function(target, name, fn)
+	if type(target) == "string" then target, name, fn = _G, target, name end
+	local original = target[name]
+	target[name] = function(...)
+		local a, b, c = original(...)
+		fn(...)
+		return a, b, c
+	end
+end
+SitStandOrDescendStart = function() end
+local mounted, cozy = false, false
+IsMounted = function() return mounted end
+IsFlying = function() return false end
+IsSwimming = function() return false end
+C_UnitAuras = { GetPlayerAuraBySpellID = function(id) return cozy and id == 7353 and {} or nil end }
+
 t.load("EverlookFriendly")
 t.fire("PLAYER_LOGIN")
 local F = Everlook:GetAddon("EverlookFriendly")
@@ -194,6 +211,89 @@ t.fire("UNIT_AURA", "player", { addedAuras = { { isHelpful = true, isFromPlayerO
 	duration = 1800, expirationTime = t.now + 1800 } } })
 runTimers()
 check(#sent == 1 and sent[1][1] == "emote THANK", "the same buff cast just now is")
+
+-- Sitting by a campfire: /hello after 5 seconds, when switched on.
+local function greets()
+	local n = 0
+	for _, entry in ipairs(sent) do if entry[1] == "emote HELLO" then n = n + 1 end end
+	return n
+end
+reset()
+cozy = true
+check(not F.db.greetCampfire, "the campfire greeting starts off")
+C_ChatInfo.PerformEmote("SIT")
+runTimers()
+check(greets() == 0, "off: sitting by a fire greets no one")
+t.change("EverlookFriendly_greetCampfire", true)
+
+reset()
+C_ChatInfo.PerformEmote("SIT")
+check(#timers == 1 and timers[1].seconds == 5, "/sit by a fire waits 5 seconds")
+runTimers()
+check(greets() == 1 and sent[#sent][3] == "none", "then /hello to everyone, not your target")
+C_ChatInfo.PerformEmote("STAND")
+
+reset()
+C_ChatInfo.PerformEmote("SIT")
+runTimers()
+check(greets() == 0, "sitting again within 5 minutes: no second greeting")
+C_ChatInfo.PerformEmote("STAND")
+
+reset()
+t.now = t.now + 301
+SitStandOrDescendStart()
+runTimers()
+check(greets() == 1, "the sit key greets too")
+reset()
+t.now = t.now + 301
+SitStandOrDescendStart() -- stands up
+runTimers()
+check(#timers == 0 and greets() == 0, "the sit key again stands you up: no greeting")
+
+reset()
+SitStandOrDescendStart()
+t.fire("PLAYER_STARTED_MOVING")
+runTimers()
+check(greets() == 0, "walking off before 5 seconds: no greeting")
+
+reset()
+C_ChatInfo.PerformEmote("SIT")
+C_ChatInfo.PerformEmote("STAND")
+C_ChatInfo.PerformEmote("SIT")
+runTimers()
+check(greets() == 1, "sit, stand, sit: one greeting, from the last sit")
+C_ChatInfo.PerformEmote("STAND")
+
+reset()
+t.now = t.now + 301
+cozy = false
+C_ChatInfo.PerformEmote("SIT")
+runTimers()
+check(greets() == 0, "sitting away from a fire greets no one")
+C_ChatInfo.PerformEmote("STAND")
+cozy = true
+
+reset()
+mounted = true
+SitStandOrDescendStart()
+mounted = false
+runTimers()
+check(#timers == 0 and greets() == 0, "the sit key while mounted doesn't count as sitting")
+
+reset()
+C_ChatInfo.PerformEmote("SIT")
+t.shift = true
+runTimers()
+t.shift = false
+check(greets() == 0, "Shift skips the greeting")
+C_ChatInfo.PerformEmote("STAND")
+
+reset()
+C_ChatInfo.PerformEmote("SIT")
+t.change("EverlookFriendly_greetCampfire", false)
+runTimers()
+check(greets() == 0, "switched off while waiting: no greeting")
+C_ChatInfo.PerformEmote("STAND")
 
 -- In combat the game can hand over the whole list as a secret, which ipairs can't walk.
 reset()
