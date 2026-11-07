@@ -32,8 +32,10 @@ local function profile()
 	pcall(function()
 		out.addons = profiler.GetOverallMetric(last)
 		out.game = profiler.GetApplicationMetric(last)
-		out.addonsOver100, out.gameOver100 = profiler.GetOverallMetric(metric("CountTimeOver100Ms")), profiler.GetApplicationMetric(metric("CountTimeOver100Ms"))
-		out.addonsOver500, out.gameOver500 = profiler.GetOverallMetric(metric("CountTimeOver500Ms")), profiler.GetApplicationMetric(metric("CountTimeOver500Ms"))
+		-- A count the client lacks is skipped: passing nil would throw and lose the busiest addons.
+		local over100, over500 = metric("CountTimeOver100Ms"), metric("CountTimeOver500Ms")
+		if over100 then out.addonsOver100, out.gameOver100 = profiler.GetOverallMetric(over100), profiler.GetApplicationMetric(over100) end
+		if over500 then out.addonsOver500, out.gameOver500 = profiler.GetOverallMetric(over500), profiler.GetApplicationMetric(over500) end
 		out.top = {}
 		for _, result in ipairs(profiler.GetTopKAddOnsForMetric(last, TOP_ADDONS) or {}) do
 			out.top[#out.top + 1] = string.format("%s %.1f", result.addOnName, result.metricValue)

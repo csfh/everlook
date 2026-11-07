@@ -157,4 +157,14 @@ frame(0.016)
 for i = 1, 60 do t.now = t.now + 10 frame(0.3) frame(0.016) end
 check(#P.db.hitches == 50 and P.db.hitches[50].ms == 300, "only the last 50 are kept")
 
+-- A client without the over-100 and over-500 ms counts still records the rest of the profiler.
+Enum = { AddOnProfilerMetric = { LastTime = 3 } }
+C_AddOnProfiler.GetOverallMetric = function(m) assert(m, "metric expected") return 480 end
+C_AddOnProfiler.GetApplicationMetric = function(m) assert(m, "metric expected") return 510 end
+t.now = t.now + 10
+frame(0.3)
+local partial = P.db.hitches[#P.db.hitches].profiler
+check(partial.addons == 480 and partial.top and partial.top[1] == "EverlookUpgrades 470.0" and partial.addonsOver100 == nil,
+	"a client without the hitch counts still records addon time and the busiest addon")
+
 t.done()
