@@ -3,6 +3,7 @@ local QuestRank = Everlook:NewAddon("EverlookQuestRank", {
 	defaults = {
 		rank = false,
 		rank_pin = false,
+		rank_follow = false,
 		-- [name-realm] = { pins = { questID in pin order }, activity = { [questID] = n }, counter = n }
 		characters = {},
 	},
@@ -20,6 +21,7 @@ EverlookQA:Expect("EverlookQuestRank", {
 	"C_QuestLog.GetQuestObjectives",
 	"C_QuestLog.IsComplete",
 	"C_SuperTrack.GetSuperTrackedQuestID",
+	"C_SuperTrack.SetSuperTrackedQuestID",
 	"QuestObjectiveTracker.EndLayout",
 	"QuestObjectiveTracker.EnumerateActiveBlocks",
 	"GameTooltip",
@@ -34,6 +36,8 @@ EverlookQA:Expect("EverlookQuestRank", {
 	"CampaignQuestObjectiveTracker.EndLayout",
 	"Constants.QuestWatchConsts.MAX_QUEST_WATCHES",
 	"C_QuestLog.GetDistanceSqToQuest",
+	"C_SuperTrack.IsSuperTrackingAnything",
+	"C_SuperTrack.IsSuperTrackingQuest",
 	"QuestUtil.CanRemoveQuestWatch",
 	"issecretvalue",
 })
@@ -136,6 +140,7 @@ local snapshots = {} -- [questID] = { sig, count, onMap }; in memory, so a reloa
 local lastSuper -- the super-tracked quest we last saw
 local pending = false -- an apply waits for combat or Shift to end
 local refused -- the target the game didn't take last time, so we don't fight it
+local followed -- the quest we last super-tracked as the tracker's top
 
 local function asSet(list)
 	local set = {}
@@ -205,15 +210,27 @@ local function sameMembers(a, b)
 	return true
 end
 
+-- Super-tracks the tracker's top quest, once each time a new quest reaches the top: a quest you
+-- super-track yourself, or clearing it, holds until the top changes. A map pin, waypoint or
+-- other non-quest target you super-track is yours, and is left alone.
+local function follow()
+	if not QuestRank.db.rank_follow then return end
+	local top = watches()[1]
+	if not top or top == followed then return end
+	local anything = C_SuperTrack.IsSuperTrackingAnything and C_SuperTrack.IsSuperTrackingAnything()
+	local quest = C_SuperTrack.IsSuperTrackingQuest and C_SuperTrack.IsSuperTrackingQuest()
+	if readable(anything) and readable(quest) and anything == true and quest == false then return end
+	followed = top
+	local current = C_SuperTrack.GetSuperTrackedQuestID()
+	if readable(current) and current == top then return end
+	-- Our own change: SUPER_TRACKING_CHANGED sees it as already known, so it isn't activity.
+	lastSuper = top
+	C_SuperTrack.SetSuperTrackedQuestID(top)
+end
+
 -- Puts the watch list in rank order. The tracker lists quests in watch order
 -- (QuestObjectiveTrackerMixin:BuildQuestWatchInfos, 12.0.0).
-function QuestRank.Apply()
-	if not QuestRank.db.rank then return end
-	if InCombatLockdown() or IsShiftKeyDown() then
-		pending = true
-		return
-	end
-	pending = false
+local function order()
 	if not canChange() then return end
 
 	local state = character()
@@ -247,6 +264,17 @@ function QuestRank.Apply()
 	lastSet = asSet(now)
 	local after = table.concat(now, ",")
 	refused = after ~= wanted and wanted or nil
+end
+
+function QuestRank.Apply()
+	if not QuestRank.db.rank then return end
+	if InCombatLockdown() or IsShiftKeyDown() then
+		pending = true
+		return
+	end
+	pending = false
+	order()
+	follow()
 end
 
 local function objectives(questID)
@@ -402,6 +430,9 @@ function QuestRank:Start()
 	local super = C_SuperTrack.GetSuperTrackedQuestID()
 	lastSuper = readable(super) and super or nil
 	lastSet = asSet(watches())
+	-- After a login or reload the top is taken as followed already, so a super-track you cleared
+	-- or changed holds until a new quest reaches the top.
+	followed = watches()[1]
 	QuestRank.RefreshAll()
 	sweepSoon()
 end
@@ -409,7 +440,7 @@ end
 -- Gives the order back to the game; every watch stays as it is.
 function QuestRank:Stop()
 	for _, event in ipairs(EVENTS) do self:UnregisterEvent(event) end
-	snapshots, lastSet, pending, refused = {}, nil, false, nil
+	snapshots, lastSet, pending, refused, followed = {}, nil, false, nil, nil
 	C_QuestLog.SortQuestWatches()
 	QuestRank.RefreshAll()
 end
@@ -420,6 +451,8 @@ function QuestRank:OnInitialize()
 		"Keeps the quests you're working on at the top of the quest tracker. A quest you make progress on, finish, super-track or walk into the area of moves to the top and is tracked; when the tracker is full, the quest with the oldest activity is untracked. A quest you untrack yourself comes back on its next activity. Waits for combat to end and while you hold Shift. Turning it off gives the order back to the game.")
 	page:Checkbox("rank_pin", "Alt-click to pin",
 		"Alt-click a quest's title in the tracker to pin it above every other quest; Alt-click it again to unpin. Pinned quests show the Everlook mark. Needs Rank the quest tracker to be on.")
+	page:Checkbox("rank_follow", "Follow the top quest",
+		"Super-tracks the quest at the top of the tracker, so the map arrow and waypoint lead to it. It changes each time a new quest reaches the top; a quest you super-track yourself holds until then, and a map pin or waypoint you set is left alone. Waits for combat to end and while you hold Shift. Turning it off leaves the quest super-tracked as it is. Needs Rank the quest tracker to be on.")
 end
 
 function QuestRank:OnEnable()
@@ -433,6 +466,9 @@ function QuestRank:OnSettingChanged(key, value)
 		if value then self:Start() else self:Stop() end
 	elseif key == "rank_pin" and self.db.rank then
 		QuestRank.RefreshAll()
+		sweepSoon()
+	elseif key == "rank_follow" and self.db.rank then
+		followed = nil
 		sweepSoon()
 	end
 end

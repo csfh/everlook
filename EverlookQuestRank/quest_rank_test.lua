@@ -57,7 +57,17 @@ C_QuestLog = {
 	IsComplete = function(id) return quest(id).complete == true end,
 	GetDistanceSqToQuest = function(id) return quest(id).distance or 100 end,
 }
-C_SuperTrack = { GetSuperTrackedQuestID = function() return super end }
+local pinTracked = false -- a map pin super-tracked instead of a quest
+C_SuperTrack = {
+	GetSuperTrackedQuestID = function() return super end,
+	SetSuperTrackedQuestID = function(id)
+		super, pinTracked = id, false
+		t.log("super " .. id)
+		fire("SUPER_TRACKING_CHANGED")
+	end,
+	IsSuperTrackingAnything = function() return pinTracked or super ~= 0 end,
+	IsSuperTrackingQuest = function() return not pinTracked and super ~= 0 end,
+}
 Constants = { QuestWatchConsts = { MAX_QUEST_WATCHES = cap } }
 UnitName = function() return "Hero" end
 GetRealmName = function() return "Realm" end
@@ -276,13 +286,57 @@ check(order() == "105 104 103", "a client that appends gets the order right afte
 progress(102)
 check(order() == "102 105 104", "and from then on")
 
+-- Follow the top quest
+check(super == 102, "following starts off and super-tracks nothing")
+super = 0
+QR.db.rank_follow = true
+QR:OnSettingChanged("rank_follow", true)
+run()
+check(super == 102 and order() == "102 105 104", "on: the top quest is super-tracked")
+local before = QR.db.characters["Hero-Realm"].counter
+progress(104)
+check(order() == "104 102 105" and super == 104, "a new quest at the top is super-tracked")
+check(QR.db.characters["Hero-Realm"].counter == before + 1, "and following it counts as no activity of its own")
+t.reset()
+t.fire("QUEST_LOG_UPDATE")
+run()
+check(not t.has("super 104"), "the same top is not super-tracked again")
+super = 0
+t.fire("SUPER_TRACKING_CHANGED")
+run()
+check(super == 0, "clearing it yourself holds")
+progress(105)
+check(order() == "105 104 102" and super == 105, "until a new quest reaches the top")
+pinTracked, super = true, 0
+progress(102)
+check(order() == "102 105 104" and pinTracked and super == 0, "a map pin you super-track is left alone")
+pinTracked = false
+t.combat = true
+progress(104)
+check(super == 0, "nothing is super-tracked in combat")
+t.combat = false
+t.fire("PLAYER_REGEN_ENABLED")
+run()
+check(order() == "104 102 105" and super == 104, "and the top is followed when combat ends")
+super = 0
+QR:Stop()
+QR:Start()
+run()
+check(super == 0, "after a reload, a super-track you cleared still holds")
+progress(102)
+check(order() == "102 104 105" and super == 102, "until a new quest reaches the top")
+QR.db.rank_follow = false
+QR:OnSettingChanged("rank_follow", false)
+progress(105)
+check(order() == "105 102 104" and super == 102, "turned off, the super-tracked quest stays as it is")
+
 -- Off
 t.reset()
 QR.db.rank = false
 QR:OnSettingChanged("rank", false)
-check(t.has("sort") and order() == "102 105 104", "turning it off gives the order back to the game and keeps the watches")
+check(t.has("sort") and order() == "105 102 104", "turning it off gives the order back to the game and keeps the watches")
 progress(103)
-check(order() == "102 105 104", "and changes nothing after")
+check(order() == "105 102 104", "and changes nothing after")
 layout()
 local drawn = false
 for _, frame in ipairs(made) do if frame.shown then drawn = true end end
