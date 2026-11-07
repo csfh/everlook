@@ -20,6 +20,7 @@ EverlookQA:Expect("EverlookPerformance", {
 }, {
 	"C_AddOnProfiler.GetOverallMetric",
 	"Enum.AddOnProfilerMetric.LastTime",
+	"Enum.AddOnProfilerMetric.CountTimeOver100Ms",
 	"Enum.AddOnProfilerMetric.CountTimeOver500Ms",
 	"GetRealZoneText",
 	"GetSubZoneText",
