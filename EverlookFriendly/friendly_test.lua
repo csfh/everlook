@@ -168,6 +168,33 @@ buff("target")
 runTimers()
 check(#sent == 1, "on again: thanks resume")
 
+-- Logging in, reloading or zoning: the game adds back the buffs you already have, some unnamed.
+reset()
+t.now = t.now + 301
+t.fire("PLAYER_ENTERING_WORLD", true, false)
+buff(nil)
+buff("target")
+t.now = t.now + 4
+buff(nil)
+runTimers()
+check(#sent == 0 and #timers == 0, "buffs added back after a loading screen get no /thank and no whisper")
+t.now = t.now + 2
+buff("target")
+runTimers()
+check(#sent == 1 and sent[1][2] == "WHISPER", "a few seconds later, a new buff is thanked again")
+
+-- A buff that started a while ago is one you already had, whenever it shows up.
+reset()
+t.now = t.now + 301
+t.fire("UNIT_AURA", "player", { addedAuras = { { isHelpful = true, isFromPlayerOrPlayerPet = true,
+	duration = 1800, expirationTime = t.now + 1200 } } })
+runTimers()
+check(#sent == 0 and #timers == 0, "an old buff showing up again is not thanked")
+t.fire("UNIT_AURA", "player", { addedAuras = { { isHelpful = true, isFromPlayerOrPlayerPet = true,
+	duration = 1800, expirationTime = t.now + 1800 } } })
+runTimers()
+check(#sent == 1 and sent[1][1] == "emote THANK", "the same buff cast just now is")
+
 -- In combat the game can hand over the whole list as a secret, which ipairs can't walk.
 reset()
 t.now = t.now + 301

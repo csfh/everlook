@@ -27,6 +27,11 @@ local MESSAGE = "Thank you!"
 local DELAY = 4
 -- One thank-you per player in this long, so a rebuff or a handful of buffs at once is one whisper.
 local QUIET = 300
+-- After a loading screen (login, /reload, a zone change) the game adds back every aura you already
+-- have, some with no caster yet; none of them is a buff that just landed. They're ignored this long.
+local SETTLE = 5
+-- A buff cast just now started at most this many seconds ago.
+local FRESH = 1
 
 -- A player the game can't name (no unit token) shares this key.
 local UNKNOWN = "unknown"
@@ -36,6 +41,7 @@ local thanked = {} -- [guid] = GetTime() of the last one
 -- One buff can land as several auras, some naming the caster and some not. An unknown caster's
 -- thank-you is dropped when a named player's buff landed this close to it: they were thanked.
 local lastNamed -- GetTime() a named stranger's buff last landed
+local settled = 0 -- GetTime() after which auras count again
 
 local function secret(value)
 	return issecretvalue and issecretvalue(value)
@@ -52,8 +58,16 @@ end
 -- Who to thank for a buff that just landed on you: guid, name for another player outside your group,
 -- UNKNOWN, false when the game has no unit token for the caster, or nil for no one. Group members
 -- always have a token, so an unknown caster is never one of them.
+-- False for a timed aura that started before just now, one you already had.
+local function fresh(aura)
+	local duration, expires = aura.duration, aura.expirationTime
+	if secret(duration) or secret(expires) or type(duration) ~= "number" or type(expires) ~= "number" then return true end
+	if duration <= 0 then return true end
+	return expires - duration >= GetTime() - FRESH
+end
+
 local function stranger(aura)
-	if not aura or secret(aura.isHelpful) or not aura.isHelpful then return nil end
+	if not aura or secret(aura.isHelpful) or not aura.isHelpful or not fresh(aura) then return nil end
 	local unit = aura.sourceUnit
 	if unit == nil then
 		-- Only a buff a player cast; a campfire, an object or a world buff has no caster to thank.
@@ -94,6 +108,7 @@ end
 
 function Friendly:UNIT_AURA(_, unit, updateInfo)
 	if unit ~= "player" or not self.db.thankBuffs or not updateInfo or secret(updateInfo) then return end
+	if GetTime() < settled then return end
 	-- The whole list can be secret (in combat, in instances); nothing in it can be read then.
 	local added = updateInfo.addedAuras
 	if not added or secret(added) then return end
@@ -116,6 +131,11 @@ function Friendly:OnInitialize()
 			.. " everyone around you outside one. Hold Shift to skip.")
 end
 
+function Friendly:PLAYER_ENTERING_WORLD()
+	settled = GetTime() + SETTLE
+end
+
 function Friendly:OnEnable()
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("UNIT_AURA")
 end
