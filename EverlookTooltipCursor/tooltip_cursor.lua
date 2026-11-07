@@ -3,6 +3,7 @@ local TooltipCursor = Everlook:NewAddon("EverlookTooltipCursor", {
 	defaults = {
 		followCursor = true,
 		onTop = true,
+		hideInCombat = false,
 	},
 })
 
@@ -14,6 +15,9 @@ EverlookQA:Expect("EverlookTooltipCursor", {
 	"GameTooltip.HookScript",
 	"GameTooltip.GetFrameStrata",
 	"GameTooltip.SetFrameStrata",
+	"GameTooltip.Hide",
+	"InCombatLockdown",
+	"IsShiftKeyDown",
 })
 
 -- Offset of the tooltip's corner from the pointer, so the pointer stays visible.
@@ -34,6 +38,8 @@ function TooltipCursor:OnInitialize()
 		"Moves the game's default tooltip just off the mouse pointer and keeps it there as you move.")
 	page:Checkbox("onTop", "Keep the tooltip above the action bars",
 		"Puts the game's tooltip back in the top layer whenever it shows, so it never draws under the action bars, for example while you drag a spell onto them.")
+	page:Checkbox("hideInCombat", "Hide tooltips in combat",
+		"Hides the game's tooltip while you're in combat, for action buttons, units, bags and everything else. Hold Shift as you point at something to see its tooltip anyway.")
 end
 
 -- The game places its default tooltip through GameTooltip_SetDefaultAnchor; one hook moves them all.
@@ -46,7 +52,13 @@ function TooltipCursor:OnEnable()
 		if self.db.onTop then keepOnTop(tooltip) end
 	end)
 	-- Tooltips placed some other way, such as the spellbook's, still pass through OnShow.
+	-- Every tooltip passes through OnShow, so in combat it is hidden again as soon as it shows,
+	-- unless Shift is held (Shift pauses what Everlook does for the player).
 	GameTooltip:HookScript("OnShow", function(tooltip)
+		if self.db.hideInCombat and InCombatLockdown() and not IsShiftKeyDown() then
+			tooltip:Hide()
+			return
+		end
 		if self.db.onTop then keepOnTop(tooltip) end
 	end)
 end

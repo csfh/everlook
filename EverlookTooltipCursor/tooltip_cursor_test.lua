@@ -55,6 +55,24 @@ GameTooltip.hooks.OnShow(GameTooltip)
 hooks.GameTooltip_SetDefaultAnchor(GameTooltip, parent)
 check(GameTooltip.strata == "LOW", "turned off, its layer is left as it is")
 
+-- Hiding it in combat.
+function GameTooltip:Hide() self.shown = false end
+check(C.db.hideInCombat == false, "hiding tooltips in combat starts off")
+GameTooltip.shown = true
+t.combat = true
+GameTooltip.hooks.OnShow(GameTooltip)
+check(GameTooltip.shown, "off: the tooltip shows in combat")
+t.change("EverlookTooltipCursor_hideInCombat", true)
+GameTooltip.hooks.OnShow(GameTooltip)
+check(not GameTooltip.shown, "on: a tooltip that shows in combat is hidden")
+GameTooltip.shown, t.shift = true, true
+GameTooltip.hooks.OnShow(GameTooltip)
+check(GameTooltip.shown, "holding Shift shows it anyway")
+t.shift, t.combat = false, false
+GameTooltip.hooks.OnShow(GameTooltip)
+check(GameTooltip.shown, "out of combat it shows")
+t.change("EverlookTooltipCursor_hideInCombat", false)
+
 owner = nil
 t.change("EverlookTooltipCursor_followCursor", false)
 hooks.GameTooltip_SetDefaultAnchor(GameTooltip, parent)

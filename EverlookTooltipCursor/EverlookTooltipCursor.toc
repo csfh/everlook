@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: Tooltip Cursor
-## Notes: The tooltip follows the cursor and stays above the action bars.
+## Notes: The tooltip follows the cursor, stays above the action bars, and can stay hidden in combat.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook
