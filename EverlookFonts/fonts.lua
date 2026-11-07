@@ -1,13 +1,11 @@
--- Sets Everlook's five font tokens (Everlook/font_tokens.lua): Heading, Body, Small, Chat and
--- Number, each a font and a size. Everlook's own text uses the tokens as they are. The game's own
--- text takes the font of the token its role belongs to and keeps its own size, which one
--- adjustment can change. Waits while you're in combat, and going back to the game's font puts back
--- the fonts it found. The font files and their licences are in assets/ (see assets/fonts.txt).
-local defaults = { setSizes = false, sizeOffset = 0 }
-for _, token in ipairs(Everlook.FONT_TOKENS) do
-	defaults[token:lower() .. "Face"] = "game"
-	defaults[token:lower() .. "Size"] = Everlook.FONT_TOKEN_DEFAULTS[token].size
-end
+-- Chooses the font of Everlook's five font tokens (Everlook/font_tokens.lua): Heading, Body,
+-- Small, Chat and Number. Everlook's own text uses the tokens, at the core's fixed scale. The game's
+-- own text takes the font of the token its role belongs to and keeps its own size: sizes are the
+-- game's, UI Scale's and each addon's for its own text, never this addon's. Waits while you're in
+-- combat, and going back to the game's font puts back the fonts it found. The font files and their
+-- licences are in assets/ (see assets/fonts.txt).
+local defaults = {}
+for _, token in ipairs(Everlook.FONT_TOKENS) do defaults[token:lower() .. "Face"] = "game" end
 local Fonts = Everlook:NewAddon("EverlookFonts", { label = "Fonts", defaults = defaults })
 
 -- Game functions this addon needs; EverlookQA checks they exist. Fonts and frames that load on
@@ -142,9 +140,6 @@ local originals = setmetatable({}, { __mode = "k" })
 local tokens = setmetatable({}, { __mode = "k" })
 local constants = {}
 local compactNames = setmetatable({}, { __mode = "k" })
--- The unit frame names EverlookUnitFrames sizes (player, target, focus, their targets, party and
--- boss) get the font but not the size adjustment. Pet and raid-style names get both.
-local unitNames = setmetatable({}, { __mode = "k" })
 local hooked = {}
 -- A full pass walks every font and frame, so it runs only when something may have changed:
 -- another addon loaded, a pass was blocked by combat, or a choice changed.
@@ -159,13 +154,13 @@ local function unsupported()
 	return UNSUPPORTED_LOCALES[GetLocale()] == true
 end
 
--- What a pass gives the game's text: each token's file while a font is chosen for it (nil for the
--- game's own), and the size adjustment while Change the game's font sizes is on.
+-- What a pass gives the game's text: each token's file while a font is chosen for it, nil for the
+-- game's own.
 local function wanted()
 	local db = Fonts.db
 	local files = {}
 	for _, token in ipairs(Everlook.FONT_TOKENS) do files[token] = Fonts.FaceFile(db[token:lower() .. "Face"]) end
-	return { files = files, offset = db.setSizes and db.sizeOffset or 0 }
+	return { files = files }
 end
 
 local function sameFiles(choice, other)
@@ -176,14 +171,14 @@ local function sameFiles(choice, other)
 end
 
 local function same(choice, other)
-	return choice ~= nil and sameFiles(choice, other) and choice.offset == other.offset
+	return choice ~= nil and sameFiles(choice, other)
 end
 
 local function empty(choice)
 	for _, token in ipairs(Everlook.FONT_TOKENS) do
 		if choice.files[token] then return false end
 	end
-	return choice.offset == 0
+	return true
 end
 
 local function fontObjectOf(object)
@@ -249,12 +244,11 @@ end
 
 -- `font` is the file to give the text, or nil for the one it had before this addon set it.
 -- Text this addon hasn't set stays as it is while nothing would change it.
-local function replace(object, font, offset)
+local function replace(object, font)
 	if not object or not object.GetFont or not object.SetFont then return end
 	if object.IsForbidden and object:IsForbidden() then return end
-	if unitNames[object] then offset = 0 end
 	local original = originals[object]
-	if not original and not font and offset == 0 then return end
+	if not original and not font then return end
 	local path, size, flags = object:GetFont()
 	if not path or not size then return end
 	local seenBefore = original ~= nil
@@ -266,23 +260,10 @@ local function replace(object, font, offset)
 	end
 	original.font = font or original[1]
 	original.earlierSize = original.lastSize
-	original.lastSize = math.max(6, original[2] + offset)
+	original.lastSize = original[2]
 	-- A later pass leaves text it already set where it is.
 	if seenBefore and path == original.font and size == original.lastSize then return end
 	object:SetFont(original.font, original.lastSize, flags)
-end
-
--- A chat window's size belongs to its tab, so it stays. A window opened after ChatFontNormal
--- changed copied this addon's font, and goes back to the font ChatFontNormal had.
-local function replaceChat(frame, file)
-	if frame.IsForbidden and frame:IsForbidden() then return end
-	local path, size, flags = frame:GetFont()
-	if not path or not size then return end
-	if not originals[frame] then
-		local source = ChatFontNormal and originals[ChatFontNormal]
-		originals[frame] = { ours(path) and source and source[1] or path, nil, flags }
-	end
-	frame:SetFont(file, size, flags)
 end
 
 local function chatFrames()
@@ -301,33 +282,26 @@ end
 -- its own font.
 local function nameTexts()
 	local list = {}
-	local function add(text, sized)
-		if type(text) ~= "table" then return end
-		list[#list + 1] = text
-		if sized then unitNames[text] = true end
+	local function add(text)
+		if type(text) == "table" then list[#list + 1] = text end
 	end
-	add(PlayerName, true)
+	add(PlayerName)
 	add(PetName)
 	for _, key in ipairs({ "TargetFrame", "FocusFrame" }) do
 		local frame = _G[key]
 		if type(frame) == "table" then
 			local content = frame.TargetFrameContent
 			local main = type(content) == "table" and content.TargetFrameContentMain
-			if type(main) == "table" then add(main.Name, true) end
-			if type(frame.totFrame) == "table" then add(frame.totFrame.Name, true) end
+			if type(main) == "table" then add(main.Name) end
+			if type(frame.totFrame) == "table" then add(frame.totFrame.Name) end
 		end
 	end
 	local pool = type(PartyFrame) == "table" and PartyFrame.PartyMemberFramePool
 	if type(pool) == "table" and type(pool.EnumerateActive) == "function" then
 		for member in pool:EnumerateActive() do
-			add(member.Name, true)
+			add(member.Name)
 			if type(member.PetFrame) == "table" then add(member.PetFrame.Name) end
 		end
-	end
-	-- Boss names keep the token of their own font, so they aren't in the list, only spared the adjustment.
-	for i = 1, MAX_BOSS_FRAMES or 5 do
-		local boss = _G["Boss" .. i .. "TargetFrame"]
-		if type(boss) == "table" and type(boss.name) == "table" then unitNames[boss.name] = true end
 	end
 	for text in pairs(compactNames) do add(text) end
 	return list
@@ -348,7 +322,7 @@ local function refreshNames()
 		return
 	end
 	local choice = wanted()
-	for _, text in ipairs(nameTexts()) do replace(text, nameFont(choice), choice.offset) end
+	for _, text in ipairs(nameTexts()) do replace(text, nameFont(choice)) end
 end
 
 -- Party members and raid-style frames are made after login, so their names change as each one
@@ -367,7 +341,7 @@ local function hookNameFrames()
 				return
 			end
 			local choice = wanted()
-			replace(frame.name, nameFont(choice), choice.offset)
+			replace(frame.name, nameFont(choice))
 		end)
 		hooked.compact = true
 	end
@@ -402,7 +376,7 @@ local function restyleLabel(label)
 	end
 	local file = passed.files[tokenOf(label)]
 	if showsRangeDot(label) then file = gameFile(label) end
-	replace(label, file, passed.offset)
+	replace(label, file)
 end
 
 local function hotkeyChanged(button)
@@ -469,7 +443,7 @@ local function restyleRegions(pass, ...)
 			and not follows(region, pass.kept) and not follows(region, pass.tokens) then
 			local file = pass.names[region] and nameFont(pass) or pass.files[tokenOf(region)]
 			if showsRangeDot(region) then file = gameFile(region) end
-			replace(region, file, pass.offset)
+			replace(region, file)
 			pass.names[region] = nil
 		end
 	end
@@ -578,8 +552,8 @@ local function beginPass()
 	for name in pairs(CHAT_FONT_NAMES) do
 		if _G[name] then chatFonts[_G[name]] = true end
 	end
+	-- Chat windows are EverlookChat's (AGENTS.md's ownership table), so the walk leaves them be.
 	for _, frame in ipairs(chatFrames()) do
-		if choice.files.Chat then replaceChat(frame, choice.files.Chat) end
 		local own = fontObjectOf(frame)
 		if own and not chatFonts[own] then kept[own] = true end
 	end
@@ -601,7 +575,7 @@ local function beginPass()
 	local names = {}
 	for _, text in ipairs(nameTexts()) do names[text] = true end
 	return {
-		files = choice.files, offset = choice.offset,
+		files = choice.files,
 		kept = kept, tokens = ownTokens, names = names, frame = false, candidates = candidates, at = 0,
 	}
 end
@@ -616,7 +590,7 @@ local function walkFonts(pass, limitMs)
 		local object = candidates[pass.at]
 		if object.GetObjectType and (not object.IsForbidden or not object:IsForbidden())
 			and object:GetObjectType() == "Font" and not follows(object, pass.kept) and not isToken(object) then
-			replace(object, pass.files[tokenOf(object)], pass.offset)
+			replace(object, pass.files[tokenOf(object)])
 		end
 		-- Reading the clock costs next to nothing; checking after each one keeps a slice in its limit.
 		if began and clock() - began >= limitMs then return true end
@@ -650,7 +624,7 @@ local function finish(pass)
 		debugRecord.finished = debugRecord.finished + 1
 		local files = {}
 		for _, token in ipairs(Everlook.FONT_TOKENS) do files[#files + 1] = token .. " " .. tostring(pass.files[token]) end
-		debugRecord.choice = table.concat(files, " / ") .. " / " .. tostring(pass.offset)
+		debugRecord.choice = table.concat(files, " / ")
 		pcall(snapshot, "pass finished")
 		if not lateShot and C_Timer and C_Timer.After then
 			lateShot = true
@@ -658,7 +632,7 @@ local function finish(pass)
 		end
 	end
 	-- Party members and raid-style frames hang under frames this walk can miss.
-	for text in pairs(pass.names) do replace(text, nameFont(pass), pass.offset) end
+	for text in pairs(pass.names) do replace(text, nameFont(pass)) end
 end
 
 -- One slice of the pass. True while work is left; combat pauses it. A request that came in during
@@ -719,11 +693,11 @@ end
 -- pass asks for a pass, and a burst of requests is answered by one pass, a few milliseconds a frame.
 function Fonts:Apply()
 	-- Everlook's tokens are this addon's own font objects, set at once, in combat too. A client
-	-- whose alphabet none of the fonts draw keeps the game's file in them, at the chosen size.
+	-- whose alphabet none of the fonts draw keeps the game's file in them.
 	for _, token in ipairs(Everlook.FONT_TOKENS) do
 		local key = token:lower()
 		local file = not unsupported() and Fonts.FaceFile(self.db[key .. "Face"]) or nil
-		Everlook.SetFontToken(token, file, self.db[key .. "Size"])
+		Everlook.SetFontToken(token, file)
 	end
 	if empty(wanted()) then return restoreAll() end
 	if unsupported() then return end
@@ -737,7 +711,7 @@ local ROLES = {
 	Heading = "titles: windows, quests, sections and tooltip headers",
 	Body = "most of the interface's text",
 	Small = "small print: labels, captions and timers",
-	Chat = "chat windows, chat bubbles, nameplates and unit frame names",
+	Chat = "the chat input, chat bubbles, nameplates and unit frame names (Chat sets the chat windows' font)",
 	Number = "numbers: health and power, damage, cooldowns, counts and key bindings",
 }
 
@@ -748,15 +722,7 @@ function Fonts:OnInitialize()
 		page:Dropdown(key .. "Face", token .. " font",
 			"The font for " .. ROLES[token] .. ", in the game's text and in Everlook's. A font file added while the game is running shows only after a full restart.",
 			choices)
-		page:Slider(key .. "Size", token .. " size",
-			"The size of Everlook's own " .. token:lower() .. " text. The game's text keeps its own sizes; Change the game's font sizes adjusts those.",
-			6, 32, 1, function(value) return value .. " pt" end)
 	end
-	page:Checkbox("setSizes", "Change the game's font sizes",
-		"Adds Font size adjustment to every font in the game's text. Chat windows keep the size set on their tab, and unit frame names take theirs from Unit Frames.")
-	page:Slider("sizeOffset", "Font size adjustment",
-		"Points added to each of the game's fonts' own size; nothing goes below 6. Needs Change the game's font sizes.",
-		-4, 8, 1, function(value) return (value > 0 and "+" or "") .. value .. " pt" end)
 end
 
 function Fonts:OnEnable()

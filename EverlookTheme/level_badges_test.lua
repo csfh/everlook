@@ -21,6 +21,14 @@ local badge = badgeOn(member)
 check(badge and badge.text.text == "17" and badge.shown, "after combat a party member gets a badge with its level")
 check(badge.atlas == nil and panelOn(badge) and panelOn(badge).fill, "a flat one: a panel, no artwork")
 check(badge.text.fontObject == Everlook.Font.Number, "its number is in Everlook's Number token")
+local sets = 0
+local setText = badge.text.SetText
+badge.text.SetText = function(self, text) sets = sets + 1 return setText(self, text) end
+badge.text.fontObject = nil
+Everlook.SetFontToken("Number", "Interface\\AddOns\\EverlookFonts\\assets\\manrope.ttf")
+check(badge.text.fontObject == Everlook.Font.Number and sets >= 2 and badge.text.text == "17",
+	"the Number token given another font: the badge gets its font again and redraws its number")
+badge.text.SetText = nil
 check(badgeOn(PlayerFrame) == nil, "the player frame keeps the badge it already has")
 levels.party1 = -1
 t.fire("UNIT_LEVEL", "party1")

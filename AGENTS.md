@@ -61,14 +61,18 @@ code fails on secret values.
   | Owner | What only it changes |
   | --- | --- |
   | `EverlookTheme` | Art textures, and the panels it draws |
-  | `EverlookFonts` | Fonts and text, and the font tokens' fonts and sizes |
+  | `EverlookFonts` | Fonts, and the font tokens' fonts; never sizes (those are the game's, UI Scale's, and each addon's for its own text) |
   | `EverlookUnitFrames` | Portraits and unit frame layout |
-  | `EverlookChat` | Chat messages |
+  | `EverlookChat` | Chat messages, and the chat windows' font, outline and shadow (their size is the tab's) |
 
   Where two of them work on the same frame, each touches only its own part or its own child
   frames.
 - Everlook's own text takes a font token: `text:SetFontObject(Everlook.Font.Body)` (Heading, Body,
   Small, Chat or Number; `Everlook/font_tokens.lua`). Only EverlookFonts sets a token.
+- A font setting shows at once. When a setting or a token changes the font, size or outline of an
+  addon's text, the addon gives each font string its font object again and sets its text afresh,
+  since a font string doesn't always redraw when its font object changes. It follows token
+  changes with `hooksecurefunc(Everlook, "SetFontToken", ...)`; its test checks the redraw.
 - An accent line Everlook draws is 2 interface units thick and never thinner than 2 screen
   pixels, as `Theme.LINE` and `Theme.LINE_PIXELS` set it: `Theme.Panel` draws it, and a line of
   an addon's own is sized with `PixelUtil.SetHeight(line, 2, 2)`. One pixel reads as a hairline.

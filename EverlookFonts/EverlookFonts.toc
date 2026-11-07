@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: Fonts
-## Notes: Five font tokens, Heading, Body, Small, Chat and Number, each a font from thirteen and a size, for the game's text and Everlook's.
+## Notes: A font from thirteen for each of five roles, Heading, Body, Small, Chat and Number, in the game's text and Everlook's.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook

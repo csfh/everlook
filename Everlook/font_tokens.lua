@@ -1,7 +1,8 @@
 -- Font tokens: Everlook's own font objects, one per role. An Everlook addon gives its own text a
 -- role with `text:SetFontObject(Everlook.Font.Body)`, and every text on a token follows it when
--- EverlookFonts changes the token's font or size. Only EverlookFonts sets them (AGENTS.md's
--- ownership table); without it, each token is the game's own font for its role, at its size.
+-- EverlookFonts changes the token's font. Only EverlookFonts sets them (AGENTS.md's ownership
+-- table); without it, each token is the game's own font for its role. The sizes are a fixed scale
+-- that keeps Everlook's text in proportion: an addon picks the token whose size suits its text.
 --
 -- The game's own text doesn't use these objects: EverlookFonts gives it the token's font file and
 -- leaves each text its own size.
@@ -45,12 +46,12 @@ function Everlook.FontTokenGameFile(name)
 	return gameFiles[name]
 end
 
--- Sets a token's file (nil for the game's own) and size. For EverlookFonts only.
-function Everlook.SetFontToken(name, file, size)
+-- Sets a token's file, nil for the game's own, at the token's size. For EverlookFonts only.
+function Everlook.SetFontToken(name, file)
 	local font = Everlook.Font[name]
 	if not font then return end
 	fromGame(name)
 	local current, _, flags = font:GetFont()
 	file = file or gameFiles[name] or current
-	if file then font:SetFont(file, size or Everlook.FONT_TOKEN_DEFAULTS[name].size, flags or "") end
+	if file then font:SetFont(file, Everlook.FONT_TOKEN_DEFAULTS[name].size, flags or "") end
 end

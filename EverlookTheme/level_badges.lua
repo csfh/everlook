@@ -51,6 +51,17 @@ local function updateLevels()
 	end
 end
 
+-- When Fonts changes the Number token, each badge gets its font again and its number set afresh,
+-- as a font string doesn't always redraw when its font object changes.
+local function refont(token)
+	if token ~= "Number" then return end
+	for _, badge in Theme.Hosts(KEY) do
+		badge.text:SetFontObject(Everlook.Font.Number)
+		badge.text:SetText("")
+	end
+	updateLevels()
+end
+
 Theme:Surface({
 	key = KEY,
 	label = "Level badges on every unit frame",
@@ -82,5 +93,6 @@ Theme:Surface({
 		Theme:On("PLAYER_TARGET_CHANGED", updateLevels)
 		Theme:On("PLAYER_FOCUS_CHANGED", updateLevels)
 		Theme:On("UNIT_LEVEL", updateLevels)
+		hooksecurefunc(Everlook, "SetFontToken", refont)
 	end,
 })

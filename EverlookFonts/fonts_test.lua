@@ -88,9 +88,12 @@ local F = Everlook:GetAddon("EverlookFonts")
 local TOKENS = { "heading", "body", "small", "chat", "number" }
 local allGame = true
 for _, key in ipairs(TOKENS) do allGame = allGame and F.db[key .. "Face"] == "game" end
-check(allGame and not F.db.setSizes and F.db.sizeOffset == 0, "every token starts on the game's font, size change off at +0")
-check(F.db.headingSize == 14 and F.db.bodySize == 12 and F.db.smallSize == 10 and F.db.chatSize == 13 and F.db.numberSize == 12,
-	"the tokens' sizes start on the scale: 14, 12, 10, 13 and 12")
+check(allGame, "every token starts on the game's font")
+local sizeSettings = 0
+for variable in pairs(t.settings) do
+	if variable:find("^EverlookFonts_") and not variable:find("Face$") then sizeSettings = sizeSettings + 1 end
+end
+check(sizeSettings == 0, "Fonts chooses fonts only: no size settings")
 
 -- The menus: the game's font first, then every font, for every token: which suits what is the
 -- player's call.
@@ -127,9 +130,6 @@ check(GameFontNormal.sets == 0 and ChatFontNormal.sets == 0 and STANDARD_TEXT_FO
 
 for _, key in ipairs({ "heading", "body", "small", "number" }) do F.db[key .. "Face"] = "expressway" end
 F.db.chatFace = "manrope"
-local slider = t.settings.EverlookFonts_sizeOffset.slider
-check(slider.min == -4 and slider.max == 8 and slider.step == 1 and slider.format(2) == "+2 pt",
-	"size slider runs from -4 to +8 points")
 
 -- An unsupported client keeps everything.
 locale = "koKR"
@@ -146,7 +146,8 @@ check(ChatFontNormal.path == MANROPE, "the chat font becomes Manrope, the Chat t
 check(GameTooltipHeaderText.path == EXPRESSWAY and GameTooltipHeaderText.size == 14, "tooltip titles take the Heading token's font")
 check(STANDARD_TEXT_FONT == EXPRESSWAY and DAMAGE_TEXT_FONT == EXPRESSWAY and UNIT_NAME_FONT == MANROPE,
 	"the engine's font globals follow")
-check(ChatFrame1.path == MANROPE and ChatFrame1.size == 16, "chat windows get Manrope and keep their tab's size")
+check(ChatFrame1.path == ARIAL and ChatFrame1.size == 16 and ChatFrame1.sets == 0,
+	"chat windows are left alone: their font is EverlookChat's")
 check(ownFont.path == EXPRESSWAY and inherits.path == EXPRESSWAY, "the game's text changes, own font or inherited")
 check(ObjectiveTrackerLineFont.sets == 0 and trackerLine.sets == 0, "objective tracker fonts are left alone")
 check(PlayerName.path == MANROPE, "unit frame names get Manrope")
@@ -181,32 +182,25 @@ t.fire("PLAYER_ENTERING_WORLD", false, false)
 t.runSchedule()
 check(GameFontNormal.sets == sets, "a zone change doesn't walk everything again")
 
--- Sizes wait for combat to end.
+-- A new choice waits for combat to end, and no text's size ever changes.
 t.combat = true
-t.change("EverlookFonts_setSizes", true)
-t.change("EverlookFonts_sizeOffset", 2)
+t.change("EverlookFonts_bodyFace", "inter")
 t.runSchedule(5)
-check(GameFontNormal.size == 12, "combat holds back changes")
+check(GameFontNormal.path == EXPRESSWAY, "combat holds back changes")
 t.combat = false
 t.fire("PLAYER_REGEN_ENABLED")
 t.runSchedule()
-check(GameFontNormal.size == 14 and ownFont.size == 12 and ChatFrame1.size == 16,
-	"after combat every font grows by the adjustment; chat windows keep their size")
-check(PlayerName.path == MANROPE and PlayerName.size == 10 and bossName.size == 10,
-	"unit frame and boss names keep their size: Unit Frames sets it")
-check(PetName.size == 12, "pet names still grow by the adjustment")
-
-t.change("EverlookFonts_sizeOffset", -8)
-t.runSchedule()
-check(ownFont.size == 6, "nothing goes below 6 points")
-t.change("EverlookFonts_sizeOffset", 2)
+check(GameFontNormal.path:find("inter.ttf"), "after combat the new font is set")
+check(GameFontNormal.size == 12 and ownFont.size == 10 and ChatFrame1.size == 16 and PlayerName.size == 10
+	and bossName.size == 10 and PetName.size == 10, "every text keeps its own size; chat windows their tab's")
+t.change("EverlookFonts_bodyFace", "expressway")
 t.runSchedule()
 
 -- Turning one family off puts that family back.
 interface("game")
 t.runSchedule()
-check(GameFontNormal.path == FRIZ and GameFontNormal.size == 14 and STANDARD_TEXT_FONT == FRIZ,
-	"Expressway off: interface fonts go back, the size change stays")
+check(GameFontNormal.path == FRIZ and GameFontNormal.size == 12 and STANDARD_TEXT_FONT == FRIZ,
+	"Expressway off: interface fonts go back")
 check(ChatFontNormal.path == MANROPE and PlayerName.path == MANROPE, "Manrope stays on chat and names")
 
 -- Another font in its place: from the game's fonts, not on top of the last choice.
@@ -219,7 +213,6 @@ t.runSchedule()
 
 -- Everything off puts back exactly what was there.
 t.change("EverlookFonts_chatFace", "game")
-t.change("EverlookFonts_setSizes", false)
 t.runSchedule()
 check(GameFontNormal.path == FRIZ and GameFontNormal.size == 12, "all off: interface font back to its own size")
 check(ChatFontNormal.path == ARIAL and ChatFontNormal.size == 14 and ChatFrame1.path == ARIAL and ChatFrame1.size == 16,
@@ -322,17 +315,15 @@ end
 check(#wrong == 0, "the game's fonts sort into the five tokens (" .. table.concat(wrong, ", ") .. ")")
 check(F.TokenFor(nil, FRIZ, 10) == "Small" and F.TokenFor(nil, FRIZ, 12) == "Body", "a text's own font sorts by its size")
 
--- Each token's font follows its choices: Everlook's own text takes its font and size.
+-- Each token's font follows its choice, at the core's fixed size.
 t.change("EverlookFonts_bodyFace", "inter")
-t.change("EverlookFonts_bodySize", 15)
 local path, size = Everlook.Font.Body:GetFont()
-check(path:find("inter.ttf") and size == 15, "the Body token takes the chosen font and size")
+check(path:find("inter.ttf") and size == 12, "the Body token takes the chosen font, at its fixed 12 points")
 local smallPath = Everlook.Font.Small:GetFont()
 check(smallPath == EXPRESSWAY, "each token has its own font")
 t.change("EverlookFonts_bodyFace", "game")
 path, size = Everlook.Font.Body:GetFont()
-check(path == Everlook.FontTokenGameFile("Body") and size == 15, "the game's font: the token's own file, at its size")
-t.change("EverlookFonts_bodySize", 12)
+check(path == Everlook.FontTokenGameFile("Body") and size == 12, "the game's font: the token's own file, at its size")
 locale = "koKR"
 t.change("EverlookFonts_bodyFace", "inter")
 check(Everlook.Font.Body:GetFont() == Everlook.FontTokenGameFile("Body"), "a Korean or Chinese client keeps the game's file in the tokens")

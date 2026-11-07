@@ -3,6 +3,9 @@ local Chat = Everlook:NewAddon("EverlookChat", {
 	defaults = {
 		shortLabels = true,
 		timestamps = false,
+		font = "game",
+		outline = "game",
+		shadow = "game",
 	},
 })
 
@@ -17,6 +20,8 @@ EverlookQA:Expect("EverlookChat", {
 	"SetCVar",
 	"GetCVarDefault",
 	"TIMESTAMP_FORMAT_HHMM",
+	"ChatFontNormal",
+	"FCF_OpenTemporaryWindow",
 })
 
 -- Blizzard builds a chat line as format(CHAT_<TYPE>_GET .. message, sender). Replacing those strings
@@ -140,6 +145,84 @@ local function applyTimestamps(on)
 	end
 end
 
+-- The chat windows' font: an Everlook token's file, an outline and a shadow, each its own dropdown
+-- that starts on the game's. The size stays the tab's own (Font Size in its menu), which keeps the
+-- file and outline it finds (FCF_SetChatWindowFontSize, FloatingChatFrame.lua, 12.0.0). Each part
+-- is set only while chosen, and choosing the game's again puts back the game's own: ChatFontNormal,
+-- inherited by every chat window (Fonts.xml), and the core's copy of its file. A window opened later
+-- (FCF_OpenTemporaryWindow) gets the choice too.
+--
+-- The game's chat text has no outline and a black shadow one pixel down and right
+-- (NumberFont_Shadow_Med, Fonts.xml), so neither menu repeats those.
+Chat.OUTLINES = { outline = "OUTLINE", thick = "THICKOUTLINE" }
+Chat.SHADOWS = { none = { 0, 0 }, soft = { 1, 0.5 }, strong = { 2, 1 } } -- offset, alpha
+local EVERLOOK_FONTS = "Interface\\AddOns\\EverlookFonts\\"
+local styled = setmetatable({}, { __mode = "k" }) -- [chat frame] = { font, outline, shadow } this session set
+
+local function chatWindows()
+	local list = {}
+	for _, name in ipairs(CHAT_FRAMES or {}) do
+		local frame = _G[name]
+		if type(frame) == "table" and type(frame.GetFont) == "function" and type(frame.SetFont) == "function"
+			and not (frame.IsForbidden and frame:IsForbidden()) then
+			list[#list + 1] = frame
+		end
+	end
+	return list
+end
+
+local function gameFlags()
+	local _, _, flags = ChatFontNormal and ChatFontNormal:GetFont()
+	return flags or ""
+end
+
+local function styleWindow(frame, db)
+	local set = styled[frame] or {}
+	styled[frame] = set
+	local path, size, flags = frame:GetFont()
+	if not path or not size then return end
+	local file, wantedFlags = path, flags
+	local token = Everlook.Font[db.font]
+	if token then
+		file = token:GetFont() or path
+		set.font = true
+	elseif set.font or path:find(EVERLOOK_FONTS, 1, true) == 1 then
+		-- A window opened while Fonts gave ChatFontNormal one of its files copied that file; on the
+		-- game's font it goes back to the game's too.
+		file = Everlook.FontTokenGameFile("Chat") or path
+		set.font = nil
+	end
+	if Chat.OUTLINES[db.outline] then
+		wantedFlags = Chat.OUTLINES[db.outline]
+		set.outline = true
+	elseif set.outline then
+		wantedFlags = gameFlags()
+		set.outline = nil
+	end
+	if file ~= path or wantedFlags ~= flags then frame:SetFont(file, size, wantedFlags) end
+	if type(frame.SetShadowOffset) ~= "function" then return end
+	local shadow = Chat.SHADOWS[db.shadow]
+	if shadow then
+		frame:SetShadowOffset(shadow[1], -shadow[1])
+		frame:SetShadowColor(0, 0, 0, shadow[2])
+		set.shadow = true
+	elseif set.shadow then
+		local x, y = 1, -1
+		local r, g, b, a = 0, 0, 0, 1
+		if ChatFontNormal and ChatFontNormal.GetShadowOffset then
+			x, y = ChatFontNormal:GetShadowOffset()
+			r, g, b, a = ChatFontNormal:GetShadowColor()
+		end
+		frame:SetShadowOffset(x, y)
+		frame:SetShadowColor(r, g, b, a)
+		set.shadow = nil
+	end
+end
+
+function Chat:ApplyFont()
+	for _, frame in ipairs(chatWindows()) do styleWindow(frame, self.db) end
+end
+
 function Chat:Apply()
 	applyFormats(self.db.shortLabels)
 	if self.db.shortLabels then
@@ -151,6 +234,7 @@ function Chat:Apply()
 			unwrap(frame, held)
 		end
 	end
+	self:ApplyFont()
 end
 
 function Chat:OnInitialize()
@@ -159,6 +243,15 @@ function Chat:OnInitialize()
 		"Say, party, guild, whisper and other lines start with a short label (S, P, G, W, To ...), then the name with no brackets. Numbered channels show just their number.")
 	page:Checkbox("timestamps", "Chat timestamps",
 		"Show the time before each chat line. Turning this off puts the game's own timestamp setting back.")
+	local fonts = { { "game", "Game's font" } }
+	for _, token in ipairs(Everlook.FONT_TOKENS) do fonts[#fonts + 1] = { token, token .. " token" } end
+	page:Dropdown("font", "Chat font",
+		"The font of the chat windows' text: the font Fonts gives one of Everlook's tokens. The size stays the one on each tab's Font Size menu.",
+		fonts)
+	page:Dropdown("outline", "Chat outline", "An outline around the chat windows' text.",
+		{ { "game", "None, the game's" }, { "outline", "Outline" }, { "thick", "Thick outline" } })
+	page:Dropdown("shadow", "Chat shadow", "A shadow behind the chat windows' text.",
+		{ { "game", "The game's" }, { "none", "None" }, { "soft", "Soft" }, { "strong", "Strong" } })
 end
 
 function Chat:OnEnable()
@@ -168,6 +261,11 @@ function Chat:OnEnable()
 	self:RegisterEvent("UPDATE_CHAT_COLOR", "Apply")
 	self:RegisterEvent("UPDATE_CHAT_WINDOWS", "Apply")
 	self:RegisterEvent("UPDATE_FLOATING_CHAT_WINDOWS", "Apply")
+	-- Whisper windows open later, and a token's font can change after ours was set.
+	if type(FCF_OpenTemporaryWindow) == "function" then
+		hooksecurefunc("FCF_OpenTemporaryWindow", function() self:ApplyFont() end)
+	end
+	hooksecurefunc(Everlook, "SetFontToken", function() self:ApplyFont() end)
 end
 
 function Chat:OnSettingChanged(key, value)
@@ -175,5 +273,7 @@ function Chat:OnSettingChanged(key, value)
 		self:Apply()
 	elseif key == "timestamps" then
 		applyTimestamps(value)
+	elseif key == "font" or key == "outline" or key == "shadow" then
+		self:ApplyFont()
 	end
 end

@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: Chat
-## Notes: Short channel labels in chat, without brackets.
+## Notes: Short channel labels in chat, without brackets, and the chat windows' font, outline and shadow.
 ## Version: 0.1.0
 ## Dependencies: Everlook, EverlookPreferences, EverlookQA
 ## Group: Everlook
